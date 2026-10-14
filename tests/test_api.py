@@ -41,10 +41,10 @@ def criar_usuario(client, email="ana@email.com"):
     return resposta.json()["id"]
 
 
-def test_paginas_abrem(client):
-    for pagina in ["/", "/cadastro", "/login", "/painel"]:
-        assert client.get(pagina).status_code == 200
+def test_pagina_inicial_abre(client):
+    assert client.get("/").status_code == 200
     assert client.get("/static/css/style.css").status_code == 200
+    assert client.get("/static/js/script.js").status_code == 200
 
 
 def test_cadastro_e_login(client):

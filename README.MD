@@ -7,9 +7,10 @@ Projeto desenvolvido para o curso de **Análise e Desenvolvimento de Sistemas (A
 ## Funcionalidades
 
 - Página inicial de apresentação
-- Cadastro e login (pelo e-mail)
-- Painel com resumo: total de refeições, dentro e fora da dieta, melhor sequência e porcentagem
-- Cadastrar, editar e excluir refeições
+- API de usuários (cadastro e login pelo e-mail)
+- API de refeições: cadastrar, listar, editar e excluir
+- Resumo da dieta: total de refeições, dentro e fora da dieta e melhor sequência
+- Banco de dados SQLite criado automaticamente
 - API REST documentada automaticamente em `/docs`
 - Testes automáticos com `pytest`
 
@@ -30,7 +31,7 @@ database.py      → conexão com o banco de dados (SQLite)
 models/          → tabelas do banco (usuários e refeições)
 schemas/         → formato e validação dos dados da API
 routes/          → rotas da API e das páginas
-templates/       → páginas HTML (início, cadastro, login, painel)
+templates/       → páginas HTML
 static/css/      → estilos
 static/js/       → scripts das páginas
 tests/           → testes automáticos
@@ -61,6 +62,16 @@ Depois abra no navegador:
 - **Documentação da API:** http://127.0.0.1:8000/docs
 
 O banco `dailyfit.db` é criado automaticamente na primeira execução.
+
+### Usar outro banco (opcional)
+
+Por padrão o projeto usa SQLite. Para usar outro banco, defina a variável `DATABASE_URL` antes de iniciar o servidor (e instale o driver do banco):
+
+```powershell
+# Windows (PowerShell) — exemplo com PostgreSQL
+$env:DATABASE_URL = "postgresql://usuario:senha@localhost:5432/dailyfit"
+uvicorn main:app --reload
+```
 
 ## Rodar os testes
 
