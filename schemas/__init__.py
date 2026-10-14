@@ -1,3 +1,2 @@
-from schemas.usuario import UsuarioCreate, UsuarioResponse
+from schemas.usuario import UsuarioCreate, UsuarioLogin, UsuarioResponse
 from schemas.refeicao import RefeicaoCreate, RefeicaoResponse
-

@@ -1,23 +1,90 @@
 # DailyFit
 
-O **DailyFit** é uma plataforma web voltada para alimentação e organização da rotina. O projeto possui uma interface para acompanhamento de refeições, hábitos e progresso, além de uma API desenvolvida para futuramente realizar o gerenciamento e armazenamento dos dados.
+O **DailyFit** é uma plataforma web para organizar a alimentação e a rotina. O usuário cria uma conta, registra as refeições do dia, marca se estão dentro ou fora da dieta e acompanha o próprio progresso.
+
+Projeto desenvolvido para o curso de **Análise e Desenvolvimento de Sistemas (ADS)**.
+
+## Funcionalidades
+
+- Página inicial de apresentação
+- Cadastro e login (pelo e-mail)
+- Painel com resumo: total de refeições, dentro e fora da dieta, melhor sequência e porcentagem
+- Cadastrar, editar e excluir refeições
+- API REST documentada automaticamente em `/docs`
+- Testes automáticos com `pytest`
+
+## Tecnologias
+
+| Parte | Tecnologia |
+|---|---|
+| Back-end / API | Python, FastAPI |
+| Banco de dados | SQLite + SQLAlchemy |
+| Front-end | HTML, CSS, JavaScript |
+| Testes | pytest |
 
 ## Estrutura do projeto
 
-- `templates/` → contém o `index.html` e demais páginas HTML.
-- `static/css/` → contém os arquivos de estilização CSS.
-- `static/js/` → contém os arquivos JavaScript e funcionalidades da interface.
-- `main.py` → responsável pela API desenvolvida com FastAPI.
+```
+main.py          → inicia a aplicação e registra as rotas
+database.py      → conexão com o banco de dados (SQLite)
+models/          → tabelas do banco (usuários e refeições)
+schemas/         → formato e validação dos dados da API
+routes/          → rotas da API e das páginas
+templates/       → páginas HTML (início, cadastro, login, painel)
+static/css/      → estilos
+static/js/       → scripts das páginas
+tests/           → testes automáticos
+```
 
-## API e servidor
+## Como rodar
 
-Para iniciar o servidor durante o desenvolvimento, o comando utilizado é:
+Requisito: **Python 3.10 ou mais novo**.
 
 ```bash
+# 1. (opcional, recomendado) criar um ambiente virtual
+python -m venv .venv
+# Windows:
+.venv\Scripts\activate
+# Linux/Mac:
+source .venv/bin/activate
+
+# 2. instalar as dependências
+pip install -r requirements.txt
+
+# 3. iniciar o servidor
 uvicorn main:app --reload
+```
 
-Obs: No momento, o servidor não funcionará completamente, pois ainda é necessário que seja desenvolvido e configurado o banco de dados do projeto.
+Depois abra no navegador:
 
-O banco de dados será responsável por armazenar os dados utilizados pelas rotas da API, permitindo que informações como usuários, refeições, hábitos, progresso e outros dados da aplicação sejam registrados e consultados.
+- **App:** http://127.0.0.1:8000
+- **Documentação da API:** http://127.0.0.1:8000/docs
 
-Por isso, a próxima etapa do projeto é a criação e integração do banco de dados com a API. Após essa integração, as rotas poderão gravar e recuperar os dados corretamente.
+O banco `dailyfit.db` é criado automaticamente na primeira execução.
+
+## Rodar os testes
+
+```bash
+pytest
+```
+
+## Rotas da API
+
+| Método | Rota | O que faz |
+|---|---|---|
+| POST | `/usuarios` | Cria um usuário |
+| POST | `/usuarios/login` | Entra com o e-mail |
+| GET | `/usuarios` | Lista usuários |
+| GET | `/usuarios/{id}` | Mostra um usuário |
+| POST | `/usuarios/{id}/refeicoes` | Cadastra uma refeição |
+| GET | `/usuarios/{id}/refeicoes` | Lista as refeições |
+| GET | `/usuarios/{id}/refeicoes/{refeicao_id}` | Mostra uma refeição |
+| PUT | `/usuarios/{id}/refeicoes/{refeicao_id}` | Edita uma refeição |
+| DELETE | `/usuarios/{id}/refeicoes/{refeicao_id}` | Exclui uma refeição |
+| GET | `/usuarios/{id}/resumo` | Métricas da dieta |
+
+## Próximos passos
+
+- Login com senha (hash com `bcrypt`) e token JWT
+- Gráfico de evolução semanal
+- Hábitos e metas personalizadas

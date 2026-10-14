@@ -354,6 +354,33 @@ a {
     transition: 0.3s ease;
 }
 
+/* BOTÃO PRINCIPAL */
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 14px 21px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--branco);
+    background: var(--laranja-principal);
+    border: 1px solid var(--laranja-principal);
+    transition: 0.3s ease;
+}
+
+.btn-primary:hover {
+    color: var(--branco);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(255, 132, 0, 0.30);
+}
+
+.cta-button {
+    margin-bottom: 30px;
+}
+
 /* BOTÃO SECUNDÁRIO */
 
 .btn-secondary {
@@ -412,13 +439,13 @@ a {
     from {
         opacity: 0;
 
-        transform:translateY(25px)cale(0.97);
+        transform: translateY(25px) scale(0.97);
     }
 
     to {
         opacity: 1;
 
-        transform:translateY(0)cale(1);
+        transform: translateY(0) scale(1);
     }
 }
 
@@ -505,7 +532,7 @@ a {
 .progress-circle {
     position: relative;
     width: 115px;
-    height: 15px;
+    height: 115px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -1036,7 +1063,7 @@ a {
 
 .feature:hover .feature-icon {
     background: rgba(255, 132, 0, 0.12);
-    transform:scale(1.05)rotate(-4deg);
+    transform: scale(1.05) rotate(-4deg);
 }
 
 .feature-number {
