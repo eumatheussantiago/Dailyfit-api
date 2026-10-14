@@ -1,17 +1,19 @@
+import os
 from pathlib import Path
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-# O banco é um arquivo SQLite criado automaticamente na pasta do projeto,
-# não importa de qual pasta o servidor seja iniciado.
+# Padrão: arquivo SQLite criado automaticamente na pasta do projeto.
+# Para usar outro banco (ex.: MySQL ou PostgreSQL), defina a variável de
+# ambiente DATABASE_URL — não é preciso mudar o código.
 BASE_DIR = Path(__file__).resolve().parent
-DATABASE_URL = f"sqlite:///{BASE_DIR / 'dailyfit.db'}"
+DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'dailyfit.db'}")
 
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False},  # necessário para SQLite + FastAPI
-)
+# "check_same_thread" só existe no SQLite; os outros bancos não aceitam essa opção
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 

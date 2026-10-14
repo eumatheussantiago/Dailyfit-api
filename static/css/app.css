@@ -94,7 +94,7 @@
     outline: none;
     border-color: var(--laranja-principal);
     background: var(--branco);
-    box-shadow: 0 0 0 3px rgba(255, 132, 0, 0.15);
+    box-shadow: var(--sombra);
 }
 
 .btn-full {
@@ -114,9 +114,9 @@
 .form-erro {
     margin-top: 14px;
     padding: 10px 12px;
-    color: #b42318;
-    background: #fef3f2;
-    border: 1px solid #fecdca;
+    color: var(--laranja-principal);
+    background: var(--fundo);
+    border: 1px solid var(--laranja-principal);
     border-radius: 8px;
     font-size: 13px;
 }
@@ -130,7 +130,7 @@
     padding: 40px 34px;
     background: var(--branco);
     border: 1px solid var(--borda);
-    border-radius: 22px;
+    border-radius: var(--radius);
     box-shadow: var(--sombra);
 }
 
@@ -169,7 +169,7 @@
     padding: 20px;
     background: var(--branco);
     border: 1px solid var(--borda);
-    border-left: 4px solid var(--laranja-principal);
+    border-left: 4px solid var(--verde-escuro);
     border-radius: 14px;
 }
 
@@ -185,7 +185,7 @@
 }
 
 .resumo-dentro { border-left-color: var(--verde-claro); }
-.resumo-fora { border-left-color: #e5484d; }
+.resumo-fora { border-left-color: var(--laranja-principal); }
 .resumo-sequencia { border-left-color: var(--amarelo); }
 
 .porcentagem {
@@ -210,7 +210,7 @@
 
 .porcentagem-barra {
     height: 8px;
-    background: #e7ece8;
+    background: var(--borda);
     border-radius: 20px;
     overflow: hidden;
 }
@@ -239,7 +239,7 @@
     padding: 26px;
     background: var(--branco);
     border: 1px solid var(--borda);
-    border-radius: 18px;
+    border-radius: var(--radius);
 }
 
 .painel-form {
@@ -290,9 +290,9 @@
 }
 
 .opcao-nao input:checked + span {
-    color: #b42318;
-    background: #fef3f2;
-    border-color: #f97066;
+    color: var(--laranja-principal);
+    background: var(--fundo);
+    border-color: var(--laranja-principal);
 }
 
 .opcao input:focus-visible + span {
@@ -364,8 +364,8 @@
 }
 
 .selo-fora {
-    color: #b42318;
-    background: #fef3f2;
+    color: var(--laranja-principal);
+    background: var(--fundo);
 }
 
 .refeicao-acoes {
@@ -392,8 +392,8 @@
 }
 
 .refeicao-acoes .apagar:hover {
-    border-color: #f97066;
-    color: #b42318;
+    border-color: var(--laranja-principal);
+    color: var(--laranja-principal);
 }
 
 

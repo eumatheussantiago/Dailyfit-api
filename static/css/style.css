@@ -374,7 +374,7 @@ a {
 .btn-primary:hover {
     color: var(--branco);
     transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(255, 132, 0, 0.30);
+    box-shadow: var(--sombra);
 }
 
 .cta-button {
