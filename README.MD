@@ -7,6 +7,8 @@ Projeto desenvolvido para o curso de **Análise e Desenvolvimento de Sistemas (A
 ## Funcionalidades
 
 - Página inicial de apresentação
+- Tela de cadastro e login ligadas ao banco (pelo e-mail)
+- Painel provisório com resumo e refeições (será substituído pelo dashboard do grupo)
 - API de usuários (cadastro e login pelo e-mail)
 - API de refeições: cadastrar, listar, editar e excluir
 - Resumo da dieta: total de refeições, dentro e fora da dieta e melhor sequência
@@ -31,7 +33,7 @@ database.py      → conexão com o banco de dados (SQLite)
 models/          → tabelas do banco (usuários e refeições)
 schemas/         → formato e validação dos dados da API
 routes/          → rotas da API e das páginas
-templates/       → páginas HTML
+templates/       → páginas HTML (início, cadastro, login, painel)
 static/css/      → estilos
 static/js/       → scripts das páginas
 tests/           → testes automáticos

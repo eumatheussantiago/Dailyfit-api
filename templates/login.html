@@ -1,0 +1,52 @@
+{% extends "base_app.html" %}
+
+{% block titulo %}Entrar{% endblock %}
+
+{% block nav %}
+<a href="/cadastro" class="btn-cadastro">Criar conta</a>
+{% endblock %}
+
+{% block conteudo %}
+<section class="auth-card">
+    <div class="section-label">ENTRAR</div>
+    <h1>Bem-vindo <span>de volta.</span></h1>
+    <p class="auth-sub">Informe o e-mail usado no cadastro.</p>
+
+    <form id="form-login" class="app-form" novalidate>
+        <label for="email">E-mail</label>
+        <input id="email" name="email" type="email" autocomplete="email" placeholder="voce@email.com" required>
+
+        <p class="form-erro" id="erro" hidden></p>
+
+        <button type="submit" class="btn-primary btn-full">Entrar</button>
+    </form>
+
+    <p class="auth-troca">Ainda não tem conta? <a href="/cadastro">Criar conta</a></p>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    redirecionarSeLogado();
+
+    document.getElementById("form-login").addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        const form = evento.target;
+        const botao = form.querySelector("button");
+        esconderErro("erro");
+        botao.disabled = true;
+
+        try {
+            const usuario = await api("/usuarios/login", {
+                method: "POST",
+                body: { email: form.email.value },
+            });
+            salvarUsuario(usuario);
+            window.location.href = "/painel";
+        } catch (erro) {
+            mostrarErro("erro", erro.message);
+            botao.disabled = false;
+        }
+    });
+</script>
+{% endblock %}
