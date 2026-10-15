@@ -51,6 +51,12 @@ tests/           → testes automáticos
 
 ## Como rodar
 
+### Jeito mais fácil (Windows)
+
+Dê **dois cliques no arquivo `iniciar.bat`**. Ele instala tudo na primeira vez e abre o app no navegador. Só precisa ter o [Python](https://www.python.org/downloads/) instalado (marque **"Add python.exe to PATH"** na instalação).
+
+### Pelo terminal
+
 Requisito: **Python 3.10 ou mais novo**.
 
 ```bash
