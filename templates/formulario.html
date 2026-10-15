@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="description"
+        content="Conte ao DailyFit sobre seus objetivos, rotina e hábitos alimentares."
+    >
+    <title>DailyFit | Formulário inicial</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+<main>
+    <section class="cadastro-section">
+        <div class="cadastro-container">
+            <div class="cadastro-logo">
+                <a href="/" class="logo">
+                    Daily<span>Fit</span>
+                </a>
+            </div>
+
+            <div class="cadastro-heading">
+                <div class="section-label">
+                    FORMULÁRIO INICIAL
+                </div>
+                <h1>
+                    Vamos conhecer
+                    <span>você.</span>
+                </h1>
+                <p id="etapa-descricao">
+                    Conte um pouco sobre seus objetivos e sua rotina
+                    para ajudarmos a organizar sua experiência no DailyFit.
+                </p>
+            </div>
+
+            <div class="form-progress">
+                <div class="progress-step active" data-step="1">
+                    <span>1</span>
+                    <small>Sobre você</small>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step" data-step="2">
+                    <span>2</span>
+                    <small>Alimentação</small>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step" data-step="3">
+                    <span>3</span>
+                    <small>Rotina</small>
+                </div>
+            </div>
+            <form class="cadastro-form" id="formulario-dieta">
+                <!-- Etapa 1 - sobre você -->
+
+                <div class="form-step active" data-step="1">
+                    <div class="form-group">
+                        <label>
+                            Qual é o seu objetivo principal?
+                        </label>
+                        <div class="radio-options">
+                            <label class="radio-option">
+                                <input
+                                    type="radio"
+                                    name="objetivo"
+                                    value="emagrecimento"
+                                    required
+                                >
+                                <span>
+                                    Emagrecimento
+                                </span>
+                            </label>
+                            <label class="radio-option">
+                                <input
+                                    type="radio"
+                                    name="objetivo"
+                                    value="ganho_massa"
+                                >
+                                <span>
+                                    Ganho de massa muscular
+                                </span>
+                            </label>
+
+                            <label class="radio-option">
+                                <input
+                                    type="radio"
+                                    name="objetivo"
+                                    value="manutencao"
+                                >
+                                <span>
+                                    Manutenção do peso
+                                </span>
+                            </label>
+
+                            <label class="radio-option">
+                                <input
+                                    type="radio"
+                                    name="objetivo"
+                                    value="reeducacao"
+                                >
+                                <span>
+                                    Reeducação alimentar
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sexo">
+                                Sexo biológico
+                            </label>
+                            <select
+                                id="sexo"
+                                name="sexo"
+                                required
+                            >
+                                <option
+                                    value=""
+                                    disabled
+                                    selected
+                                >
+                                    Selecione
+                                </option>
+
+                                <option value="masculino">
+                                    Masculino
+                                </option>
+
+                                <option value="feminino">
+                                    Feminino
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="idade">
+                                Idade
+                            </label>
+                            <input
+                                type="number"
+                                id="idade"
+                                name="idade"
+                                min="1"
+                                max="120"
+                                placeholder="Ex.: 25"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="altura">
+                                Altura
+                            </label>
+                            <input
+                                type="number"
+                                id="altura"
+                                name="altura"
+                                min="1"
+                                step="0.1"
+                                placeholder="Ex.: 170 cm"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="peso_atual">
+                                Peso atual
+                            </label>
+                            <input
+                                type="number"
+                                id="peso_atual"
+                                name="peso_atual"
+                                min="1"
+                                step="0.1"
+                                placeholder="Ex.: 70 kg"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="peso_meta">
+                            Peso desejado
+                        </label>
+                        <input
+                            type="number"
+                            id="peso_meta"
+                            name="peso_meta"
+                            min="1"
+                            step="0.1"
+                            placeholder="Ex.: 65 kg"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Como é o seu nível de atividade física?
+                        </label>
+                        <div class="radio-options">
+                            <label class="radio-option">
+                                <input
+                                    type="radio"
+                                    name="atividade"
+                                    value="sedentario"
+                                    required
+                                >
+                                <span>
+                                    <strong>Sedentário</strong>
+                                    <small>
+                                        Pouco ou nenhum exercício.
+                                    </small>
+                                </span>
+
+                            </label>
+
+                            <label class="radio-option">
+                                <input
+                                    type="radio"
+                                    name="atividade"
+                                    value="levemente_ativo"
+                                >
+                                <span>
+                                    <strong>Levemente ativo</strong>
+                                    <small>
+                                        Exercício leve de 1 a 3 dias por semana.
+                                    </small>
+                                </span>
+                            </label>
+
+                            <label class="radio-option">
+                                <input
+                                    type="radio"
+                                    name="atividade"
+                                    value="moderadamente_ativo"
+                                >
+                                <span>
+                                    <strong>Moderadamente ativo</strong>
+                                    <small>
+                                        Exercício moderado de 3 a 5 dias por semana.
+                                    </small>
+                                </span>
+                            </label>
+
+                            <label class="radio-option">
+                                <input
+                                    type="radio"
+                                    name="atividade"
+                                    value="muito_ativo"
+                                >
+                                <span>
+                                    <strong>Muito ativo</strong>
+                                    <small>
+                                        Exercício intenso de 6 a 7 dias por semana.
+                                    </small>
+                                </span>
+                            </label>
+
+                            <label class="radio-option">
+                                <input
+                                    type="radio"
+                                    name="atividade"
+                                    value="extremamente_ativo"
+                                >
+                                <span>
+                                    <strong>Extremamente ativo</strong>
+                                    <small>
+                                        Treino pesado diário ou trabalho muito braçal.
+                                    </small>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn-cadastro-submit next-step"
+                    >
+                        Continuar
+                    </button>
+                </div>
+                <!-- Etapa 2 - alimentação -->
+
+                <div class="form-step" data-step="2">
+                    <div class="form-group">
+                        <label>
+                            Como é a sua alimentação?
+                        </label>
+
+                        <p class="form-description">
+                            Essas informações ajudam o DailyFit a entender
+                            melhor suas preferências.
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipo_alimentacao">
+                            Tipo de alimentação atual
+                        </label>
+
+                        <select
+                            id="tipo_alimentacao"
+                            name="tipo_alimentacao"
+                            required
+                        >
+                            <option
+                                value=""
+                                disabled
+                                selected
+                            >
+                                Selecione
+                            </option>
+
+                            <option value="variada">
+                                Alimentação variada
+                            </option>
+
+                            <option value="vegetariana">
+                                Vegetariana
+                            </option>
+
+                            <option value="vegana">
+                                Vegana
+                            </option>
+
+                            <option value="outra">
+                                Outra
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restricoes">
+                            Existe algum alimento que você não consome?
+                        </label>
+                        <textarea
+                            id="restricoes"
+                            name="restricoes"
+                            rows="3"
+                            placeholder="Conte aqui sobre alergias, restrições ou alimentos que você evita."
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="preferencias">
+                            Quais alimentos você gosta ou gostaria de incluir?
+                        </label>
+                        <textarea
+                            id="preferencias"
+                            name="preferencias"
+                            rows="3"
+                            placeholder="Ex.: arroz, frango, frutas, massas..."
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="refeicoes">
+                            Quantas refeições você costuma fazer por dia?
+                        </label>
+                        <select
+                            id="refeicoes"
+                            name="refeicoes"
+                            required
+                        >
+                            <option
+                                value=""
+                                disabled
+                                selected
+                            >
+                                Selecione
+                            </option>
+
+                            <option value="3">
+                                3 refeições
+                            </option>
+
+                            <option value="4">
+                                4 refeições
+                            </option>
+
+                            <option value="5">
+                                5 refeições
+                            </option>
+
+                            <option value="6">
+                                6 ou mais refeições
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-navigation">
+                        <button
+                            type="button"
+                            class="btn-secondary-form prev-step"
+                        >
+                            Voltar
+                        </button>
+                        <button
+                            type="button"
+                            class="btn-cadastro-submit next-step"
+                        >
+                            Continuar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Etapa 3 - rotina -->
+
+                <div class="form-step" data-step="3">
+                    <div class="form-group">
+                        <label>
+                            Como funciona a sua rotina?
+                        </label>
+                        <p class="form-description">
+                            Queremos entender seus horários para que sua
+                            organização seja mais adequada ao seu dia a dia.
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cafe">
+                            Horário aproximado do café da manhã
+                        </label>
+                        <input
+                            type="time"
+                            id="cafe"
+                            name="horario_cafe"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="almoco">
+                            Horário aproximado do almoço
+                        </label>
+                        <input
+                            type="time"
+                            id="almoco"
+                            name="horario_almoco"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="jantar">
+                            Horário aproximado do jantar
+                        </label>
+                        <input
+                            type="time"
+                            id="jantar"
+                            name="horario_jantar"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rotina">
+                            Existe alguma dificuldade na sua rotina
+                            alimentar?
+                        </label>
+
+                        <textarea
+                            id="rotina"
+                            name="dificuldades_rotina"
+                            rows="4"
+                            placeholder="Ex.: Tenho pouco tempo para cozinhar, costumo esquecer de fazer refeições..."
+                        ></textarea>
+                    </div>
+
+                    <div class="form-notice">
+                        <strong>Quase tudo pronto!</strong>
+                        <p>
+                            Essas informações ajudam a personalizar sua
+                            experiência no DailyFit. Elas não substituem
+                            a orientação de um profissional de saúde.
+                        </p>
+                    </div>
+
+                    <div class="form-navigation">
+                        <button
+                            type="button"
+                            class="btn-secondary-form prev-step"
+                        >
+                            Voltar
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="btn-cadastro-submit"
+                        >
+                            Finalizar
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Voltar para o cadastro -->
+
+            <div class="cadastro-login">
+                <span>
+                    Quer voltar?
+                </span>
+                <a href="/cadastro">
+                    Voltar para o cadastro
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+<script src="/static/js/app.js"></script>
+<script src="/static/js/formulario.js"></script>
+</body>
+</html>

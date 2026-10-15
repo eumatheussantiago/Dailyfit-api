@@ -1,23 +1,122 @@
 # DailyFit
 
-O **DailyFit** é uma plataforma web voltada para alimentação e organização da rotina. O projeto possui uma interface para acompanhamento de refeições, hábitos e progresso, além de uma API desenvolvida para futuramente realizar o gerenciamento e armazenamento dos dados.
+O **DailyFit** é uma plataforma web para organizar a alimentação e a rotina. O usuário cria uma conta, registra as refeições do dia, marca se estão dentro ou fora da dieta e acompanha o próprio progresso.
+
+Projeto desenvolvido para o curso de **Análise e Desenvolvimento de Sistemas (ADS)**.
+
+## Funcionalidades
+
+- Página inicial de apresentação
+- Cadastro com senha criptografada (a senha nunca é salva como texto)
+- Login com e-mail e senha, com opção "Manter conectado"
+- Formulário inicial (objetivo, medidas, alimentação e rotina) salvo no banco
+- Painel provisório com resumo e refeições (será substituído pelo dashboard do grupo)
+- API de usuários, perfil e refeições
+- API de refeições: cadastrar, listar, editar e excluir
+- Resumo da dieta: total de refeições, dentro e fora da dieta e melhor sequência
+- Banco de dados SQLite criado automaticamente
+- API REST documentada automaticamente em `/docs`
+- Testes automáticos com `pytest`
+
+## Fluxo do usuário
+
+```
+Início → Criar conta → Formulário inicial (3 etapas) → Painel
+Início → Entrar → Painel  (ou Formulário, se ainda não respondeu)
+```
+
+## Tecnologias
+
+| Parte | Tecnologia |
+|---|---|
+| Back-end / API | Python, FastAPI |
+| Banco de dados | SQLite + SQLAlchemy |
+| Front-end | HTML, CSS, JavaScript |
+| Testes | pytest |
 
 ## Estrutura do projeto
 
-- `templates/` → contém o `index.html` e demais páginas HTML.
-- `static/css/` → contém os arquivos de estilização CSS.
-- `static/js/` → contém os arquivos JavaScript e funcionalidades da interface.
-- `main.py` → responsável pela API desenvolvida com FastAPI.
+```
+main.py          → inicia a aplicação e registra as rotas
+database.py      → conexão com o banco de dados (SQLite)
+seguranca.py     → criptografia das senhas
+models/          → tabelas do banco (usuários, perfis e refeições)
+schemas/         → formato e validação dos dados da API
+routes/          → rotas da API e das páginas
+templates/       → páginas HTML (início, cadastro, login, formulário, painel)
+static/css/      → estilos
+static/js/       → scripts das páginas
+tests/           → testes automáticos
+```
 
-## API e servidor
+## Como rodar
 
-Para iniciar o servidor durante o desenvolvimento, o comando utilizado é:
+### Jeito mais fácil (Windows)
+
+Dê **dois cliques no arquivo `iniciar.bat`**. Ele instala tudo na primeira vez e abre o app no navegador. Só precisa ter o [Python](https://www.python.org/downloads/) instalado (marque **"Add python.exe to PATH"** na instalação).
+
+### Pelo terminal
+
+Requisito: **Python 3.10 ou mais novo**.
 
 ```bash
+# 1. (opcional, recomendado) criar um ambiente virtual
+python -m venv .venv
+# Windows:
+.venv\Scripts\activate
+# Linux/Mac:
+source .venv/bin/activate
+
+# 2. instalar as dependências
+pip install -r requirements.txt
+
+# 3. iniciar o servidor
 uvicorn main:app --reload
+```
 
-Obs: No momento, o servidor não funcionará completamente, pois ainda é necessário que seja desenvolvido e configurado o banco de dados do projeto.
+Depois abra no navegador:
 
-O banco de dados será responsável por armazenar os dados utilizados pelas rotas da API, permitindo que informações como usuários, refeições, hábitos, progresso e outros dados da aplicação sejam registrados e consultados.
+- **App:** http://127.0.0.1:8000
+- **Documentação da API:** http://127.0.0.1:8000/docs
 
-Por isso, a próxima etapa do projeto é a criação e integração do banco de dados com a API. Após essa integração, as rotas poderão gravar e recuperar os dados corretamente.
+O banco `dailyfit.db` é criado automaticamente na primeira execução.
+
+### Usar outro banco (opcional)
+
+Por padrão o projeto usa SQLite. Para usar outro banco, defina a variável `DATABASE_URL` antes de iniciar o servidor (e instale o driver do banco):
+
+```powershell
+# Windows (PowerShell) — exemplo com PostgreSQL
+$env:DATABASE_URL = "postgresql://usuario:senha@localhost:5432/dailyfit"
+uvicorn main:app --reload
+```
+
+## Rodar os testes
+
+```bash
+pytest
+```
+
+## Rotas da API
+
+| Método | Rota | O que faz |
+|---|---|---|
+| POST | `/usuarios` | Cria um usuário |
+| POST | `/usuarios/login` | Entra com e-mail e senha |
+| PUT | `/usuarios/{id}/perfil` | Salva as respostas do formulário inicial |
+| GET | `/usuarios/{id}/perfil` | Mostra as respostas do formulário inicial |
+| GET | `/usuarios` | Lista usuários |
+| GET | `/usuarios/{id}` | Mostra um usuário |
+| POST | `/usuarios/{id}/refeicoes` | Cadastra uma refeição |
+| GET | `/usuarios/{id}/refeicoes` | Lista as refeições |
+| GET | `/usuarios/{id}/refeicoes/{refeicao_id}` | Mostra uma refeição |
+| PUT | `/usuarios/{id}/refeicoes/{refeicao_id}` | Edita uma refeição |
+| DELETE | `/usuarios/{id}/refeicoes/{refeicao_id}` | Exclui uma refeição |
+| GET | `/usuarios/{id}/resumo` | Métricas da dieta |
+
+## Próximos passos
+
+- Token JWT para proteger as rotas da API
+- Recuperação de senha
+- Gráfico de evolução semanal
+- Hábitos e metas personalizadas

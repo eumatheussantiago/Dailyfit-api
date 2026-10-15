@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+sqlalchemy>=2.0
+jinja2
+
+# Para rodar os testes automáticos (pytest)
+pytest
+httpx

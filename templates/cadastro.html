@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+<meta name="description"
+    content="Crie sua conta no DailyFit e comece a organizar sua rotina de forma simples e prática.">
+
+<title>DailyFit | Criar conta</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+
+</head>
+
+<body>
+<main>
+    <section class="cadastro-section">
+        <div class="cadastro-container">
+            <div class="cadastro-logo">
+                <a href="/" class="logo">
+                    Daily<span>Fit</span>
+                </a>
+            </div>
+            <!-- cabeçalho -->
+            <div class="cadastro-heading">
+                <div class="section-label">
+                    CRIE SUA CONTA
+                </div>
+                <h1>
+                    Comece a cuidar da sua
+                    <span>rotina.</span>
+                </h1>
+                <p>
+                    Crie sua conta gratuitamente e comece a organizar
+                    seus hábitos e acompanhar seu progresso.
+                </p>
+            </div>
+            <!-- formulário -->
+            <form class="cadastro-form" id="formulario-cadastro">
+                <div class="form-group">
+                    <label for="nome">
+                        Nome completo
+                    </label>
+                    <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        placeholder="Digite seu nome completo"
+                        autocomplete="name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="email">
+                        E-mail
+                    </label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Digite seu e-mail"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="senha">
+                            Senha
+                        </label>
+                        <input
+                            type="password"
+                            id="senha"
+                            name="senha"
+                            placeholder="Crie uma senha"
+                            autocomplete="new-password"
+                            required
+                        >
+                    </div>
+                    <!-- Confirmação de senha -->
+                    <div class="form-group">
+                        <label for="confirmar-senha">
+                            Confirmar senha
+                        </label>
+                        <input
+                            type="password"
+                            id="confirmar-senha"
+                            name="confirmar-senha"
+                            placeholder="Confirme sua senha"
+                            autocomplete="new-password"
+                            required
+                        >
+                    </div>
+                </div>
+                <div class="form-check">
+                    <input
+                        type="checkbox"
+                        id="termos"
+                        name="termos"
+                        required
+                    >
+                    <label for="termos">
+                        Aceito os termos de uso e a política de privacidade.
+                    </label>
+                </div>
+                <button type="submit" class="btn-cadastro-submit">
+                    Criar minha conta
+                </button>
+                <p id="mensagem-cadastro" class="login-message" role="status" aria-live="polite"></p>
+            </form>
+            <!-- Login -->
+            <div class="cadastro-login">
+                <span>
+                    Já possui uma conta?
+                </span>
+                <a href="/login">
+                    Entrar
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+<script src="/static/js/app.js"></script>
+<script src="/static/js/cadastro.js"></script>
+</body>
+</html>

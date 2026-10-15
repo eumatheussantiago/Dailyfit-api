@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Entre na sua conta DailyFit.">
+    <title>DailyFit | Entrar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<main>
+    <section class="cadastro-section">
+        <div class="cadastro-container login-container">
+            <div class="cadastro-logo">
+                <a href="/" class="logo">
+                    Daily<span>Fit</span>
+                </a>
+            </div>
+            <div class="cadastro-heading">
+                <div class="section-label">BEM-VINDA DE VOLTA</div>
+                <h1>
+                    Que bom ter
+                    <span>você aqui.</span>
+                </h1>
+
+                <p>
+                    Entre na sua conta para continuar acompanhando
+                    sua rotina e seus hábitos.
+                </p>
+            </div>
+            <form class="cadastro-form login-form" id="formulario-login">
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Digite seu e-mail"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <div class="login-password">
+                        <input
+                            type="password"
+                            id="senha"
+                            name="senha"
+                            placeholder="Digite sua senha"
+                            autocomplete="current-password"
+                            required
+                        >
+                        <button
+                            type="button"
+                            id="mostrar-senha"
+                            class="login-show-password"
+                            aria-label="Mostrar senha"
+                        >
+                            Mostrar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="login-options">
+                    <label class="login-remember">
+                        <input type="checkbox" name="lembrar">
+                        <span>Manter conectado</span>
+                    </label>
+                    <a href="#" id="recuperar-senha">
+                        Esqueci minha senha
+                    </a>
+                </div>
+
+                <button type="submit" class="btn-cadastro-submit">
+                    Entrar
+                </button>
+
+                <p
+                    id="mensagem-login"
+                    class="login-message"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+            </form>
+            <div class="cadastro-login">
+                <span>Ainda não tem uma conta?</span>
+                <a href="/cadastro">Criar conta</a>
+            </div>
+
+            <div class="login-back">
+                <a href="/">Voltar para o início</a>
+            </div>
+        </div>
+    </section>
+</main>
+<script src="/static/js/app.js"></script>
+<script src="/static/js/login.js"></script>
+</body>
+</html>

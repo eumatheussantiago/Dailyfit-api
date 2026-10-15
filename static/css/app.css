@@ -1,0 +1,478 @@
+/* TELAS DO APP (cadastro, login e painel) — usa as variáveis do style.css */
+
+.app-body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-main {
+    flex: 1;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 50px 24px 80px;
+}
+
+.app-main h1 {
+    margin: 10px 0 8px;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    font-weight: 800;
+}
+
+.app-main h1 span {
+    color: var(--laranja-principal);
+}
+
+.app-main h2 {
+    margin-bottom: 18px;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.nav-ola {
+    color: var(--branco);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.btn-sair {
+    min-height: 40px;
+    padding: 9px 17px;
+    border-radius: 10px;
+    font: inherit;
+    font-size: 14px;
+    color: var(--texto);
+    background: var(--branco);
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn-sair:hover {
+    transform: translateY(-2px);
+}
+
+
+/* BOTÃO PRINCIPAL */
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 14px 21px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--branco);
+    background: var(--laranja-principal);
+    border: 1px solid var(--laranja-principal);
+    transition: 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--sombra);
+}
+
+
+/* FORMULÁRIOS */
+
+.app-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.app-form label {
+    margin: 14px 0 6px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.app-form label small {
+    color: var(--texto-secundario);
+    font-weight: 500;
+}
+
+.app-form input[type="text"],
+.app-form input[type="email"],
+.app-form textarea {
+    width: 100%;
+    padding: 12px 14px;
+    font: inherit;
+    font-size: 14px;
+    color: var(--texto);
+    background: var(--fundo);
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    resize: vertical;
+    transition: 0.2s ease;
+}
+
+.app-form input:focus,
+.app-form textarea:focus {
+    outline: none;
+    border-color: var(--laranja-principal);
+    background: var(--branco);
+    box-shadow: var(--sombra);
+}
+
+.btn-full {
+    width: 100%;
+    margin-top: 22px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-full:disabled {
+    opacity: 0.6;
+    cursor: wait;
+    transform: none;
+}
+
+.form-erro {
+    margin-top: 14px;
+    padding: 10px 12px;
+    color: var(--laranja-principal);
+    background: var(--fundo);
+    border: 1px solid var(--laranja-principal);
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+
+/* CADASTRO / LOGIN */
+
+.auth-card {
+    max-width: 440px;
+    margin: 20px auto;
+    padding: 40px 34px;
+    background: var(--branco);
+    border: 1px solid var(--borda);
+    border-radius: var(--radius);
+    box-shadow: var(--sombra);
+}
+
+.auth-sub {
+    color: var(--texto-secundario);
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.auth-troca {
+    margin-top: 22px;
+    text-align: center;
+    color: var(--texto-secundario);
+    font-size: 13px;
+}
+
+.auth-troca a {
+    color: var(--laranja-principal);
+    font-weight: 700;
+}
+
+
+/* PAINEL — RESUMO */
+
+.painel-topo {
+    margin-bottom: 26px;
+}
+
+.resumo-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.resumo-card {
+    padding: 20px;
+    background: var(--branco);
+    border: 1px solid var(--borda);
+    border-left: 4px solid var(--verde-escuro);
+    border-radius: 14px;
+}
+
+.resumo-card span {
+    display: block;
+    color: var(--texto-secundario);
+    font-size: 12px;
+}
+
+.resumo-card strong {
+    font-size: 30px;
+    line-height: 1.2;
+}
+
+.resumo-dentro { border-left-color: var(--verde-claro); }
+.resumo-fora { border-left-color: var(--laranja-principal); }
+.resumo-sequencia { border-left-color: var(--amarelo); }
+
+.porcentagem {
+    margin: 14px 0 34px;
+    padding: 18px 20px;
+    background: var(--branco);
+    border: 1px solid var(--borda);
+    border-radius: 14px;
+}
+
+.porcentagem-topo {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: var(--texto-secundario);
+}
+
+.porcentagem-topo strong {
+    color: var(--verde-escuro);
+}
+
+.porcentagem-barra {
+    height: 8px;
+    background: var(--borda);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.porcentagem-barra span {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--verde-claro), var(--verde-escuro));
+    border-radius: inherit;
+    transition: width 0.6s ease;
+}
+
+
+/* PAINEL — FORMULÁRIO E LISTA */
+
+.painel-colunas {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.painel-form,
+.lista-refeicoes {
+    padding: 26px;
+    background: var(--branco);
+    border: 1px solid var(--borda);
+    border-radius: var(--radius);
+}
+
+.painel-form {
+    position: sticky;
+    top: 90px;
+}
+
+.escolha-dieta {
+    margin-top: 16px;
+    border: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.escolha-dieta legend {
+    width: 100%;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.app-form .opcao {
+    flex: 1;
+    margin: 0;
+    cursor: pointer;
+}
+
+.opcao input {
+    position: absolute;
+    opacity: 0;
+}
+
+.opcao span {
+    display: block;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    font-weight: 700;
+    transition: 0.2s ease;
+}
+
+.opcao-sim input:checked + span {
+    color: var(--verde-escuro);
+    background: var(--fundo-verde);
+    border-color: var(--verde-claro);
+}
+
+.opcao-nao input:checked + span {
+    color: var(--laranja-principal);
+    background: var(--fundo);
+    border-color: var(--laranja-principal);
+}
+
+.opcao input:focus-visible + span {
+    outline: 3px solid var(--amarelo);
+    outline-offset: 2px;
+}
+
+.btn-cancelar {
+    margin-top: 10px;
+    padding: 10px;
+    font: inherit;
+    font-size: 13px;
+    color: var(--texto-secundario);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.lista-vazia {
+    color: var(--texto-secundario);
+    font-size: 14px;
+}
+
+.lista-refeicoes ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.refeicao-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 14px;
+    padding: 16px;
+    background: var(--fundo);
+    border-radius: 12px;
+}
+
+.refeicao-info strong {
+    display: block;
+    font-size: 15px;
+}
+
+.refeicao-info small {
+    color: var(--texto-secundario);
+    font-size: 12px;
+}
+
+.refeicao-info p {
+    margin-top: 6px;
+    color: var(--texto-secundario);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.selo {
+    align-self: start;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.selo-dentro {
+    color: var(--verde-escuro);
+    background: var(--fundo-verde);
+}
+
+.selo-fora {
+    color: var(--laranja-principal);
+    background: var(--fundo);
+}
+
+.refeicao-acoes {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 8px;
+}
+
+.refeicao-acoes button {
+    padding: 6px 12px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--texto);
+    background: var(--branco);
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.refeicao-acoes button:hover {
+    border-color: var(--laranja-principal);
+    color: var(--laranja-principal);
+}
+
+.refeicao-acoes .apagar:hover {
+    border-color: var(--laranja-principal);
+    color: var(--laranja-principal);
+}
+
+
+/* AVISO RÁPIDO */
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translate(-50%, 20px);
+    padding: 12px 18px;
+    color: var(--branco);
+    background: var(--texto);
+    border-radius: 10px;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s ease;
+}
+
+.toast.visivel {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+
+/* RESPONSIVO */
+
+@media (max-width: 900px) {
+    .resumo-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .painel-colunas {
+        grid-template-columns: 1fr;
+    }
+
+    .painel-form {
+        position: static;
+    }
+}
+
+@media (max-width: 500px) {
+    .app-main {
+        padding: 30px 16px 60px;
+    }
+
+    .auth-card {
+        padding: 30px 22px;
+    }
+
+    .nav-ola {
+        display: none;
+    }
+
+    .resumo-card strong {
+        font-size: 24px;
+    }
+}
