@@ -4,6 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 class UsuarioCreate(BaseModel):
     nome: str = Field(min_length=2, max_length=100)
     email: str = Field(max_length=255)
+    senha: str = Field(min_length=6, max_length=128)
 
     @field_validator("nome")
     @classmethod
@@ -25,6 +26,7 @@ class UsuarioCreate(BaseModel):
 
 class UsuarioLogin(BaseModel):
     email: str
+    senha: str
 
     @field_validator("email")
     @classmethod
@@ -36,5 +38,6 @@ class UsuarioResponse(BaseModel):
     id: int
     nome: str
     email: str
+    perfil_preenchido: bool = False
 
     model_config = ConfigDict(from_attributes=True)

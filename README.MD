@@ -7,14 +7,23 @@ Projeto desenvolvido para o curso de **Análise e Desenvolvimento de Sistemas (A
 ## Funcionalidades
 
 - Página inicial de apresentação
-- Tela de cadastro e login ligadas ao banco (pelo e-mail)
+- Cadastro com senha criptografada (a senha nunca é salva como texto)
+- Login com e-mail e senha, com opção "Manter conectado"
+- Formulário inicial (objetivo, medidas, alimentação e rotina) salvo no banco
 - Painel provisório com resumo e refeições (será substituído pelo dashboard do grupo)
-- API de usuários (cadastro e login pelo e-mail)
+- API de usuários, perfil e refeições
 - API de refeições: cadastrar, listar, editar e excluir
 - Resumo da dieta: total de refeições, dentro e fora da dieta e melhor sequência
 - Banco de dados SQLite criado automaticamente
 - API REST documentada automaticamente em `/docs`
 - Testes automáticos com `pytest`
+
+## Fluxo do usuário
+
+```
+Início → Criar conta → Formulário inicial (3 etapas) → Painel
+Início → Entrar → Painel  (ou Formulário, se ainda não respondeu)
+```
 
 ## Tecnologias
 
@@ -30,10 +39,11 @@ Projeto desenvolvido para o curso de **Análise e Desenvolvimento de Sistemas (A
 ```
 main.py          → inicia a aplicação e registra as rotas
 database.py      → conexão com o banco de dados (SQLite)
-models/          → tabelas do banco (usuários e refeições)
+seguranca.py     → criptografia das senhas
+models/          → tabelas do banco (usuários, perfis e refeições)
 schemas/         → formato e validação dos dados da API
 routes/          → rotas da API e das páginas
-templates/       → páginas HTML (início, cadastro, login, painel)
+templates/       → páginas HTML (início, cadastro, login, formulário, painel)
 static/css/      → estilos
 static/js/       → scripts das páginas
 tests/           → testes automáticos
@@ -86,7 +96,9 @@ pytest
 | Método | Rota | O que faz |
 |---|---|---|
 | POST | `/usuarios` | Cria um usuário |
-| POST | `/usuarios/login` | Entra com o e-mail |
+| POST | `/usuarios/login` | Entra com e-mail e senha |
+| PUT | `/usuarios/{id}/perfil` | Salva as respostas do formulário inicial |
+| GET | `/usuarios/{id}/perfil` | Mostra as respostas do formulário inicial |
 | GET | `/usuarios` | Lista usuários |
 | GET | `/usuarios/{id}` | Mostra um usuário |
 | POST | `/usuarios/{id}/refeicoes` | Cadastra uma refeição |
@@ -98,6 +110,7 @@ pytest
 
 ## Próximos passos
 
-- Login com senha (hash com `bcrypt`) e token JWT
+- Token JWT para proteger as rotas da API
+- Recuperação de senha
 - Gráfico de evolução semanal
 - Hábitos e metas personalizadas

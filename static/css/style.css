@@ -2237,3 +2237,657 @@ footer {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* Cadastro */
+
+.cadastro-section {
+    min-height: 100vh;
+    background: var(--fundo);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 20px;
+}
+
+.cadastro-container {
+    width: 100%;
+    max-width: 520px;
+    background: var(--branco);
+    border: 1px solid var(--borda);
+    border-radius: var(--radius);
+    padding: 45px 50px;
+    box-shadow: var(--sombra);
+}
+
+.cadastro-logo {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.cadastro-logo .logo {
+    color: var(--texto);
+    text-decoration: none;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.cadastro-logo .logo span {
+    color: var(--laranja-principal);
+}
+
+.cadastro-heading {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.cadastro-heading .section-label {
+    margin-bottom: 12px;
+}
+
+.cadastro-heading h1 {
+    margin-bottom: 12px;
+    font-size: 32px;
+    line-height: 1.2;
+    color: var(--texto);
+}
+
+.cadastro-heading h1 span {
+    color: var(--laranja-principal);
+}
+
+.cadastro-heading p {
+    margin: 0 auto;
+    max-width: 420px;
+    color: var(--texto-secundario);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* formulário */
+
+.cadastro-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: var(--texto);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    height: 48px;
+    padding: 0 15px;
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    background: var(--branco);
+    color: var(--texto);
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input::placeholder {
+    color: var(--texto-secundario);
+    opacity: 0.75;
+}
+
+.form-group input:focus {
+    border-color: var(--laranja-principal);
+    box-shadow: 0 0 0 3px rgba(40, 125, 69, 0.10);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 2px;
+}
+
+.form-check input {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: var(--laranja-principal);
+    cursor: pointer;
+}
+
+.form-check label {
+    color: var(--texto-secundario);
+    font-size: 13px;
+    line-height: 1.5;
+    cursor: pointer;
+} 
+
+.btn-cadastro-submit {
+    width: 100%;
+    min-height: 50px;
+    border: none;
+    border-radius: 10px;
+    background: var(--amarelo);
+    color: var(--branco);
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+} 
+
+.btn-cadastro-submit:hover {
+    background: var(--amarelo-hover);
+    transform: translateY(-1px);
+}
+
+ .cadastro-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin-top: 25px;
+    color: var(--texto-secundario);
+    font-size: 14px;
+} 
+
+.cadastro-login a {
+    color: var(--amarelo);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.cadastro-login a:hover {
+    text-decoration: underline;
+}
+
+/* Formulário */
+/* Espaçamento geral */
+
+.cadastro-form .form-group {
+    margin-bottom: 24px;
+}
+
+.cadastro-form .form-group > label:first-child {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--texto);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.form-description {
+    margin: -3px 0 16px;
+    color: var(--texto);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.cadastro-form input[type="number"],
+.cadastro-form input[type="text"],
+.cadastro-form input[type="time"],
+.cadastro-form input[type="email"],
+.cadastro-form select,
+.cadastro-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px 15px;
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    background: var(--branco);
+    color: var(--texto);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.cadastro-form input::placeholder,
+.cadastro-form textarea::placeholder {
+    color: var(--texto-secundario);
+}
+
+.cadastro-form input[type="number"]:focus,
+.cadastro-form input[type="text"]:focus,
+.cadastro-form input[type="time"]:focus,
+.cadastro-form input[type="email"]:focus,
+.cadastro-form select:focus,
+.cadastro-form textarea:focus {
+    border-color: var(--amarelo);
+    box-shadow: none;
+    background: var(--branco);
+}
+
+.cadastro-form textarea {
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.5;
+}
+
+/*caixa de seleção*/
+
+.cadastro-form select {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    padding-right: 42px;
+    background-color: var(--branco);
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--texto-secundario) 50%),
+        linear-gradient(135deg, var(--texto-secundario) 50%, transparent 50%);
+    background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 13px) 50%;
+    background-size:
+        5px 5px,
+        5px 5px;
+    background-repeat: no-repeat;
+}
+
+/* select */
+
+.cadastro-form select option {
+    color: var(--texto);
+    background: var(--branco);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.radio-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.radio-option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 52px;
+    box-sizing: border-box;
+    padding: 11px 15px;
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    background: var(--branco);
+    cursor: pointer;
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+/* Esconde o original */
+
+.radio-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.radio-option > span {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: 18px;
+    width: 100%;
+    padding-left: 30px;
+    color: var(--texto);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.radio-option > span::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--borda);
+    border-radius: 50%;
+    background: var(--branco);
+    transform: translateY(-50%);
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.radio-option input[type="radio"]:checked + span::before {
+    border-color: var(--amarelo);
+}
+
+.radio-option input[type="radio"]:checked + span::after {
+    content: none;
+}
+
+.radio-option > span strong {
+    display: block;
+    color: var(--texto);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.radio-option > span small {
+    display: block;
+    margin: 0;
+    color: var(--texto-secundario);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+.radio-option:has(input[type="radio"]:checked) {
+    border-color: var(--amarelo);
+    background: var(--amarelo);
+}
+
+.radio-option:hover {
+    border-color: var(--amarelo-hover);
+    background: var(--amarelo-hover);
+}
+
+.radio-option:has(input[type="radio"]:checked):hover {
+    border-color: var(--amarelo-hover);
+    background: var(--amarelo-hover);
+}
+
+.form-navigation {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.form-navigation .btn-cadastro-submit {
+    flex: 1;
+    box-shadow: none;
+}
+
+.btn-secondary-form {
+    flex: 0 0 auto;
+    padding: 13px 22px;
+    border: 1px solid var(--amarelo);
+    border-radius: 8px;
+    background: var(--branco);
+    color: var(--texto);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: none;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.btn-secondary-form:hover {
+    background: var(--amarelo);
+    border-color: var(--branco);
+    color: var(--branco);
+    box-shadow: none;
+}
+
+.form-notice {
+    margin-top: 24px;
+    padding: 15px 17px;
+    border-radius: 10px;
+    background: var(--branco);
+    border: 1px solid var(--branco);
+}
+
+.form-notice strong {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--texto);
+    font-size: 13px;
+}
+
+.form-notice p {
+    margin: 0;
+    color: var(--texto-secundario);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .form-progress {
+        gap: 6px;
+    }
+
+    .progress-step small {
+        display: none;
+    }
+
+    .progress-line {
+        width: 25px;
+    }
+
+    .form-navigation {
+        flex-direction: column-reverse;
+    }
+
+    .form-navigation button {
+        width: 100%;
+    }
+}
+
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+}
+
+.form-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 0 auto 35px;
+}
+
+.progress-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--texto-secundario);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.progress-step span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--branco);
+    color: var(--texto-secundario);
+    font-size: 13px;
+}
+
+.progress-step.active {
+    color: var(--texto);
+}
+
+.progress-step.active span,
+.progress-step.completed span {
+    background: var(--amarelo);
+    color: var(--texto);
+}
+
+.progress-line {
+    width: 35px;
+    height: 1px;
+    background: var(--fundo);
+}
+
+/* Login */
+
+.login-container {
+    max-width: 520px;
+}
+
+.login-form input[type="password"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px 15px;
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    background: var(--branco);
+    color: var(--texto);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.login-form input[type="password"]:focus {
+    border-color: var(--amarelo);
+    background: var(--branco);
+}
+
+.login-password {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.login-password input {
+    padding-right: 80px;
+}
+
+.login-show-password {
+    position: absolute;
+    right: 12px;
+    padding: 5px;
+    border: none;
+    background: transparent;
+    color: var(--laranja-principal);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.login-show-password:hover {
+    color: var(--laranja-principal);
+}
+
+.login-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: -5px 0 24px;
+    font-size: 12px;
+}
+
+.login-remember {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--texto-secundario);
+    cursor: pointer;
+}
+
+.login-remember input {
+    accent-color: var(--amarelo);
+    cursor: pointer;
+}
+
+.login-options a,
+.cadastro-login a,
+.login-back a {
+    color: var(--laranja-principal);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.login-options a:hover,
+.cadastro-login a:hover,
+.login-back a:hover {
+    text-decoration: underline;
+}
+
+.login-form .btn-cadastro-submit {
+    width: 100%;
+    box-shadow: none;
+}
+
+.login-message {
+    margin: 12px 0 0;
+    color: var(--texto-secundario);
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.login-back {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 12px;
+}
+
+.login-options > a,
+.login-back a {
+    font-size: 14px;
+}
+
+.login-remember {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 2px;
+}
+
+.login-remember input {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: var(--laranja-principal);
+    cursor: pointer;
+}
+
+.login-remember label {
+    color: var(--texto-secundario);
+    font-size: 13px;
+    line-height: 1.5;
+    cursor: pointer;
+} 
+
+@media (max-width: 600px) {
+    .login-options {
+        align-items: flex-start;
+    }
+}

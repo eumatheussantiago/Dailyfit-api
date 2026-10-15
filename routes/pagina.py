@@ -18,4 +18,5 @@ def _pagina(nome: str):
 router.add_api_route("/", _pagina("index.html"), methods=["GET"])
 router.add_api_route("/cadastro", _pagina("cadastro.html"), methods=["GET"])
 router.add_api_route("/login", _pagina("login.html"), methods=["GET"])
+router.add_api_route("/formulario", _pagina("formulario.html"), methods=["GET"])
 router.add_api_route("/painel", _pagina("painel.html"), methods=["GET"])

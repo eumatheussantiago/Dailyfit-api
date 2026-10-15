@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models.usuario import UsuarioModel
 from schemas.usuario import UsuarioCreate, UsuarioLogin, UsuarioResponse
+from seguranca import gerar_hash_senha, verificar_senha
 
 
 router = APIRouter(
@@ -36,7 +37,8 @@ def criar_usuario(
 
     novo_usuario = UsuarioModel(
         nome=usuario.nome,
-        email=usuario.email
+        email=usuario.email,
+        senha_hash=gerar_hash_senha(usuario.senha)
     )
 
     db.add(novo_usuario)
@@ -46,7 +48,7 @@ def criar_usuario(
     return novo_usuario
 
 
-# ENTRAR (busca o usuário pelo e-mail)
+# ENTRAR (confere e-mail e senha)
 @router.post(
     "/login",
     response_model=UsuarioResponse
@@ -61,10 +63,11 @@ def entrar(
         .first()
     )
 
-    if not usuario:
+    # Mesma mensagem para e-mail ou senha errados: não revela quais e-mails existem
+    if not usuario or not verificar_senha(dados.senha, usuario.senha_hash):
         raise HTTPException(
-            status_code=404,
-            detail="Nenhuma conta encontrada com esse e-mail"
+            status_code=401,
+            detail="E-mail ou senha incorretos"
         )
 
     return usuario

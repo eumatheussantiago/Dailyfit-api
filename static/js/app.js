@@ -36,7 +36,7 @@ function mensagemDeErro(dados) {
 
     const primeiro = dados.detail[0];
     const campo = primeiro?.loc?.[primeiro.loc.length - 1];
-    const nomes = { nome: "Nome", email: "E-mail", descricao: "Descrição" };
+    const nomes = { nome: "Nome", email: "E-mail", senha: "Senha", descricao: "Descrição", idade: "Idade", altura: "Altura", peso_atual: "Peso atual", peso_meta: "Peso desejado" };
     const texto = (primeiro?.msg || "Dados inválidos").replace("Value error, ", "");
 
     if (texto.startsWith("String should have at least")) {
@@ -45,9 +45,18 @@ function mensagemDeErro(dados) {
     return nomes[campo] ? `${nomes[campo]}: ${texto}` : texto;
 }
 
-function salvarUsuario(usuario) {
+// lembrar = true  -> continua logado mesmo fechando o navegador (localStorage)
+// lembrar = false -> sai ao fechar o navegador (sessionStorage)
+// sem "lembrar": mantém onde o login já estava guardado
+function salvarUsuario(usuario, lembrar) {
     try {
-        localStorage.setItem(CHAVE_USUARIO, JSON.stringify(usuario));
+        if (lembrar === undefined) {
+            lembrar = !sessionStorage.getItem(CHAVE_USUARIO);
+        }
+        localStorage.removeItem(CHAVE_USUARIO);
+        sessionStorage.removeItem(CHAVE_USUARIO);
+        const destino = lembrar ? localStorage : sessionStorage;
+        destino.setItem(CHAVE_USUARIO, JSON.stringify(usuario));
     } catch {
         /* navegador sem armazenamento: segue sem lembrar o login */
     }
@@ -56,7 +65,9 @@ function salvarUsuario(usuario) {
 
 function obterUsuario() {
     try {
-        const salvo = localStorage.getItem(CHAVE_USUARIO);
+        const salvo =
+            localStorage.getItem(CHAVE_USUARIO) ||
+            sessionStorage.getItem(CHAVE_USUARIO);
         if (salvo) return JSON.parse(salvo);
     } catch {
         /* ignora */
@@ -67,14 +78,28 @@ function obterUsuario() {
 function sair() {
     try {
         localStorage.removeItem(CHAVE_USUARIO);
+        sessionStorage.removeItem(CHAVE_USUARIO);
     } catch {
         /* ignora */
     }
     window.location.href = "/login";
 }
 
+// Depois de entrar: quem ainda não respondeu o formulário inicial vai para ele
+function destinoAposEntrar(usuario) {
+    return usuario && usuario.perfil_preenchido ? "/painel" : "/formulario";
+}
+
 function redirecionarSeLogado() {
-    if (obterUsuario()) window.location.href = "/painel";
+    const usuario = obterUsuario();
+    if (usuario) window.location.href = destinoAposEntrar(usuario);
+}
+
+// Mensagem de status nas telas do grupo (usa o <p class="login-message">)
+function mostrarMensagem(elemento, texto, tipo = "erro") {
+    elemento.textContent = texto;
+    elemento.style.color =
+        tipo === "erro" ? "var(--laranja-principal)" : "var(--verde-escuro)";
 }
 
 function mostrarErro(id, mensagem) {
