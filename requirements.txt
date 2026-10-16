@@ -3,6 +3,9 @@ uvicorn[standard]
 sqlalchemy>=2.0
 jinja2
 
+# Driver do PostgreSQL (usado em produção, no Render + Supabase)
+psycopg[binary]>=3.1
+
 # Para rodar os testes automáticos (pytest)
 pytest
 httpx

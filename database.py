@@ -5,15 +5,35 @@ from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 # Padrão: arquivo SQLite criado automaticamente na pasta do projeto.
-# Para usar outro banco (ex.: MySQL ou PostgreSQL), defina a variável de
-# ambiente DATABASE_URL — não é preciso mudar o código.
+# Em produção (Render), a variável de ambiente DATABASE_URL aponta para o
+# PostgreSQL do Supabase — não é preciso mudar o código.
 BASE_DIR = Path(__file__).resolve().parent
-DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'dailyfit.db'}")
 
-# "check_same_thread" só existe no SQLite; os outros bancos não aceitam essa opção
-connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 
-engine = create_engine(DATABASE_URL, connect_args=connect_args)
+def montar_url(url: str) -> str:
+    """Usa o driver psycopg 3 para PostgreSQL, qualquer que seja o formato da URL."""
+    for prefixo in ("postgres://", "postgresql://"):
+        if url.startswith(prefixo):
+            return "postgresql+psycopg://" + url[len(prefixo):]
+    return url
+
+
+DATABASE_URL = montar_url(
+    os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'dailyfit.db'}")
+)
+USANDO_SQLITE = DATABASE_URL.startswith("sqlite")
+
+if USANDO_SQLITE:
+    # "check_same_thread" só existe no SQLite
+    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+else:
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,   # reconecta sozinho se a conexão cair (ex.: servidor dormiu)
+        pool_recycle=300,
+        pool_size=3,          # o plano grátis do Supabase limita as conexões
+        max_overflow=2,
+    )
 
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
@@ -40,6 +60,12 @@ def criar_tabelas():
                     conexao.execute(
                         text(f'ALTER TABLE {tabela.name} ADD COLUMN "{coluna.name}" {tipo}')
                     )
+
+            # No Supabase, as tabelas também ficam visíveis pela API pública dele.
+            # Ligar o RLS (sem regras) bloqueia esse acesso; o app continua
+            # funcionando porque é o dono das tabelas.
+            if engine.dialect.name == "postgresql":
+                conexao.execute(text(f"ALTER TABLE {tabela.name} ENABLE ROW LEVEL SECURITY"))
 
 
 def get_db():

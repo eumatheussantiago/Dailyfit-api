@@ -91,6 +91,17 @@ $env:DATABASE_URL = "postgresql://usuario:senha@localhost:5432/dailyfit"
 uvicorn main:app --reload
 ```
 
+## Deploy (link público)
+
+O app está configurado para o **Render** (servidor) + **Supabase** (banco PostgreSQL):
+
+- `render.yaml` → configuração do Render (plano grátis, região Ohio)
+- Variável `DATABASE_URL` → endereço do banco no Supabase (configurada no painel do Render, nunca no código)
+
+A cada `git push` na `master`, o Render publica a versão nova sozinho.
+
+> No plano grátis, o site "dorme" após 15 minutos sem acesso e leva cerca de 1 minuto para acordar.
+
 ## Rodar os testes
 
 ```bash
