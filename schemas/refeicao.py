@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -34,3 +34,9 @@ class RefeicaoResponse(BaseModel):
     nao_dieta: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("data_hora")
+    @classmethod
+    def em_utc(cls, valor: datetime) -> datetime:
+        # O banco guarda em UTC sem fuso; informa o fuso para o navegador converter
+        return valor if valor.tzinfo else valor.replace(tzinfo=timezone.utc)

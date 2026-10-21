@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timezone
 from pathlib import Path
 
 from sqlalchemy import create_engine, inspect, text
@@ -42,6 +43,16 @@ class Base(DeclarativeBase):
     pass
 
 
+def agora_utc() -> datetime:
+    """Data e hora atuais em UTC (sem fuso), o padrão salvo no banco.
+
+    O servidor do Render roda em UTC e o computador de cada um no horário local;
+    salvar sempre em UTC evita o horário "pular" 3 horas. A API devolve a data
+    com o fuso (Z) e o navegador converte para o horário de quem está usando.
+    """
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
 def criar_tabelas():
     """Cria as tabelas que faltam e adiciona colunas novas em bancos já existentes.
 
@@ -66,6 +77,10 @@ def criar_tabelas():
             # funcionando porque é o dono das tabelas.
             if engine.dialect.name == "postgresql":
                 conexao.execute(text(f"ALTER TABLE {tabela.name} ENABLE ROW LEVEL SECURITY"))
+
+            # create_all não cria índices novos em tabelas que já existem
+            for indice in tabela.indexes:
+                indice.create(bind=conexao, checkfirst=True)
 
 
 def get_db():

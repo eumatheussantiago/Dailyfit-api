@@ -3,8 +3,14 @@
 const CHAVE_USUARIO = "dailyfit_usuario";
 
 // Chama a API e devolve o JSON. Em caso de erro, lança uma mensagem amigável.
+// Se o usuário estiver logado, envia o token de acesso junto.
 async function api(caminho, { method = "GET", body } = {}) {
     const opcoes = { method, headers: {} };
+    const token = obterUsuario()?.token;
+
+    if (token) {
+        opcoes.headers["Authorization"] = `Bearer ${token}`;
+    }
 
     if (body !== undefined) {
         opcoes.headers["Content-Type"] = "application/json";
@@ -21,6 +27,12 @@ async function api(caminho, { method = "GET", body } = {}) {
     if (resposta.status === 204) return null;
 
     const dados = await resposta.json().catch(() => null);
+
+    // Token vencido ou inválido (ex.: login antigo, de antes desta versão): pede login de novo
+    if (resposta.status === 401 && token) {
+        sair();
+        throw new Error("Sua sessão expirou. Faça login novamente.");
+    }
 
     if (!resposta.ok) {
         throw new Error(mensagemDeErro(dados));
@@ -63,16 +75,18 @@ function salvarUsuario(usuario, lembrar) {
     window.__usuario = usuario;
 }
 
+// Só conta como logado quem tem token (logins de versões antigas não têm)
 function obterUsuario() {
+    let usuario = window.__usuario || null;
     try {
         const salvo =
             localStorage.getItem(CHAVE_USUARIO) ||
             sessionStorage.getItem(CHAVE_USUARIO);
-        if (salvo) return JSON.parse(salvo);
+        if (salvo) usuario = JSON.parse(salvo);
     } catch {
         /* ignora */
     }
-    return window.__usuario || null;
+    return usuario && usuario.token ? usuario : null;
 }
 
 function sair() {

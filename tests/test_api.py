@@ -1,11 +1,14 @@
 """Testes automáticos da API. Rode com:  pytest"""
 
+from datetime import datetime, timedelta, timezone
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+import seguranca
 from database import Base, get_db
 from main import app
 
@@ -30,15 +33,18 @@ def get_db_teste():
 def client():
     Base.metadata.create_all(bind=engine_teste)
     app.dependency_overrides[get_db] = get_db_teste
+    seguranca._tentativas.clear()
     yield TestClient(app)
     app.dependency_overrides.clear()
     Base.metadata.drop_all(bind=engine_teste)
 
 
 def criar_usuario(client, email="ana@email.com"):
+    """Cria um usuário e devolve (id, cabeçalho com o token de acesso)."""
     resposta = client.post("/usuarios", json={"nome": "Ana", "email": email, "senha": "segredo123"})
     assert resposta.status_code == 201
-    return resposta.json()["id"]
+    dados = resposta.json()
+    return dados["id"], {"Authorization": f"Bearer {dados['token']}"}
 
 
 def test_paginas_abrem(client):
@@ -48,8 +54,14 @@ def test_paginas_abrem(client):
     assert client.get("/static/js/script.js").status_code == 200
 
 
+def test_cabecalhos_de_seguranca(client):
+    resposta = client.get("/")
+    assert resposta.headers["X-Content-Type-Options"] == "nosniff"
+    assert resposta.headers["X-Frame-Options"] == "DENY"
+
+
 def test_cadastro_e_login(client):
-    usuario_id = criar_usuario(client, "Ana@Email.com ")
+    usuario_id, _ = criar_usuario(client, "Ana@Email.com ")
 
     duplicado = client.post("/usuarios", json={"nome": "Ana", "email": "ana@email.com", "senha": "outra123"})
     assert duplicado.status_code == 400
@@ -58,6 +70,7 @@ def test_cadastro_e_login(client):
     assert login.status_code == 200
     assert login.json()["id"] == usuario_id
     assert login.json()["perfil_preenchido"] is False
+    assert login.json()["token"]
 
     senha_errada = client.post("/usuarios/login", json={"email": "ana@email.com", "senha": "errada123"})
     assert senha_errada.status_code == 401
@@ -67,8 +80,8 @@ def test_cadastro_e_login(client):
 def test_senha_nao_fica_salva_em_texto(client):
     from models.usuario import UsuarioModel
 
-    criar_usuario(client)
-    resposta = client.get("/usuarios").json()[0]
+    usuario_id, token = criar_usuario(client)
+    resposta = client.get(f"/usuarios/{usuario_id}", headers=token).json()
     assert "senha" not in resposta and "senha_hash" not in resposta
 
     with SessaoTeste() as db:
@@ -77,60 +90,112 @@ def test_senha_nao_fica_salva_em_texto(client):
     assert hash_salvo.startswith("pbkdf2_sha256$")
 
 
+def test_lista_de_usuarios_nao_e_publica(client):
+    criar_usuario(client)
+    # A rota que listava nome e e-mail de todos foi removida
+    assert client.get("/usuarios").status_code == 405
+
+
+def test_rotas_exigem_login(client):
+    usuario_id, _ = criar_usuario(client)
+
+    for rota in ["", "/refeicoes", "/resumo", "/perfil"]:
+        assert client.get(f"/usuarios/{usuario_id}{rota}").status_code == 401
+
+    falso = {"Authorization": "Bearer token.falso"}
+    assert client.get(f"/usuarios/{usuario_id}/resumo", headers=falso).status_code == 401
+
+
+def test_token_expirado_e_recusado(client, monkeypatch):
+    usuario_id, _ = criar_usuario(client)
+    monkeypatch.setattr(seguranca, "VALIDADE_TOKEN", -1)
+    vencido = {"Authorization": f"Bearer {seguranca.gerar_token(usuario_id)}"}
+    assert client.get(f"/usuarios/{usuario_id}/resumo", headers=vencido).status_code == 401
+
+
+def test_ninguem_acessa_dados_de_outro_usuario(client):
+    ana, token_ana = criar_usuario(client, "ana@email.com")
+    bia, token_bia = criar_usuario(client, "bia@email.com")
+
+    refeicao = client.post(
+        f"/usuarios/{ana}/refeicoes", json={"nome": "Café", "nao_dieta": False}, headers=token_ana
+    ).json()
+    client.put(f"/usuarios/{ana}/perfil", json=PERFIL, headers=token_ana)
+
+    # Bia, logada, tentando ler/editar/apagar dados da Ana
+    assert client.get(f"/usuarios/{ana}", headers=token_bia).status_code == 403
+    assert client.get(f"/usuarios/{ana}/perfil", headers=token_bia).status_code == 403
+    assert client.get(f"/usuarios/{ana}/resumo", headers=token_bia).status_code == 403
+    assert client.get(f"/usuarios/{ana}/refeicoes", headers=token_bia).status_code == 403
+    assert client.delete(f"/usuarios/{ana}/refeicoes/{refeicao['id']}", headers=token_bia).status_code == 403
+
+    # E pelo caminho dela própria, a refeição da Ana não aparece
+    assert client.get(f"/usuarios/{bia}/refeicoes/{refeicao['id']}", headers=token_bia).status_code == 404
+
+
+def test_limite_de_tentativas_de_login(client):
+    criar_usuario(client)
+    errado = {"email": "ana@email.com", "senha": "errada123"}
+
+    for _ in range(seguranca.MAX_TENTATIVAS):
+        assert client.post("/usuarios/login", json=errado).status_code == 401
+
+    bloqueado = client.post("/usuarios/login", json={"email": "ana@email.com", "senha": "segredo123"})
+    assert bloqueado.status_code == 429
+
+
 def test_validacoes(client):
     assert client.post("/usuarios", json={"nome": "A", "email": "a@b.com", "senha": "segredo123"}).status_code == 422
     assert client.post("/usuarios", json={"nome": "Ana", "email": "invalido", "senha": "segredo123"}).status_code == 422
     assert client.post("/usuarios", json={"nome": "Ana", "email": "a@b.com", "senha": "123"}).status_code == 422
 
-    usuario_id = criar_usuario(client)
-    vazio = client.post(f"/usuarios/{usuario_id}/refeicoes", json={"nome": "   "})
+    usuario_id, token = criar_usuario(client)
+    vazio = client.post(f"/usuarios/{usuario_id}/refeicoes", json={"nome": "   "}, headers=token)
     assert vazio.status_code == 422
 
 
 def test_crud_de_refeicoes(client):
-    usuario_id = criar_usuario(client)
+    usuario_id, token = criar_usuario(client)
     base = f"/usuarios/{usuario_id}/refeicoes"
 
-    criada = client.post(base, json={"nome": "Almoço", "descricao": "Arroz e feijão", "nao_dieta": False})
+    criada = client.post(base, json={"nome": "Almoço", "descricao": "Arroz e feijão", "nao_dieta": False}, headers=token)
     assert criada.status_code == 201
     refeicao_id = criada.json()["id"]
 
-    assert client.get(f"{base}/{refeicao_id}").json()["nome"] == "Almoço"
+    assert client.get(f"{base}/{refeicao_id}", headers=token).json()["nome"] == "Almoço"
 
-    editada = client.put(f"{base}/{refeicao_id}", json={"nome": "Almoço leve", "nao_dieta": True})
+    editada = client.put(f"{base}/{refeicao_id}", json={"nome": "Almoço leve", "nao_dieta": True}, headers=token)
     assert editada.status_code == 200
     assert editada.json()["nao_dieta"] is True
 
-    assert client.delete(f"{base}/{refeicao_id}").status_code == 204
-    assert client.get(f"{base}/{refeicao_id}").status_code == 404
+    assert client.delete(f"{base}/{refeicao_id}", headers=token).status_code == 204
+    assert client.get(f"{base}/{refeicao_id}", headers=token).status_code == 404
 
 
-def test_refeicao_de_outro_usuario_nao_aparece(client):
-    ana = criar_usuario(client, "ana@email.com")
-    bia = criar_usuario(client, "bia@email.com")
+def test_horario_da_refeicao_vem_com_fuso(client):
+    """Antes, o horário aparecia 3 horas adiantado no navegador."""
+    usuario_id, token = criar_usuario(client)
+    criada = client.post(f"/usuarios/{usuario_id}/refeicoes", json={"nome": "Café"}, headers=token).json()
 
-    refeicao = client.post(f"/usuarios/{ana}/refeicoes", json={"nome": "Café", "nao_dieta": False}).json()
-
-    assert client.get(f"/usuarios/{bia}/refeicoes/{refeicao['id']}").status_code == 404
-    assert client.delete(f"/usuarios/{bia}/refeicoes/{refeicao['id']}").status_code == 404
+    data_hora = datetime.fromisoformat(criada["data_hora"].replace("Z", "+00:00"))
+    assert data_hora.tzinfo is not None
+    assert abs(datetime.now(timezone.utc) - data_hora) < timedelta(minutes=1)
 
 
 def test_resumo(client):
-    usuario_id = criar_usuario(client)
+    usuario_id, token = criar_usuario(client)
     base = f"/usuarios/{usuario_id}/refeicoes"
 
     for nome, fora in [("Café", False), ("Lanche", False), ("Pizza", True), ("Almoço", False), ("Jantar", False), ("Ceia", False)]:
-        client.post(base, json={"nome": nome, "nao_dieta": fora})
+        client.post(base, json={"nome": nome, "nao_dieta": fora}, headers=token)
 
-    resumo = client.get(f"/usuarios/{usuario_id}/resumo").json()
+    resumo = client.get(f"/usuarios/{usuario_id}/resumo", headers=token).json()
     assert resumo == {
         "total_refeicoes_cadastradas": 6,
         "total_refeicoes_dentro_da_dieta": 5,
         "total_refeicoes_fora_da_dieta": 1,
         "melhor_sequencia_de_refeicoes_dentro_da_dieta": 3,
     }
-
-    assert client.get("/usuarios/999/resumo").status_code == 404
 
 
 PERFIL = {
@@ -153,26 +218,25 @@ PERFIL = {
 
 
 def test_formulario_inicial(client):
-    usuario_id = criar_usuario(client)
+    usuario_id, token = criar_usuario(client)
     url = f"/usuarios/{usuario_id}/perfil"
 
-    assert client.get(url).status_code == 404
+    assert client.get(url, headers=token).status_code == 404
 
-    salvo = client.put(url, json=PERFIL)
+    salvo = client.put(url, json=PERFIL, headers=token)
     assert salvo.status_code == 200
     assert salvo.json()["preferencias"] is None  # texto vazio vira vazio no banco
 
     # Responder de novo atualiza em vez de duplicar
-    atualizado = client.put(url, json={**PERFIL, "peso_atual": 69})
+    atualizado = client.put(url, json={**PERFIL, "peso_atual": 69}, headers=token)
     assert atualizado.json()["peso_atual"] == 69
-    assert client.get(url).json()["peso_atual"] == 69
+    assert client.get(url, headers=token).json()["peso_atual"] == 69
 
     login = client.post("/usuarios/login", json={"email": "ana@email.com", "senha": "segredo123"})
     assert login.json()["perfil_preenchido"] is True
 
-    assert client.put(url, json={**PERFIL, "objetivo": "voar"}).status_code == 422
-    assert client.put(url, json={**PERFIL, "horario_cafe": "25:00"}).status_code == 422
-    assert client.put("/usuarios/999/perfil", json=PERFIL).status_code == 404
+    assert client.put(url, json={**PERFIL, "objetivo": "voar"}, headers=token).status_code == 422
+    assert client.put(url, json={**PERFIL, "horario_cafe": "25:00"}, headers=token).status_code == 422
 
 
 def test_banco_antigo_ganha_coluna_de_senha(tmp_path):
@@ -194,6 +258,8 @@ def test_banco_antigo_ganha_coluna_de_senha(tmp_path):
         colunas = {c["name"] for c in inspect(database.engine).get_columns("usuarios")}
         assert "senha_hash" in colunas
         assert "perfis" in inspect(database.engine).get_table_names()
+        indices = {i["name"] for i in inspect(database.engine).get_indexes("refeicoes")}
+        assert "ix_refeicoes_usuario_data" in indices
     finally:
         database.engine.dispose()
         database.engine = engine_original

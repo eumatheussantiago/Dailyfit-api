@@ -24,13 +24,9 @@ const formatarData = new Intl.DateTimeFormat("pt-BR", {
     minute: "2-digit",
 });
 
+// Lista e resumo são buscados ao mesmo tempo; se o login tiver vencido,
+// a função api() já leva o usuário de volta para a tela de login.
 async function iniciar() {
-    try {
-        await api(base); // confirma que a conta ainda existe
-    } catch {
-        sair();
-        return;
-    }
     await atualizarTudo();
 }
 

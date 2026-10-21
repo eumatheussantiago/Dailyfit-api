@@ -41,3 +41,9 @@ class UsuarioResponse(BaseModel):
     perfil_preenchido: bool = False
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UsuarioLogado(UsuarioResponse):
+    """Resposta do cadastro e do login: os dados do usuário + o token de acesso."""
+
+    token: str

@@ -15,3 +15,5 @@ services:
         value: 3.12.7
       - key: DATABASE_URL
         sync: false         # o Render pede este valor na hora de criar
+      - key: SECRET_KEY
+        generateValue: true # chave que assina os tokens de login (gerada pelo Render)
