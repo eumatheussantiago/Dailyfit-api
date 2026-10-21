@@ -5,11 +5,13 @@ from database import get_db
 from models.perfil import PerfilModel
 from models.usuario import UsuarioModel
 from schemas.perfil import PerfilResponse, PerfilSalvar
+from seguranca import exigir_dono
 
 
 router = APIRouter(
     prefix="/usuarios/{usuario_id}/perfil",
-    tags=["Perfil (formulário inicial)"]
+    tags=["Perfil (formulário inicial)"],
+    dependencies=[Depends(exigir_dono)]  # só o dono dos dados acessa
 )
 
 

@@ -4,7 +4,7 @@ from typing import Optional
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from database import Base
+from database import Base, agora_utc
 
 
 class PerfilModel(Base):
@@ -41,7 +41,7 @@ class PerfilModel(Base):
     dificuldades_rotina: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     atualizado_em: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.now, onupdate=datetime.now
+        DateTime, default=agora_utc, onupdate=agora_utc
     )
 
     usuario: Mapped["UsuarioModel"] = relationship(back_populates="perfil")

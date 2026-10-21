@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 
 import models  # registra as tabelas antes de criá-las
@@ -21,6 +21,18 @@ app = FastAPI(
     description="API para controle de usuários, perfil e refeições",
     version="1.0.0",
 )
+
+
+
+@app.middleware("http")
+async def cabecalhos_de_seguranca(request: Request, call_next):
+    """Proteções básicas do navegador em todas as respostas."""
+    resposta = await call_next(request)
+    resposta.headers.setdefault("X-Content-Type-Options", "nosniff")
+    resposta.headers.setdefault("X-Frame-Options", "DENY")
+    resposta.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    return resposta
+
 
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 

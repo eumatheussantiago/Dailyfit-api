@@ -16,6 +16,7 @@ Projeto em grupo do curso de **Análise e Desenvolvimento de Sistemas (ADS)**.
 - Página inicial de apresentação
 - Cadastro com senha criptografada (a senha nunca é salva como texto)
 - Login com e-mail e senha, com "Manter conectado" e botão "Mostrar senha"
+- Cada usuário só acessa os próprios dados (token de acesso) e o login bloqueia após 10 senhas erradas
 - Formulário inicial em 3 etapas (objetivo, medidas, alimentação e rotina), salvo no banco
 - Painel com resumo da dieta e cadastro, edição e exclusão de refeições *(provisório — será substituído pelo dashboard do grupo)*
 - Resumo: total de refeições, dentro e fora da dieta e melhor sequência
@@ -44,7 +45,7 @@ Início → Entrar → Painel  (ou Formulário, se ainda não respondeu)
 ```
 main.py          → inicia a aplicação e registra as rotas
 database.py      → conexão com o banco de dados
-seguranca.py     → criptografia das senhas
+seguranca.py     → criptografia das senhas, tokens de acesso e limite de tentativas
 models/          → tabelas do banco (usuários, perfis e refeições)
 schemas/         → formato e validação dos dados da API
 routes/          → rotas da API e das páginas
@@ -98,7 +99,7 @@ No computador, o banco é um arquivo `dailyfit.db` criado automaticamente na pri
 pytest
 ```
 
-Resultado esperado: `9 passed`.
+Resultado esperado: `15 passed`.
 
 ## Deploy (site publicado)
 
@@ -109,9 +110,14 @@ Resultado esperado: `9 passed`.
 
 **Para atualizar o site, basta dar `git push` na branch `master`.** O Render publica a versão nova sozinho em 2 a 3 minutos.
 
-### Variável de ambiente
+### Variáveis de ambiente
 
-O endereço do banco fica **somente** na variável `DATABASE_URL`, no painel do Render (**Environment**). Ela contém a senha do banco, então **nunca coloque esse valor no código nem compartilhe**.
+Ficam **somente** no painel do Render (**Environment**), nunca no código:
+
+| Variável | Para que serve |
+|---|---|
+| `DATABASE_URL` | Endereço do banco no Supabase. Contém a senha do banco: **não compartilhe** |
+| `SECRET_KEY` | Chave que assina os tokens de login. Opcional: sem ela, a chave é derivada da `DATABASE_URL` |
 
 Formato usado (Session pooler do Supabase):
 
@@ -124,6 +130,8 @@ postgresql://dailyfit_app.<id-do-projeto>:<senha>@aws-0-us-east-2.pooler.supabas
 - O app usa um usuário próprio no banco (`dailyfit_app`), sem permissão de administrador.
 - As tabelas têm **RLS** ligado: a API pública do Supabase não consegue ler os dados, só o app.
 - As senhas dos usuários são salvas criptografadas (PBKDF2-SHA256).
+- As rotas com `/usuarios/{id}` exigem o token do próprio usuário: ninguém lê nem altera dados de outra pessoa.
+- Depois de 10 senhas erradas, o login daquele e-mail fica bloqueado por 15 minutos.
 
 ### Se o deploy falhar
 
@@ -135,20 +143,21 @@ postgresql://dailyfit_app.<id-do-projeto>:<senha>@aws-0-us-east-2.pooler.supabas
 
 ## Rotas da API
 
+O cadastro e o login devolvem um **`token`**. As demais rotas exigem esse token no cabeçalho `Authorization: Bearer <token>` e só funcionam para o próprio usuário (🔒). No `/docs`, clique em **"Authorize"** e cole o token para testar.
+
 | Método | Rota | O que faz |
 |---|---|---|
-| POST | `/usuarios` | Cria um usuário |
-| POST | `/usuarios/login` | Entra com e-mail e senha |
-| GET | `/usuarios` | Lista usuários |
-| GET | `/usuarios/{id}` | Mostra um usuário |
-| PUT | `/usuarios/{id}/perfil` | Salva as respostas do formulário inicial |
-| GET | `/usuarios/{id}/perfil` | Mostra as respostas do formulário inicial |
-| POST | `/usuarios/{id}/refeicoes` | Cadastra uma refeição |
-| GET | `/usuarios/{id}/refeicoes` | Lista as refeições |
-| GET | `/usuarios/{id}/refeicoes/{refeicao_id}` | Mostra uma refeição |
-| PUT | `/usuarios/{id}/refeicoes/{refeicao_id}` | Edita uma refeição |
-| DELETE | `/usuarios/{id}/refeicoes/{refeicao_id}` | Exclui uma refeição |
-| GET | `/usuarios/{id}/resumo` | Métricas da dieta |
+| POST | `/usuarios` | Cria um usuário (devolve o token) |
+| POST | `/usuarios/login` | Entra com e-mail e senha (devolve o token) |
+| GET | `/usuarios/{id}` 🔒 | Mostra o próprio usuário |
+| PUT | `/usuarios/{id}/perfil` 🔒 | Salva as respostas do formulário inicial |
+| GET | `/usuarios/{id}/perfil` 🔒 | Mostra as respostas do formulário inicial |
+| POST | `/usuarios/{id}/refeicoes` 🔒 | Cadastra uma refeição |
+| GET | `/usuarios/{id}/refeicoes` 🔒 | Lista as refeições |
+| GET | `/usuarios/{id}/refeicoes/{refeicao_id}` 🔒 | Mostra uma refeição |
+| PUT | `/usuarios/{id}/refeicoes/{refeicao_id}` 🔒 | Edita uma refeição |
+| DELETE | `/usuarios/{id}/refeicoes/{refeicao_id}` 🔒 | Exclui uma refeição |
+| GET | `/usuarios/{id}/resumo` 🔒 | Métricas da dieta |
 
 ## Regras do grupo
 
@@ -175,13 +184,13 @@ postgresql://dailyfit_app.<id-do-projeto>:<senha>@aws-0-us-east-2.pooler.supabas
 ### Como trocar o painel pelo dashboard do grupo
 
 1. Substitua o arquivo `templates/painel.html` pelo dashboard novo.
-2. Para buscar os dados, use as rotas `GET /usuarios/{id}/resumo` e `/usuarios/{id}/refeicoes`. O `id` do usuário logado está salvo no navegador. Veja `static/js/app.js`, função `obterUsuario()`.
+2. Para buscar os dados, use as rotas `GET /usuarios/{id}/resumo` e `/usuarios/{id}/refeicoes` **pela função `api()` do `static/js/app.js`**: ela já envia o token de acesso. O usuário logado (com `id` e `token`) vem de `obterUsuario()`.
 3. Rode `pytest`, teste com o `iniciar.bat` e dê `git push`.
 
 ## Próximos passos
 
 - Dashboard final do grupo
 - Recuperação de senha ("Esqueci minha senha" ainda só mostra um aviso)
-- Token JWT para proteger as rotas da API
+- Imagens da tela de início mais leves (hoje somam ~9,5 MB)
 - Gráfico de evolução semanal
 - Hábitos e metas personalizadas

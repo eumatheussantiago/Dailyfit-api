@@ -1,5 +1,5 @@
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -62,3 +62,8 @@ class PerfilResponse(PerfilBase):
     atualizado_em: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("atualizado_em")
+    @classmethod
+    def em_utc(cls, valor: datetime) -> datetime:
+        return valor if valor.tzinfo else valor.replace(tzinfo=timezone.utc)

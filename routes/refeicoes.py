@@ -7,20 +7,18 @@ from database import get_db
 from models.refeicao import RefeicaoModel
 from models.usuario import UsuarioModel
 from schemas.refeicao import RefeicaoCreate, RefeicaoResponse
+from seguranca import exigir_dono
 
 
 router = APIRouter(
     prefix="/usuarios/{usuario_id}/refeicoes",
-    tags=["Refeições"]
+    tags=["Refeições"],
+    dependencies=[Depends(exigir_dono)]  # só o dono dos dados acessa
 )
 
 
 def verificar_usuario(usuario_id: int, db: Session):
-    usuario = (
-        db.query(UsuarioModel)
-        .filter(UsuarioModel.id == usuario_id)
-        .first()
-    )
+    usuario = db.get(UsuarioModel, usuario_id)
 
     if not usuario:
         raise HTTPException(
@@ -72,7 +70,7 @@ def listar_refeicoes(
     return (
         db.query(RefeicaoModel)
         .filter(RefeicaoModel.usuario_id == usuario_id)
-        .order_by(RefeicaoModel.data_hora.desc())
+        .order_by(RefeicaoModel.data_hora.desc(), RefeicaoModel.id.desc())
         .all()
     )
 
