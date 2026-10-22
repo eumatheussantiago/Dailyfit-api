@@ -1,0 +1,18 @@
+{% extends "base_app.html" %}
+
+{# Molde das telas depois do login: "Olá", botão Sair e o menu com as 4 telas #}
+
+{% block nav %}
+<span class="nav-ola" id="ola"></span>
+<button type="button" class="btn-sair" id="sair">Sair</button>
+{% endblock %}
+
+{% block conteudo %}
+<nav class="abas" aria-label="Menu do app">
+    {% for endereco, nome in [("/painel", "Painel"), ("/refeicoes", "Refeições"), ("/treinos", "Treinos"), ("/progresso", "Progresso")] %}
+    <a href="{{ endereco }}"{% if request.url.path == endereco %} class="ativa" aria-current="page"{% endif %}>{{ nome }}</a>
+    {% endfor %}
+</nav>
+
+{% block pagina %}{% endblock %}
+{% endblock %}
