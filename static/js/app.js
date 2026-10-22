@@ -135,3 +135,54 @@ function avisar(mensagem) {
     clearTimeout(temporizadorToast);
     temporizadorToast = setTimeout(() => toast.classList.remove("visivel"), 2500);
 }
+
+// Telas depois do login (base_logado.html): sem login volta para /login;
+// com login mostra "Olá, Nome" e liga o botão Sair. Devolve o usuário logado.
+function exigirLogin() {
+    const usuario = obterUsuario();
+    if (!usuario) {
+        window.location.href = "/login";
+        return null;
+    }
+    document.getElementById("ola").textContent = `Olá, ${usuario.nome?.split(" ")[0] || ""}`;
+    document.getElementById("sair").addEventListener("click", sair);
+    return usuario;
+}
+
+const formatarData = new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+});
+
+// Item de lista de uma refeição: nome, data, descrição e selo dentro/fora da dieta
+function criarItemRefeicao(refeicao) {
+    const item = document.createElement("li");
+    item.className = "refeicao-item";
+
+    const info = document.createElement("div");
+    info.className = "refeicao-info";
+
+    const nome = document.createElement("strong");
+    nome.textContent = refeicao.nome;
+
+    const data = document.createElement("small");
+    data.textContent = formatarData.format(new Date(refeicao.data_hora));
+
+    info.append(nome, data);
+
+    if (refeicao.descricao) {
+        const desc = document.createElement("p");
+        desc.textContent = refeicao.descricao;
+        info.append(desc);
+    }
+
+    const selo = document.createElement("span");
+    selo.className = refeicao.nao_dieta ? "selo selo-fora" : "selo selo-dentro";
+    selo.textContent = refeicao.nao_dieta ? "Fora da dieta" : "Na dieta";
+
+    item.append(info, selo);
+    return item;
+}

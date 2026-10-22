@@ -49,8 +49,8 @@ seguranca.py     → criptografia das senhas, tokens de acesso e limite de tenta
 models/          → tabelas do banco (usuários, perfis e refeições)
 schemas/         → formato e validação dos dados da API
 routes/          → rotas da API e das páginas
-templates/       → páginas HTML (início, cadastro, login, formulário, painel)
-static/css/      → estilos (style.css do grupo + app.css do painel)
+templates/       → páginas HTML (início, cadastro, login, formulário e, depois do login, painel, refeições, treinos e progresso)
+static/css/      → estilos (style.css do grupo + app.css das telas depois do login)
 static/js/       → scripts das páginas e da ligação com a API
 tests/           → testes automáticos
 render.yaml      → configuração do deploy no Render
@@ -181,15 +181,22 @@ O cadastro e o login devolvem um **`token`**. As demais rotas exigem esse token 
 | `--sombra` | `0 20px 60px rgba(40, 125, 69, 0.10)` |
 | `--radius` | `18px` |
 
-### Como trocar o painel pelo dashboard do grupo
+### Telas depois do login
 
-1. Substitua o arquivo `templates/painel.html` pelo dashboard novo.
-2. Para buscar os dados, use as rotas `GET /usuarios/{id}/resumo` e `/usuarios/{id}/refeicoes` **pela função `api()` do `static/js/app.js`**: ela já envia o token de acesso. O usuário logado (com `id` e `token`) vem de `obterUsuario()`.
-3. Rode `pytest`, teste com o `iniciar.bat` e dê `git push`.
+| Tela | Arquivos | O que faz |
+|---|---|---|
+| Painel (`/painel`) | `painel.html` + `painel.js` | Resumo e as 5 refeições mais recentes |
+| Refeições (`/refeicoes`) | `refeicoes.html` + `refeicoes.js` | Adicionar, editar e excluir refeições + histórico |
+| Treinos (`/treinos`) | `treinos.html` | Demonstrativa (ainda não salva no banco) |
+| Progresso (`/progresso`) | `progresso.html` + `progresso.js` | Números da dieta, % e melhor sequência |
+
+- As 4 telas usam o molde `templates/base_logado.html` (menu com as abas, "Olá" e botão Sair).
+- Os dados vêm da API **pela função `api()` do `static/js/app.js`**, que já envia o token de acesso. O usuário logado vem de `exigirLogin()` (sem login, volta para `/login`). Não use campo de "ID do usuário": a API só mostra os dados do dono do token.
+- Depois de mudar, rode `pytest`, teste com o `iniciar.bat` e dê `git push`.
 
 ## Próximos passos
 
-- Dashboard final do grupo
+- Salvar os treinos no banco (hoje a tela é demonstrativa)
 - Recuperação de senha ("Esqueci minha senha" ainda só mostra um aviso)
 - Imagens da tela de início mais leves (hoje somam ~9,5 MB)
 - Gráfico de evolução semanal
