@@ -34,6 +34,8 @@
             <div class="stat" id="meta-bloco"><span>Meta</span> <strong id="peso-meta">—</strong></div>
             <div class="stat" id="dif-bloco"><span>Para chegar à meta</span> <strong id="peso-dif">—</strong></div>
         </div>
+        <p class="progress-text" id="n-meta" hidden></p>
+        <p class="alerta-meta" id="n-alerta" hidden></p>
         <p class="progress-text">O peso não é atualizado sozinho: quando mudar, edite suas respostas.</p>
 
         <h3 class="metas-titulo">Metas da rotina</h3>
@@ -71,6 +73,33 @@
     </aside>
 
 </div>
+
+<section class="lista-refeicoes bloco numeros" id="numeros" aria-labelledby="numeros-titulo" hidden>
+    <h2 id="numeros-titulo">Seu corpo em números</h2>
+    <div class="resumo-grid">
+        <div class="resumo-card">
+            <span>IMC</span>
+            <strong id="n-imc">—</strong>
+            <p id="n-imc-faixa"></p>
+        </div>
+        <div class="resumo-card resumo-dentro">
+            <span>Peso saudável para a sua altura</span>
+            <strong id="n-peso">—</strong>
+            <p>IMC de 18,5 a 24,9</p>
+        </div>
+        <div class="resumo-card resumo-sequencia">
+            <span>Gasto estimado</span>
+            <strong id="n-gasto">—</strong>
+            <p id="n-gasto-ajuda"></p>
+        </div>
+        <div class="resumo-card">
+            <span>Água</span>
+            <strong id="n-agua">—</strong>
+            <p>por dia (35 ml por kg)</p>
+        </div>
+    </div>
+    <p class="aviso">Estimativas gerais: IMC e faixas da OMS, gasto pela fórmula de Mifflin-St Jeor com o seu nível de atividade. Não substituem a avaliação de um nutricionista ou médico.</p>
+</section>
 {% endblock %}
 
 {% block scripts %}

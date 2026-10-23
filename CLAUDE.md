@@ -12,12 +12,14 @@ responde um formulário inicial (3 etapas), registra refeições (dentro/fora da
 - Banco: SQLite local (dailyfit.db, criado sozinho) | PostgreSQL no Supabase em produção (driver psycopg 3)
 - Front-end: HTML + CSS + JavaScript puro (sem framework)
 - Deploy: Render, plano grátis, configurado em render.yaml. Todo push na master publica sozinho (2-3 min)
-- Testes: pytest (tests/test_api.py) — 15 testes, todos devem passar
+- Testes: pytest (tests/test_api.py) — 19 testes (test_api.py + test_saude.py), todos devem passar
 
 ## Estrutura
 main.py        app FastAPI, middleware de cabeçalhos de segurança, cria tabelas ao iniciar
 database.py    conexão; DATABASE_URL por variável de ambiente; criar_tabelas() adiciona colunas/índices
                novos em bancos existentes e liga RLS no Postgres; agora_utc() para datas
+saude.py       IMC e faixa da OMS, peso saudável, gasto calórico (Mifflin-St Jeor), água e prazo
+               até a meta; GET/PUT /perfil devolvem esses números em "indicadores"
 seguranca.py   hash de senha (PBKDF2-SHA256), tokens assinados (HMAC, 30 dias), exigir_dono(),
                limite de 10 senhas erradas por e-mail a cada 15 min
 models/        usuarios, perfis (formulário inicial), refeicoes (índice usuario_id + data_hora)
@@ -68,7 +70,7 @@ iniciar.bat    roda o app no Windows com dois cliques
 ## Como rodar e testar
 pip install -r requirements.txt
 uvicorn main:app --reload        -> http://127.0.0.1:8000
-pytest                           -> esperado: 15 passed
+pytest                           -> esperado: 19 passed
 
 ## Estado atual (21/10/2026)
 - Concluído e publicado: banco, cadastro/login com senha e token, formulário inicial, refeições,
