@@ -99,7 +99,7 @@ No computador, o banco é um arquivo `dailyfit.db` criado automaticamente na pri
 pytest
 ```
 
-Resultado esperado: `24 passed`.
+Resultado esperado: `29 passed`.
 
 ## Deploy (site publicado)
 
@@ -116,7 +116,7 @@ A tela **Objetivos** tem o botão **"Gerar dicas"**: a IA escreve de 3 a 5 dicas
 
 - **Para ligar:** crie uma chave em [console.anthropic.com](https://console.anthropic.com), coloque um pouco de crédito e, no painel do Render, em **Environment**, crie `ANTHROPIC_API_KEY` com a chave. Sem a chave, as dicas ficam desligadas e o resto do site funciona normal. **Nunca coloque a chave no código.**
 - **Custo:** cada geração custa menos de US$ 0,001. Cada pessoa gera no máximo uma vez a cada 20 horas, e o site todo no máximo `DICAS_LIMITE_DIA` vezes por dia (padrão 200). Vale definir também um limite de gasto no console da Anthropic.
-- **Privacidade (LGPD):** para a IA vão só as respostas do formulário, os números e o resumo das refeições, **nunca nome nem e-mail**. A tela avisa antes de enviar.
+- **Privacidade (LGPD):** para a IA vão só as respostas do formulário, os números e o resumo das refeições, **nunca nome nem e-mail**. Para gerar, a pessoa marca que concorda (a data do aceite fica salva) e precisa ter 18 anos ou mais.
 
 ### Variáveis de ambiente
 
