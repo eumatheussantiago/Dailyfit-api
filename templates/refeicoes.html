@@ -5,8 +5,8 @@
 {% block pagina %}
 <div class="painel-topo">
     <div class="section-label">ALIMENTAÇÃO</div>
-    <h1>Registre suas <span>refeições</span> 🍽️</h1>
-    <p>Adicione o que comeu e acompanhe seus registros.</p>
+    <h1>Comeu? <span>Registre agora.</span></h1>
+    <p>Escolha a refeição, diga se foi dentro da dieta e pronto.</p>
 </div>
 
 <div class="painel-colunas">
@@ -15,8 +15,9 @@
     <form id="form-refeicao" class="app-form painel-form" novalidate>
         <h2 id="form-titulo">Nova refeição</h2>
 
-        <label for="nome">Nome</label>
-        <input id="nome" name="nome" type="text" placeholder="Ex.: Almoço" required maxlength="100">
+        <label for="nome">Qual refeição?</label>
+        <div class="atalhos" id="atalhos" role="group" aria-label="Atalhos de refeição"></div>
+        <input id="nome" name="nome" type="text" placeholder="Ou escreva outro nome, ex.: Pré-treino" required maxlength="100">
 
         <label for="descricao">Descrição <small>(opcional)</small></label>
         <textarea id="descricao" name="descricao" rows="3" maxlength="500" placeholder="Ex.: Arroz, feijão, frango e salada"></textarea>
@@ -42,8 +43,8 @@
     <!-- HISTÓRICO -->
     <div class="lista-refeicoes">
         <h2>Histórico de refeições</h2>
-        <p class="lista-vazia" id="vazia" hidden>Nenhuma refeição cadastrada ainda. Adicione a primeira ao lado.</p>
-        <ul id="lista"></ul>
+        <p class="lista-vazia" id="vazia" hidden>Nenhuma refeição registrada ainda. Comece pela de agora.</p>
+        <div id="lista"></div>
     </div>
 
 </div>

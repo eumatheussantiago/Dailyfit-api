@@ -1,4 +1,4 @@
-// Tela de refeições: cadastro, edição, exclusão e histórico
+// Tela de refeições: atalhos de nome, cadastro, edição, exclusão e histórico por dia
 
 const usuario = exigirLogin();
 
@@ -8,8 +8,34 @@ const lista = document.getElementById("lista");
 const btnSalvar = document.getElementById("btn-salvar");
 const btnCancelar = document.getElementById("btn-cancelar");
 const formTitulo = document.getElementById("form-titulo");
+const atalhos = document.getElementById("atalhos");
+const formatarDia = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "numeric", month: "long" });
 
 let editandoId = null;
+
+// Atalhos com os tipos que o Painel reconhece: o nome escolhido entra no plano do dia
+for (const tipo of TIPOS_REFEICAO) {
+    const botao = document.createElement("button");
+    botao.type = "button";
+    botao.dataset.nome = tipo.nome;
+    botao.textContent = `${tipo.icone} ${tipo.nome}`;
+    botao.addEventListener("click", () => {
+        form.nome.value = tipo.nome;
+        marcarAtalho();
+        form.descricao.focus();
+    });
+    atalhos.append(botao);
+}
+
+// Destaca o atalho do tipo que o nome digitado já é
+function marcarAtalho() {
+    const tipo = tipoDaRefeicao(form.nome.value);
+    for (const botao of atalhos.children) {
+        botao.setAttribute("aria-pressed", String(botao.dataset.nome === tipo?.nome));
+    }
+}
+
+form.nome.addEventListener("input", marcarAtalho);
 
 // Se o login tiver vencido, a função api() já leva o usuário de volta para a tela de login.
 async function carregarRefeicoes() {
@@ -20,31 +46,62 @@ async function carregarRefeicoes() {
     }
 }
 
+function nomeDoDia(data) {
+    if (chaveDia(data) === chaveDia(new Date())) return "Hoje";
+    if (chaveDia(data) === diasAtras(1).getTime()) return "Ontem";
+    return formatarDia.format(data);
+}
+
+// A API devolve da mais recente para a mais antiga: cada dia vira um grupo, na mesma ordem
 function desenharLista(refeicoes) {
-    lista.replaceChildren();
     document.getElementById("vazia").hidden = refeicoes.length > 0;
 
+    const dias = new Map();
     for (const refeicao of refeicoes) {
-        const item = criarItemRefeicao(refeicao);
-
-        const acoes = document.createElement("div");
-        acoes.className = "refeicao-acoes";
-
-        const editar = document.createElement("button");
-        editar.type = "button";
-        editar.textContent = "Editar";
-        editar.addEventListener("click", () => comecarEdicao(refeicao));
-
-        const apagar = document.createElement("button");
-        apagar.type = "button";
-        apagar.className = "apagar";
-        apagar.textContent = "Excluir";
-        apagar.addEventListener("click", () => excluir(refeicao));
-
-        acoes.append(editar, apagar);
-        item.append(acoes);
-        lista.append(item);
+        const chave = chaveDia(refeicao.data_hora);
+        if (!dias.has(chave)) dias.set(chave, []);
+        dias.get(chave).push(refeicao);
     }
+
+    lista.replaceChildren(
+        ...[...dias].map(([chave, doDia]) => {
+            const grupo = document.createElement("section");
+            grupo.className = "dia-grupo";
+
+            const titulo = document.createElement("h3");
+            const resumo = document.createElement("small");
+            const dentro = doDia.filter((r) => !r.nao_dieta).length;
+            resumo.textContent = `${plural(doDia.length, "refeição", "refeições")} · ${dentro} na dieta`;
+            titulo.append(nomeDoDia(new Date(chave)), " ", resumo);
+
+            const itens = document.createElement("ul");
+            itens.append(...doDia.map(criarItemComAcoes));
+            grupo.append(titulo, itens);
+            return grupo;
+        })
+    );
+}
+
+function criarItemComAcoes(refeicao) {
+    const item = criarItemRefeicao(refeicao);
+
+    const acoes = document.createElement("div");
+    acoes.className = "refeicao-acoes";
+
+    const editar = document.createElement("button");
+    editar.type = "button";
+    editar.textContent = "Editar";
+    editar.addEventListener("click", () => comecarEdicao(refeicao));
+
+    const apagar = document.createElement("button");
+    apagar.type = "button";
+    apagar.className = "apagar";
+    apagar.textContent = "Excluir";
+    apagar.addEventListener("click", () => excluir(refeicao));
+
+    acoes.append(editar, apagar);
+    item.append(acoes);
+    return item;
 }
 
 function comecarEdicao(refeicao) {
@@ -52,6 +109,7 @@ function comecarEdicao(refeicao) {
     form.nome.value = refeicao.nome;
     form.descricao.value = refeicao.descricao || "";
     form.dieta.value = refeicao.nao_dieta ? "nao" : "sim";
+    marcarAtalho();
     formTitulo.textContent = "Editar refeição";
     btnSalvar.textContent = "Salvar alterações";
     btnCancelar.hidden = false;
@@ -62,6 +120,7 @@ function comecarEdicao(refeicao) {
 function limparFormulario() {
     editandoId = null;
     form.reset();
+    marcarAtalho();
     formTitulo.textContent = "Nova refeição";
     btnSalvar.textContent = "Adicionar refeição";
     btnCancelar.hidden = true;
@@ -110,5 +169,10 @@ async function excluir(refeicao) {
         avisar(erro.message);
     }
 }
+
+// Vindo do Painel (seta de uma refeição do plano), o nome já chega preenchido
+const nomeSugerido = new URLSearchParams(location.search).get("nome");
+if (nomeSugerido) form.nome.value = nomeSugerido.slice(0, 100);
+marcarAtalho();
 
 if (usuario) carregarRefeicoes();
