@@ -12,7 +12,7 @@ responde um formulário inicial (3 etapas), registra refeições (dentro/fora da
 - Banco: SQLite local (dailyfit.db, criado sozinho) | PostgreSQL no Supabase em produção (driver psycopg 3)
 - Front-end: HTML + CSS + JavaScript puro (sem framework)
 - Deploy: Render, plano grátis, configurado em render.yaml. Todo push na master publica sozinho (2-3 min)
-- Testes: pytest (tests/test_api.py + tests/test_saude.py) — 24 testes, todos devem passar
+- Testes: pytest (tests/test_api.py + tests/test_saude.py) — 29 testes, todos devem passar
 - IA: Claude Haiku 5.5 (SDK oficial `anthropic`) para as dicas da tela Objetivos (ia.py)
 
 ## Estrutura
@@ -71,8 +71,11 @@ iniciar.bat    roda o app no Windows com dois cliques
   O --laranja-principal puro fica só para fundo, borda e gráfico (2,4:1 como texto não passa).
 - Nunca colocar senhas, DATABASE_URL, SECRET_KEY ou ANTHROPIC_API_KEY no código/commits (ficam só no Render).
 - Dicas com IA (routes/dicas.py): para a IA vão só formulário, números de saude.py e resumo dos
-  últimos 7 dias, nunca nome/e-mail (dados de saúde são sensíveis pela LGPD); a tela avisa antes;
-  1 geração por pessoa a cada 20 h e DICAS_LIMITE_DIA (padrão 200) no site todo. Nos testes a IA
+  últimos 7 dias, nunca nome/e-mail (dados de saúde são sensíveis pela LGPD); gerar exige
+  {"consentimento": true} (caixa marcada na tela; a data do 1º aceite fica em
+  usuarios.consentimento_ia_em) e 18 anos ou mais. Cada tentativa grava uma reserva ANTES de
+  chamar a IA (libera a conexão do banco durante a chamada e conta tentativas, não só sucessos):
+  1 geração por pessoa a cada 20 h, 3 falhas por dia e DICAS_LIMITE_DIA (padrão 200) no site. Nos testes a IA
   é trocada por uma função falsa (monkeypatch em ia.gerar_dicas): o pytest nunca gasta nada.
 - Sempre trabalhar em branch separada e abrir pull request. Não fazer merge sem aprovação.
 - Explicar tudo em português simples, como para um leigo.
@@ -80,7 +83,7 @@ iniciar.bat    roda o app no Windows com dois cliques
 ## Como rodar e testar
 pip install -r requirements.txt
 uvicorn main:app --reload        -> http://127.0.0.1:8000
-pytest                           -> esperado: 24 passed
+pytest                           -> esperado: 29 passed
 
 ## Estado atual (21/10/2026)
 - Concluído e publicado: banco, cadastro/login com senha e token, formulário inicial, refeições,

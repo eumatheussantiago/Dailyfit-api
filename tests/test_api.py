@@ -306,6 +306,7 @@ def test_banco_antigo_ganha_coluna_de_senha(tmp_path):
         database.engine = engine_original
 
 
+ACEITE = {"consentimento": True}
 DICA = {"titulo": "Café no horário", "texto": "Tome o café às 7h30, como você planejou."}
 
 
@@ -323,7 +324,7 @@ def test_dicas_desligadas_sem_chave(client, monkeypatch):
     usuario_id, token = criar_usuario(client)
     url = f"/usuarios/{usuario_id}/dicas"
     assert client.get(url, headers=token).json() == {"ligadas": False, "dicas": [], "criado_em": None, "proxima_em": None}
-    assert client.post(url, headers=token).status_code == 503
+    assert client.post(url, json=ACEITE, headers=token).status_code == 503
 
 
 def test_dicas_com_ia(client, monkeypatch):
@@ -336,7 +337,7 @@ def test_dicas_com_ia(client, monkeypatch):
     url, usuario_id, token = preparar_dicas(client, monkeypatch, ia_falsa)
     client.post(f"/usuarios/{usuario_id}/refeicoes", json={"nome": "Lanche", "nao_dieta": True}, headers=token)
 
-    gerada = client.post(url, headers=token)
+    gerada = client.post(url, json=ACEITE, headers=token)
     assert gerada.status_code == 200
     assert gerada.json()["ligadas"] is True and gerada.json()["dicas"] == [DICA]
     assert gerada.json()["criado_em"].endswith("Z")
@@ -350,7 +351,7 @@ def test_dicas_com_ia(client, monkeypatch):
 
     # fica guardada; gerar de novo no mesmo dia é recusado sem chamar a IA
     assert client.get(url, headers=token).json()["dicas"] == [DICA]
-    assert client.post(url, headers=token).status_code == 429
+    assert client.post(url, json=ACEITE, headers=token).status_code == 429
     assert len(enviados) == 1
 
     # só o dono vê
@@ -363,16 +364,16 @@ def test_dicas_erro_da_ia_e_limites(client, monkeypatch):
         raise ia.ErroDicas("O serviço de IA não respondeu agora. Tente de novo mais tarde.")
 
     url, usuario_id, token = preparar_dicas(client, monkeypatch, ia_fora_do_ar)
-    falhou = client.post(url, headers=token)
+    falhou = client.post(url, json=ACEITE, headers=token)
     assert falhou.status_code == 503 and "não respondeu" in falhou.json()["detail"]
     assert client.get(url, headers=token).json()["dicas"] == []  # nada foi salvo
 
     monkeypatch.setenv("DICAS_LIMITE_DIA", "0")
-    assert "limite" in client.post(url, headers=token).json()["detail"]
+    assert "limite" in client.post(url, json=ACEITE, headers=token).json()["detail"]
 
     # sem formulário respondido
     sem_perfil, token_sem = criar_usuario(client, "caio@email.com")
-    assert client.post(f"/usuarios/{sem_perfil}/dicas", headers=token_sem).status_code == 400
+    assert client.post(f"/usuarios/{sem_perfil}/dicas", json=ACEITE, headers=token_sem).status_code == 400
 
 
 def test_ia_usa_haiku_e_trata_recusa(monkeypatch):
@@ -396,3 +397,99 @@ def test_ia_usa_haiku_e_trata_recusa(monkeypatch):
     assert chamadas[0]["model"] == "claude-haiku-5-5"
     assert chamadas[0]["output_format"] is ia.Dicas
     assert "emagrecimento" in chamadas[0]["messages"][0]["content"]
+
+
+def test_dicas_exigem_consentimento_e_maioridade(client, monkeypatch):
+    url, usuario_id, token = preparar_dicas(client, monkeypatch, lambda dados: [DICA])
+    sem_aceite = client.post(url, json={}, headers=token)
+    assert sem_aceite.status_code == 400 and "concorda" in sem_aceite.json()["detail"]
+
+    client.put(f"/usuarios/{usuario_id}/perfil", json={**PERFIL, "idade": 16}, headers=token)
+    menor = client.post(url, json=ACEITE, headers=token)
+    assert menor.status_code == 400 and "18 anos" in menor.json()["detail"]
+
+
+def test_dicas_tentativas_contam_no_limite(client, monkeypatch):
+    def ia_fora_do_ar(dados):
+        raise ia.ErroDicas("O serviço de IA não respondeu agora. Tente de novo mais tarde.")
+
+    url, usuario_id, token = preparar_dicas(client, monkeypatch, ia_fora_do_ar)
+    # 3 falhas seguidas e a quarta tentativa já é recusada sem chamar a IA
+    assert [client.post(url, json=ACEITE, headers=token).status_code for _ in range(4)] == [503, 503, 503, 429]
+
+    # a falha também conta no limite do site
+    monkeypatch.setenv("DICAS_LIMITE_DIA", "3")
+    bia_id, token_bia = criar_usuario(client, "bia@email.com")
+    client.put(f"/usuarios/{bia_id}/perfil", json=PERFIL, headers=token_bia)
+    bia = client.post(f"/usuarios/{bia_id}/dicas", json=ACEITE, headers=token_bia)
+    assert bia.status_code == 503 and "limite" in bia.json()["detail"]
+
+
+def test_dicas_em_andamento_bloqueiam_clique_duplo(client, monkeypatch):
+    from datetime import datetime as dt
+
+    url, usuario_id, token = preparar_dicas(client, monkeypatch, lambda dados: [DICA])
+    # simula uma geração ainda em andamento (reserva gravada há poucos segundos)
+    db = next(get_db_teste())
+    from models.dica import DicaModel
+    from database import agora_utc
+    db.add(DicaModel(usuario_id=usuario_id, conteudo="", criado_em=agora_utc()))
+    db.commit()
+    resposta = client.post(url, json=ACEITE, headers=token)
+    assert resposta.status_code == 429 and "sendo geradas" in resposta.json()["detail"]
+    assert client.get(url, headers=token).json()["dicas"] == []  # reserva não aparece como dica
+
+
+def test_dados_para_ia_sinalizam_quem_precisa_de_cuidado(client, monkeypatch):
+    enviados = []
+    url, usuario_id, token = preparar_dicas(client, monkeypatch, lambda dados: enviados.append(dados) or [DICA])
+
+    # 19 anos com meta de IMC 16,5: saude.py não classifica a faixa, mas o sinal vale em qualquer idade
+    client.put(f"/usuarios/{usuario_id}/perfil", json={**PERFIL, "idade": 19, "peso_meta": 45}, headers=token)
+    client.post(url, json=ACEITE, headers=token)
+    assert enviados[-1]["precisa_cuidado"] is True
+
+    # já abaixo do peso, sem meta
+    _, token_bia = criar_usuario(client, "bia@email.com")
+    bia_id = client.post("/usuarios/login", json={"email": "bia@email.com", "senha": "segredo123"}).json()["id"]
+    client.put(f"/usuarios/{bia_id}/perfil", json={**PERFIL, "peso_atual": 48, "peso_meta": None}, headers=token_bia)
+    client.post(f"/usuarios/{bia_id}/dicas", json=ACEITE, headers=token_bia)
+    assert enviados[-1]["precisa_cuidado"] is True
+
+    # PERFIL padrão (IMC 25,9, meta 64 kg = IMC 23,5) não precisa
+    _, token_caio = criar_usuario(client, "caio@email.com")
+    caio_id = client.post("/usuarios/login", json={"email": "caio@email.com", "senha": "segredo123"}).json()["id"]
+    client.put(f"/usuarios/{caio_id}/perfil", json=PERFIL, headers=token_caio)
+    client.post(f"/usuarios/{caio_id}/dicas", json=ACEITE, headers=token_caio)
+    assert enviados[-1]["precisa_cuidado"] is False
+
+
+def test_ia_resposta_cortada_ou_vazia_vira_erro_amigavel(monkeypatch):
+    from pydantic import ValidationError
+
+    class Vazia:
+        stop_reason = "end_turn"
+        parsed_output = ia.Dicas(dicas=[])
+
+    respostas = []
+
+    class ClienteFalso:
+        def __init__(self, **opcoes):
+            self.messages = self
+
+        def parse(self, **pedido):
+            resposta = respostas.pop(0)
+            if isinstance(resposta, Exception):
+                raise resposta
+            return resposta
+
+    monkeypatch.setattr(ia.anthropic, "Anthropic", ClienteFalso)
+    try:
+        ia.Dicas.model_validate_json('{"dicas": [{"titulo": "Café')  # JSON cortado
+    except ValidationError as cortado:
+        respostas.append(cortado)
+    respostas.append(Vazia())
+
+    for _ in range(2):
+        with pytest.raises(ia.ErroDicas):
+            ia.gerar_dicas({"formulario": {}})

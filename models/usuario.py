@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import String
+from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
@@ -13,6 +14,8 @@ class UsuarioModel(Base):
     nome: Mapped[str] = mapped_column(String(100))
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     senha_hash: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    # LGPD (dado de saúde): quando a pessoa concordou pela primeira vez em enviar dados à IA
+    consentimento_ia_em: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
     # Ao apagar um usuário, as refeições, o perfil e as dicas dele são apagados junto
     refeicoes: Mapped[list["RefeicaoModel"]] = relationship(

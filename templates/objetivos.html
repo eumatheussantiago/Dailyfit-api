@@ -105,8 +105,12 @@
     <h2 id="dicas-titulo" tabindex="-1">Dicas da semana <small>com IA</small></h2>
     <p class="lista-vazia" id="dicas-estado" role="status"></p>
     <ul id="dicas-lista"></ul>
-    <p class="aviso">Ao gerar, o DailyFit envia para a IA Claude (da Anthropic) as respostas do formulário, os números acima e o resumo das suas refeições dos últimos 7 dias, sem nome nem e-mail. As dicas são gerais e não substituem um nutricionista ou médico.</p>
+    <label class="aceite" id="dicas-aceite-rotulo" hidden>
+        <input type="checkbox" id="dicas-aceite">
+        <span>Concordo em enviar para a IA Claude, da Anthropic (empresa dos EUA, onde os dados são processados), as respostas do meu formulário, incluindo peso, altura e restrições, que são dados de saúde, os números acima e o resumo das minhas refeições dos últimos 7 dias. Nome e e-mail não são enviados. Os textos que escrevi no formulário vão como estão: não coloque neles o que não quiser compartilhar.</span>
+    </label>
     <button type="button" class="btn-primary" id="dicas-gerar" hidden>Gerar dicas</button>
+    <p class="aviso">As dicas são gerais e não substituem um nutricionista ou médico.</p>
 </section>
 {% endblock %}
 

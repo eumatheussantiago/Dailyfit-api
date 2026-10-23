@@ -126,7 +126,16 @@ function formatarQuando(data) {
     return formatarDiaHora.format(data);
 }
 
-// Dicas da IA: a API guarda a última geração e diz quando dá para gerar de novo
+// Dicas da IA: a API guarda a última geração e diz quando dá para gerar de novo.
+// Gerar exige marcar o consentimento (dado de saúde, LGPD); a API registra o aceite.
+const aceite = document.getElementById("dicas-aceite");
+let podeGerar = false;
+
+function atualizarBotaoDicas() {
+    document.getElementById("dicas-gerar").disabled = !(podeGerar && aceite.checked);
+}
+aceite.addEventListener("change", atualizarBotaoDicas);
+
 function desenharDicas(resposta) {
     const estado = document.getElementById("dicas-estado");
     const botao = document.getElementById("dicas-gerar");
@@ -147,6 +156,7 @@ function desenharDicas(resposta) {
     if (!resposta.ligadas) {
         estado.textContent = "As dicas com IA ainda não foram ligadas neste site.";
         botao.hidden = true;
+        document.getElementById("dicas-aceite-rotulo").hidden = true;
         return;
     }
 
@@ -156,7 +166,9 @@ function desenharDicas(resposta) {
         ? `Geradas ${formatarQuando(new Date(resposta.criado_em))}.`
         : "Gere dicas feitas para você a partir do seu formulário e das refeições da semana.";
     botao.hidden = false;
-    botao.disabled = Boolean(esperar);
+    document.getElementById("dicas-aceite-rotulo").hidden = Boolean(esperar);
+    podeGerar = !esperar;
+    atualizarBotaoDicas();
     botao.textContent = esperar
         ? `Novas dicas ${formatarQuando(proxima)}`
         : resposta.criado_em
@@ -164,7 +176,13 @@ function desenharDicas(resposta) {
           : "Gerar dicas";
 }
 
-async function carregarDicas() {
+async function carregarDicas(perfil) {
+    if (perfil.idade < 18) {
+        // LGPD art. 14: dado de saúde de menor não vai para a IA (a API também recusa)
+        document.getElementById("dicas").hidden = false;
+        document.getElementById("dicas-estado").textContent = "As dicas com IA são só para maiores de 18 anos.";
+        return;
+    }
     try {
         desenharDicas(await api(`/usuarios/${usuario.id}/dicas`));
     } catch (erro) {
@@ -179,11 +197,13 @@ document.getElementById("dicas-gerar").addEventListener("click", async () => {
     botao.textContent = "Gerando dicas…";
     estado.textContent = "A IA está escrevendo suas dicas. Leva alguns segundos.";
     try {
-        desenharDicas(await api(`/usuarios/${usuario.id}/dicas`, { method: "POST" }));
+        desenharDicas(
+            await api(`/usuarios/${usuario.id}/dicas`, { method: "POST", body: { consentimento: aceite.checked } })
+        );
         document.getElementById("dicas-titulo").focus();
     } catch (erro) {
         estado.textContent = erro.message;
-        botao.disabled = false;
+        atualizarBotaoDicas();
         botao.textContent = "Tentar de novo";
     }
 });
@@ -224,7 +244,7 @@ async function carregarObjetivos() {
         desenharNumeros(perfil);
         desenharPlano(perfil);
         desenharContou(perfil);
-        carregarDicas(); // sem await: as dicas não seguram o resto da tela
+        carregarDicas(perfil); // sem await: as dicas não seguram o resto da tela
         desenharRotina(perfil, await api(`/usuarios/${usuario.id}/refeicoes`));
     } catch (erro) {
         avisar(erro.message);
