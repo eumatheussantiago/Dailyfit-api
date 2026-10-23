@@ -265,6 +265,10 @@ def test_formulario_inicial(client):
     # Responder de novo atualiza em vez de duplicar
     atualizado = client.put(url, json={**PERFIL, "peso_atual": 69}, headers=token)
     assert atualizado.json()["peso_atual"] == 69
+    # números calculados vêm junto (detalhes em tests/test_saude.py)
+    indicadores = atualizado.json()["indicadores"]
+    assert indicadores["imc"] == 25.3 and indicadores["faixa_imc"] == "Sobrepeso"
+    assert indicadores["semanas_ate_meta"] == 10  # 69 → 64 kg a 0,5 kg por semana
     assert client.get(url, headers=token).json()["peso_atual"] == 69
 
     login = client.post("/usuarios/login", json={"email": "ana@email.com", "senha": "segredo123"})

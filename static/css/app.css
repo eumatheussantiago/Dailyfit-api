@@ -644,6 +644,22 @@
     font-size: 12px;
 }
 
+.alerta-meta {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    color: var(--texto);
+    background: var(--fundo);
+    border-left: 4px solid var(--laranja-principal);
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.numeros .aviso {
+    margin-top: 16px;
+    color: var(--texto-secundario);
+    font-size: 12px;
+}
+
 .contou dt {
     margin-top: 12px;
     font-size: 13px;

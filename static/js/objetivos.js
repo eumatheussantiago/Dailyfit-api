@@ -89,6 +89,32 @@ function desenharPlano(perfil) {
         .join(" · ");
 }
 
+// Números calculados pela API a partir do formulário (saude.py)
+function desenharNumeros(perfil) {
+    const n = perfil.indicadores;
+    const num = (valor, casas = 1) => Number(valor).toLocaleString("pt-BR", { maximumFractionDigits: casas });
+
+    document.getElementById("n-imc").textContent = num(n.imc);
+    document.getElementById("n-imc-faixa").textContent =
+        n.faixa_imc || "Abaixo de 20 anos, o IMC é avaliado por tabela de idade";
+    document.getElementById("n-peso").textContent = `${num(n.peso_saudavel_min)} a ${num(n.peso_saudavel_max)} kg`;
+    document.getElementById("n-gasto").textContent = n.gasto_calorico ? `${num(n.gasto_calorico, 0)} kcal` : "—";
+    document.getElementById("n-gasto-ajuda").textContent = n.gasto_calorico
+        ? "por dia, para manter o peso atual"
+        : "a fórmula vale a partir de 18 anos";
+    document.getElementById("n-agua").textContent = `${num(n.agua_litros)} L`;
+
+    const meta = document.getElementById("n-meta");
+    meta.hidden = !n.semanas_ate_meta;
+    meta.textContent = `No ritmo de 0,5 kg por semana, a meta leva cerca de ${plural(n.semanas_ate_meta, "semana", "semanas")}.`;
+
+    const alerta = document.getElementById("n-alerta");
+    alerta.hidden = !n.meta_abaixo_do_saudavel;
+    alerta.textContent = `Essa meta fica abaixo da faixa saudável para a sua altura (IMC ${num(n.imc_meta)}). Vale conversar com um nutricionista antes.`;
+
+    document.getElementById("numeros").hidden = false;
+}
+
 // Respostas de texto livre: só aparecem as que foram preenchidas
 function desenharContou(perfil) {
     const campos = [
@@ -122,6 +148,7 @@ async function carregarObjetivos() {
 
         document.getElementById("obj-nome").textContent = OBJETIVOS[perfil.objetivo] || perfil.objetivo;
         desenharPeso(perfil);
+        desenharNumeros(perfil);
         desenharPlano(perfil);
         desenharContou(perfil);
         desenharRotina(perfil, await api(`/usuarios/${usuario.id}/refeicoes`));

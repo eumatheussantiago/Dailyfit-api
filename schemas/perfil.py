@@ -2,7 +2,9 @@ import re
 from datetime import datetime, timezone
 from typing import Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
+
+from saude import calcular_indicadores
 
 # Valores aceitos = os "value" dos campos em templates/formulario.html
 Objetivo = Literal["emagrecimento", "ganho_massa", "manutencao", "reeducacao"]
@@ -57,11 +59,37 @@ class PerfilSalvar(PerfilBase):
     pass
 
 
+class Indicadores(BaseModel):
+    """Estimativas calculadas a partir do formulário (ver saude.py)."""
+
+    imc: float
+    faixa_imc: Optional[str]          # só a partir de 20 anos
+    peso_saudavel_min: float          # kg, IMC 18,5 para a altura
+    peso_saudavel_max: float          # kg, IMC 24,9 para a altura
+    gasto_calorico: Optional[int]     # kcal por dia; só a partir de 18 anos
+    agua_litros: float
+    imc_meta: Optional[float]
+    meta_abaixo_do_saudavel: bool
+    semanas_ate_meta: Optional[int]   # no ritmo de 0,5 kg por semana
+
+
 class PerfilResponse(PerfilBase):
     usuario_id: int
     atualizado_em: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+    @computed_field
+    @property
+    def indicadores(self) -> Indicadores:
+        return Indicadores(**calcular_indicadores(
+            sexo=self.sexo,
+            idade=self.idade,
+            altura=self.altura,
+            peso_atual=self.peso_atual,
+            peso_meta=self.peso_meta,
+            atividade=self.atividade,
+        ))
 
     @field_validator("atualizado_em")
     @classmethod
