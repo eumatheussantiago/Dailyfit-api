@@ -50,7 +50,7 @@ function mensagemDeErro(dados) {
 
     const primeiro = dados.detail[0];
     const campo = primeiro?.loc?.[primeiro.loc.length - 1];
-    const nomes = { nome: "Nome", email: "E-mail", senha: "Senha", descricao: "Descrição", idade: "Idade", altura: "Altura", peso_atual: "Peso atual", peso_meta: "Peso desejado" };
+    const nomes = { nome: "Nome", email: "E-mail", senha: "Senha", descricao: "Descrição", idade: "Idade", altura: "Altura", peso_atual: "Peso atual", peso_meta: "Peso desejado", data_hora: "Horário" };
     const texto = (primeiro?.msg || "Dados inválidos").replace("Value error, ", "");
 
     if (texto.startsWith("String should have at least")) {

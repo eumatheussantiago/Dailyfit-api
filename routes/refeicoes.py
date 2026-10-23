@@ -48,6 +48,8 @@ def cadastrar_refeicao(
         descricao=refeicao.descricao,
         nao_dieta=refeicao.nao_dieta
     )
+    if refeicao.data_hora:  # sem horário informado, o modelo usa a hora do registro
+        nova_refeicao.data_hora = refeicao.data_hora
 
     db.add(nova_refeicao)
     db.commit()
@@ -132,6 +134,8 @@ def editar_refeicao(
     refeicao.nome = dados.nome
     refeicao.descricao = dados.descricao
     refeicao.nao_dieta = dados.nao_dieta
+    if dados.data_hora:  # sem horário informado, mantém o que já estava
+        refeicao.data_hora = dados.data_hora
 
     db.commit()
     db.refresh(refeicao)

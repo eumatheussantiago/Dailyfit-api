@@ -13,6 +13,19 @@ const formatarDia = new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "nu
 
 let editandoId = null;
 
+// Valor do campo datetime-local ("2026-10-23T12:30") no horário do navegador
+const doisDigitos = (n) => String(n).padStart(2, "0");
+const valorDataLocal = (d) =>
+    `${d.getFullYear()}-${doisDigitos(d.getMonth() + 1)}-${doisDigitos(d.getDate())}T${doisDigitos(d.getHours())}:${doisDigitos(d.getMinutes())}`;
+
+// O calendário do campo só oferece os últimos 30 dias até agora (a API recusa o resto)
+function limitarCampoQuando() {
+    const agora = new Date();
+    form.quando.max = valorDataLocal(agora);
+    form.quando.min = valorDataLocal(new Date(agora.getTime() - 30 * 24 * 60 * 60 * 1000));
+}
+form.quando.addEventListener("focus", limitarCampoQuando);
+
 // Atalhos com os tipos que o Painel reconhece: o nome escolhido entra no plano do dia
 for (const tipo of TIPOS_REFEICAO) {
     const botao = document.createElement("button");
@@ -115,6 +128,8 @@ function comecarEdicao(refeicao) {
     editandoId = refeicao.id;
     form.nome.value = refeicao.nome;
     form.descricao.value = refeicao.descricao || "";
+    form.quando.value = valorDataLocal(new Date(refeicao.data_hora));
+    form.quando.dataset.original = form.quando.value;
     form.dieta.value = refeicao.nao_dieta ? "nao" : "sim";
     marcarAtalho();
     formTitulo.textContent = "Editar refeição";
@@ -127,6 +142,7 @@ function comecarEdicao(refeicao) {
 function limparFormulario() {
     editandoId = null;
     form.reset();
+    form.quando.dataset.original = "";
     marcarAtalho();
     formTitulo.textContent = "Nova refeição";
     btnSalvar.textContent = "Adicionar refeição";
@@ -150,6 +166,13 @@ form.addEventListener("submit", async (evento) => {
         descricao: form.descricao.value,
         nao_dieta: form.dieta.value === "nao",
     };
+    // Vazio: ao criar vale a hora do registro; ao editar a API mantém a hora que já estava.
+    // O campo vem no horário local; a API recebe com fuso (toISOString é UTC).
+    // Na edição, só manda se a pessoa mudou: reenviar a hora de uma refeição antiga (mais de
+    // 30 dias) seria recusado e cortaria os segundos.
+    if (form.quando.value && form.quando.value !== form.quando.dataset.original) {
+        dados.data_hora = new Date(form.quando.value).toISOString();
+    }
 
     try {
         if (editandoId) {

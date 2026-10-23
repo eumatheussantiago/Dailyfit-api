@@ -186,6 +186,37 @@ def test_horario_da_refeicao_vem_com_fuso(client):
     assert abs(datetime.now(timezone.utc) - data_hora) < timedelta(minutes=1)
 
 
+def test_horario_informado_pela_pessoa(client):
+    """A refeição pode ter a hora em que foi feita, não só a do registro."""
+    usuario_id, token = criar_usuario(client)
+    base = f"/usuarios/{usuario_id}/refeicoes"
+    duas_horas_atras = datetime.now(timezone.utc) - timedelta(hours=2)
+
+    # com fuso de Brasília: a API guarda e devolve o mesmo instante, em UTC
+    em_brasilia = duas_horas_atras.astimezone(timezone(timedelta(hours=-3))).isoformat()
+    criada = client.post(base, json={"nome": "Café", "data_hora": em_brasilia}, headers=token)
+    assert criada.status_code == 201
+    salva = datetime.fromisoformat(criada.json()["data_hora"].replace("Z", "+00:00"))
+    assert abs(salva - duas_horas_atras) < timedelta(seconds=1)
+
+    # ao editar sem mandar o horário, ele continua o mesmo
+    refeicao_id = criada.json()["id"]
+    editada = client.put(f"{base}/{refeicao_id}", json={"nome": "Café da manhã"}, headers=token).json()
+    assert editada["data_hora"] == criada.json()["data_hora"]
+
+    # ao editar mandando outro horário, ele muda
+    ontem = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()
+    editada = client.put(f"{base}/{refeicao_id}", json={"nome": "Café", "data_hora": ontem}, headers=token).json()
+    assert editada["data_hora"] != criada.json()["data_hora"]
+
+    # recusados: no futuro, mais de 30 dias atrás e sem fuso
+    amanha = (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()
+    antigo = (datetime.now(timezone.utc) - timedelta(days=40)).isoformat()
+    for data_hora in [amanha, antigo, "2026-10-23T12:30:00"]:
+        resposta = client.post(base, json={"nome": "Café", "data_hora": data_hora}, headers=token)
+        assert resposta.status_code == 422, data_hora
+
+
 def test_resumo(client):
     usuario_id, token = criar_usuario(client)
     base = f"/usuarios/{usuario_id}/refeicoes"

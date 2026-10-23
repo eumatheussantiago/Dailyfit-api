@@ -12,7 +12,7 @@ responde um formulário inicial (3 etapas), registra refeições (dentro/fora da
 - Banco: SQLite local (dailyfit.db, criado sozinho) | PostgreSQL no Supabase em produção (driver psycopg 3)
 - Front-end: HTML + CSS + JavaScript puro (sem framework)
 - Deploy: Render, plano grátis, configurado em render.yaml. Todo push na master publica sozinho (2-3 min)
-- Testes: pytest (tests/test_api.py) — 15 testes, todos devem passar
+- Testes: pytest (tests/test_api.py) — 16 testes, todos devem passar
 
 ## Estrutura
 main.py        app FastAPI, middleware de cabeçalhos de segurança, cria tabelas ao iniciar
@@ -50,6 +50,9 @@ iniciar.bat    roda o app no Windows com dois cliques
 - Telas depois do login: estenda templates/base_logado.html e comece o script com
   `const usuario = exigirLogin();` (sem login, volta para /login). Nunca peça "ID do usuário" na tela.
 - Datas são salvas em UTC e devolvidas com "Z"; o navegador converte para o horário local.
+- POST/PUT de refeição aceitam "data_hora" opcional (com fuso; até 5 min no futuro e no máximo
+  30 dias atrás). Sem ele: ao criar vale a hora do registro; ao editar mantém a que estava.
+  A tela Refeições tem o campo "Quando?" e só manda o horário na edição se ele mudou.
 
 ## Regras do grupo (obrigatórias)
 - NÃO alterar o visual de: templates/index.html, cadastro.html, login.html, formulario.html,
@@ -68,7 +71,7 @@ iniciar.bat    roda o app no Windows com dois cliques
 ## Como rodar e testar
 pip install -r requirements.txt
 uvicorn main:app --reload        -> http://127.0.0.1:8000
-pytest                           -> esperado: 15 passed
+pytest                           -> esperado: 16 passed
 
 ## Estado atual (21/10/2026)
 - Concluído e publicado: banco, cadastro/login com senha e token, formulário inicial, refeições,
