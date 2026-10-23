@@ -170,6 +170,38 @@
 }
 
 
+/* RECUPERAÇÃO DE SENHA */
+
+.cartao-estreito {
+    max-width: 480px;
+    margin: 20px auto;
+}
+
+.codigo-recuperacao {
+    margin: 18px 0 10px;
+    padding: 18px;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-align: center;
+    background: var(--fundo);
+    border: 2px dashed var(--borda);
+    border-radius: 12px;
+    overflow-wrap: anywhere;
+}
+
+.btn-borda,
+.btn-copiar {
+    border: 1px solid var(--borda);
+}
+
+.btn-borda:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+
 /* PAINEL — RESUMO */
 
 .painel-topo {

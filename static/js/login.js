@@ -15,13 +15,10 @@ botaoMostrar.addEventListener("click", () => {
     botaoMostrar.setAttribute("aria-label", visivel ? "Mostrar senha" : "Ocultar senha");
 });
 
+// "Esqueci minha senha" (o link do grupo tem href="#") leva para a recuperação com o código
 document.getElementById("recuperar-senha").addEventListener("click", (evento) => {
     evento.preventDefault();
-    mostrarMensagem(
-        mensagemLogin,
-        "A recuperação de senha ainda não está disponível.",
-        "info"
-    );
+    window.location.href = "/recuperar-senha";
 });
 
 formLogin.addEventListener("submit", async (evento) => {

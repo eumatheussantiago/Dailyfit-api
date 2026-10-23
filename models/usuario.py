@@ -14,6 +14,8 @@ class UsuarioModel(Base):
     nome: Mapped[str] = mapped_column(String(100))
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     senha_hash: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    # Hash do código de recuperação de senha (contas antigas ficam sem até gerar um)
+    codigo_recuperacao_hash: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     # LGPD (dado de saúde): quando a pessoa concordou pela primeira vez em enviar dados à IA
     consentimento_ia_em: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 

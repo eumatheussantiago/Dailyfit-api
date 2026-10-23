@@ -99,7 +99,7 @@ No computador, o banco é um arquivo `dailyfit.db` criado automaticamente na pri
 pytest
 ```
 
-Resultado esperado: `29 passed`.
+Resultado esperado: `32 passed`.
 
 ## Deploy (site publicado)
 
@@ -204,5 +204,5 @@ O cadastro e o login devolvem um **`token`**. As demais rotas exigem esse token 
 
 ## Próximos passos
 
-- Recuperação de senha ("Esqueci minha senha" ainda só mostra um aviso)
+- Recuperação de senha: feita com **código de recuperação** (aparece uma vez depois do cadastro; em Objetivos dá para gerar outro). Se um dia o site mandar e-mail, dá para trocar por link no e-mail.
 - Hábitos e metas personalizadas
