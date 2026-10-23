@@ -14,7 +14,7 @@ function montarPlano(perfil, doDia) {
 
     for (const p of PLANO) {
         if (!perfil?.[p.campo]) continue;
-        const i = restantes.findIndex((r) => tipoDaRefeicao(r.nome)?.chave === p.chave);
+        const i = restantes.findIndex((r) => tipoDaRefeicao(r.nome) === p);
         itens.push({ ...p, horario: perfil[p.campo], refeicao: i >= 0 ? restantes.splice(i, 1)[0] : null });
     }
     for (const r of restantes) {
@@ -51,6 +51,7 @@ function criarItemPlano({ nome, icone, refeicao, hora }) {
     if (refeicao) {
         fim = document.createElement("span");
         fim.className = refeicao.nao_dieta ? "meal-check fora" : "meal-check";
+        fim.setAttribute("aria-hidden", "true"); // o texto "Registrado às" já diz que foi feita
         fim.textContent = "✓";
     } else {
         fim = document.createElement("a");
@@ -141,7 +142,7 @@ async function carregarPainel() {
     try {
         const [refeicoes, perfil] = await Promise.all([
             api(`${base}/refeicoes`),
-            api(`${base}/perfil`).catch(() => null), // 404 = formulário ainda não respondido
+            buscarPerfil(usuario.id),
         ]);
 
         // Sem formulário respondido, usa o mínimo que ele oferece (3 refeições por dia)
@@ -155,6 +156,7 @@ async function carregarPainel() {
         desenharObjetivo(perfil);
     } catch (erro) {
         avisar(erro.message);
+        document.getElementById("frase").textContent = `Não foi possível carregar seus dados: ${erro.message}`;
     }
 }
 

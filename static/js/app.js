@@ -35,7 +35,9 @@ async function api(caminho, { method = "GET", body } = {}) {
     }
 
     if (!resposta.ok) {
-        throw new Error(mensagemDeErro(dados));
+        const erro = new Error(mensagemDeErro(dados));
+        erro.status = resposta.status;
+        throw erro;
     }
 
     return dados;
@@ -150,28 +152,36 @@ function exigirLogin() {
 }
 
 // Tipos de refeição: atalhos da tela Refeições, plano do Painel e ícones.
-// Uma refeição é de um tipo quando o nome contém a chave (sem acento e sem maiúscula).
+// Uma refeição é de um tipo quando o nome contém uma das chaves (sem acento e sem maiúscula).
 const TIPOS_REFEICAO = [
-    { nome: "Café da manhã", icone: "☕", chave: "cafe", campo: "horario_cafe" },
-    { nome: "Almoço", icone: "🥗", chave: "almoco", campo: "horario_almoco" },
-    { nome: "Lanche", icone: "🍎", chave: "lanche" },
-    { nome: "Jantar", icone: "🌙", chave: "jant", campo: "horario_jantar" },
+    { nome: "Café da manhã", icone: "☕", chaves: ["cafe"], campo: "horario_cafe" },
+    { nome: "Almoço", icone: "🥗", chaves: ["almoco"], campo: "horario_almoco" },
+    { nome: "Lanche", icone: "🍎", chaves: ["lanche", "cafe da tarde"] },
+    { nome: "Jantar", icone: "🌙", chaves: ["jant"], campo: "horario_jantar" },
 ];
 
 const simplificar = (texto) => texto.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
-// Vale a chave que aparece primeiro no nome: "Lanche com café" é lanche, não café da manhã
+// Vale a chave que aparece primeiro no nome ("Lanche com café" é lanche); no empate, a mais
+// longa ("Café da tarde" é lanche, não café da manhã)
 function tipoDaRefeicao(nome) {
     const texto = simplificar(nome);
-    let escolhido;
-    let posicao = Infinity;
+    let melhor = null;
     for (const tipo of TIPOS_REFEICAO) {
-        const i = texto.indexOf(tipo.chave);
-        if (i >= 0 && i < posicao) {
-            escolhido = tipo;
-            posicao = i;
+        for (const chave of tipo.chaves) {
+            const posicao = texto.indexOf(chave);
+            if (posicao < 0) continue;
+            if (!melhor || posicao < melhor.posicao || (posicao === melhor.posicao && chave.length > melhor.chave.length)) {
+                melhor = { tipo, posicao, chave };
+            }
         }
     }
-    return escolhido;
+    return melhor?.tipo;
+}
+
+// Perfil do formulário inicial; null só quando ainda não foi respondido (404).
+// Outros erros (rede, servidor) seguem como erro, para a tela não pedir o formulário à toa.
+function buscarPerfil(usuarioId) {
+    return api(`/usuarios/${usuarioId}/perfil`).catch((erro) => (erro.status === 404 ? null : Promise.reject(erro)));
 }
 
 const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;

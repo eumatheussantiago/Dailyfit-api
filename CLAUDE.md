@@ -28,8 +28,9 @@ templates/     index, cadastro, login, formulario (do grupo)
                depois do login: abas Painel/Refeições/Objetivos/Progresso, "Olá" e botão Sair)
                painel, refeicoes, objetivos, progresso (telas depois do login)
 static/js/     app.js (função api() que envia o token, obterUsuario(), salvarUsuario(), sair(),
-               exigirLogin(), TIPOS_REFEICAO/tipoDaRefeicao() (café, almoço, lanche, jantar: nome
-               sem acento contém a chave), datas no fuso local (meiaNoite, diasAtras, chaveDia),
+               exigirLogin(), buscarPerfil() (null só no 404), TIPOS_REFEICAO/tipoDaRefeicao()
+               (café, almoço, lanche, jantar: nome sem acento contém a chave; vale a que aparece
+               primeiro, "Café da tarde" é lanche), datas no fuso local (meiaNoite, diasAtras, chaveDia),
                refeicoesPorDia(), diasSeguidos(), plural(), criarItemRefeicao())
                cadastro.js, login.js, formulario.js, script.js (do grupo)
                painel.js (cartão "Hoje" da landing com dados reais: % do dia, plano pelos horários
@@ -76,6 +77,8 @@ pytest                           -> esperado: 15 passed
   gráfico de 14 dias) e Objetivos (no lugar de Treinos, decisão de 22/10/2026; /treinos
   redireciona para /objetivos) prontos.
   Dias e semana são contados no horário do navegador, a partir da lista de refeições.
+  Para andar entre dias use diasAtras()/chaveDia() (partem do meio-dia; nunca setDate() direto
+  numa meia-noite, que não existe onde o horário de verão começa à meia-noite).
 
 ## Pendências
 1. Recuperação de senha ("Esqueci minha senha" hoje só mostra um aviso).

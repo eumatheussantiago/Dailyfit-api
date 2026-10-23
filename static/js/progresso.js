@@ -106,7 +106,7 @@ async function carregarProgresso() {
             dietaAnterior === null ? "Sem registros nos 7 dias anteriores" : `Nos 7 dias anteriores: ${dietaAnterior}%`;
 
         document.getElementById("seq-atual").textContent = plural(diasSeguidos(porDia), "dia", "dias");
-        document.getElementById("seq-melhor").textContent = `Melhor sequência: ${plural(melhorSequenciaDeDias(porDia), "dia", "dias")}`;
+        document.getElementById("seq-melhor").textContent = `Recorde: ${plural(melhorSequenciaDeDias(porDia), "dia", "dias")}`;
         document.getElementById("seq-refeicoes").textContent = resumo.melhor_sequencia_de_refeicoes_dentro_da_dieta;
 
         desenharGrafico(porDia);
@@ -114,7 +114,7 @@ async function carregarProgresso() {
         const total = resumo.total_refeicoes_cadastradas;
         const geral = porcentagemDieta({ total, dentro: resumo.total_refeicoes_dentro_da_dieta }) || 0;
         document.getElementById("r-desde").textContent =
-            `Desde o início: ${plural(total, "refeição", "refeições")} em ${plural(porDia.size, "dia", "dias")}, dentro da dieta`;
+            `Dentro da dieta desde o início (${plural(total, "refeição", "refeições")} em ${plural(porDia.size, "dia", "dias")})`;
         document.getElementById("r-porcentagem").textContent = `${geral}%`;
         document.getElementById("r-barra").style.width = `${geral}%`;
     } catch (erro) {

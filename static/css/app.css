@@ -5,6 +5,12 @@
     display: none !important;
 }
 
+/* foco do teclado visível em qualquer fundo (o amarelo do style.css some no branco) */
+.app-body :focus-visible {
+    outline: 3px solid var(--texto);
+    outline-offset: 2px;
+}
+
 .app-body {
     min-height: 100vh;
     display: flex;
@@ -119,7 +125,8 @@
 
 .app-form input:focus,
 .app-form textarea:focus {
-    outline: none;
+    outline: 2px solid var(--texto);
+    outline-offset: 1px;
     border-color: var(--laranja-principal);
     background: var(--branco);
     box-shadow: var(--sombra);
@@ -311,20 +318,23 @@
     transition: 0.2s ease;
 }
 
+/* selecionado: borda dupla escura, não só a cor do fundo */
 .opcao-sim input:checked + span {
     color: var(--verde-escuro);
     background: var(--fundo-verde);
-    border-color: var(--verde-claro);
+    border-color: var(--verde-escuro);
+    box-shadow: inset 0 0 0 1px var(--verde-escuro);
 }
 
 .opcao-nao input:checked + span {
     color: var(--laranja-principal);
     background: var(--fundo);
-    border-color: var(--laranja-principal);
+    border-color: var(--texto);
+    box-shadow: inset 0 0 0 1px var(--texto);
 }
 
 .opcao input:focus-visible + span {
-    outline: 3px solid var(--amarelo);
+    outline: 3px solid var(--texto);
     outline-offset: 2px;
 }
 
@@ -360,9 +370,14 @@
     border-radius: 12px;
 }
 
+.refeicao-info {
+    min-width: 0;
+}
+
 .refeicao-info strong {
     display: block;
     font-size: 15px;
+    overflow-wrap: anywhere;
 }
 
 .refeicao-info small {
@@ -381,7 +396,7 @@
     align-self: start;
     padding: 5px 10px;
     border-radius: 20px;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     white-space: nowrap;
 }
@@ -514,11 +529,12 @@
 .atalhos button[aria-pressed="true"] {
     color: var(--verde-escuro);
     background: var(--fundo-verde);
-    border-color: var(--verde-claro);
+    border-color: var(--verde-escuro);
+    box-shadow: inset 0 0 0 1px var(--verde-escuro);
 }
 
 .atalhos button:focus-visible {
-    outline: 3px solid var(--amarelo);
+    outline: 3px solid var(--texto);
     outline-offset: 2px;
 }
 
@@ -591,7 +607,7 @@
 .coluna small {
     min-height: 14px;
     color: var(--texto-secundario);
-    font-size: 11px;
+    font-size: 12px;
 }
 
 /* 2px de espaço entre as partes; só a ponta de cima é arredondada */
@@ -616,7 +632,7 @@
     padding-top: 6px;
     border-top: 1px solid var(--borda);
     color: var(--texto-secundario);
-    font-size: 11px;
+    font-size: 12px;
     text-align: center;
 }
 
@@ -644,6 +660,13 @@
     margin-top: 16px;
 }
 
+.meta-ajuda {
+    display: block;
+    margin-top: 6px;
+    color: var(--texto-secundario);
+    font-size: 12px;
+}
+
 .contou dt {
     margin-top: 12px;
     font-size: 13px;
@@ -666,9 +689,16 @@
     align-items: start;
 }
 
-.hoje .card-label,
+.app-main .card-label,
 .hoje .status {
-    font-size: 11px;
+    font-size: 12px;
+}
+
+/* h2 dos cartões com o tamanho que o cartão da landing dá ao h3 */
+.app-main .card-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
 }
 
 .hoje .progress-circle {
@@ -713,6 +743,11 @@
 
 .plano .meal-icon {
     background: var(--fundo-verde);
+}
+
+.plano .meal-info {
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .plano .meal-info strong {
@@ -770,7 +805,7 @@
     align-items: center;
     gap: 4px;
     color: var(--texto-secundario);
-    font-size: 10px;
+    font-size: 12px;
     text-transform: capitalize;
 }
 
@@ -784,7 +819,7 @@
     display: block;
 }
 
-.objetivo h3 {
+.objetivo h2 {
     margin: 4px 0;
     font-size: 18px;
 }

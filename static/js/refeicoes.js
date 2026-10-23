@@ -18,7 +18,10 @@ for (const tipo of TIPOS_REFEICAO) {
     const botao = document.createElement("button");
     botao.type = "button";
     botao.dataset.nome = tipo.nome;
-    botao.textContent = `${tipo.icone} ${tipo.nome}`;
+    const icone = document.createElement("span");
+    icone.setAttribute("aria-hidden", "true");
+    icone.textContent = tipo.icone;
+    botao.append(icone, ` ${tipo.nome}`);
     botao.addEventListener("click", () => {
         form.nome.value = tipo.nome;
         marcarAtalho();
@@ -84,6 +87,8 @@ function desenharLista(refeicoes) {
 
 function criarItemComAcoes(refeicao) {
     const item = criarItemRefeicao(refeicao);
+    // Vários "Editar"/"Excluir" na lista: o nome acessível diz de qual refeição é
+    const qual = `${refeicao.nome} das ${formatarHora.format(new Date(refeicao.data_hora))}`;
 
     const acoes = document.createElement("div");
     acoes.className = "refeicao-acoes";
@@ -91,12 +96,14 @@ function criarItemComAcoes(refeicao) {
     const editar = document.createElement("button");
     editar.type = "button";
     editar.textContent = "Editar";
+    editar.setAttribute("aria-label", `Editar ${qual}`);
     editar.addEventListener("click", () => comecarEdicao(refeicao));
 
     const apagar = document.createElement("button");
     apagar.type = "button";
     apagar.className = "apagar";
     apagar.textContent = "Excluir";
+    apagar.setAttribute("aria-label", `Excluir ${qual}`);
     apagar.addEventListener("click", () => excluir(refeicao));
 
     acoes.append(editar, apagar);
@@ -127,7 +134,11 @@ function limparFormulario() {
     esconderErro("erro");
 }
 
-btnCancelar.addEventListener("click", limparFormulario);
+// O botão some ao cancelar: o foco volta para o formulário em vez de ir para o topo da página
+btnCancelar.addEventListener("click", () => {
+    limparFormulario();
+    form.nome.focus();
+});
 
 form.addEventListener("submit", async (evento) => {
     evento.preventDefault();
@@ -165,6 +176,7 @@ async function excluir(refeicao) {
         if (editandoId === refeicao.id) limparFormulario();
         avisar("Refeição excluída");
         await carregarRefeicoes();
+        document.getElementById("historico-titulo").focus(); // o item com foco foi apagado
     } catch (erro) {
         avisar(erro.message);
     }
