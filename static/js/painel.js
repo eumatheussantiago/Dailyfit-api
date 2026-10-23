@@ -10,31 +10,9 @@ const OBJETIVOS = {
     reeducacao: "Reeducação alimentar",
 };
 
-// Refeição registrada conta para o plano quando o nome contém a chave (sem acento)
-const PLANO = [
-    { campo: "horario_cafe", nome: "Café da manhã", icone: "☕", chave: "cafe" },
-    { campo: "horario_almoco", nome: "Almoço", icone: "🥗", chave: "almoco" },
-    { campo: "horario_jantar", nome: "Jantar", icone: "🌙", chave: "jant" },
-];
-
-const simplificar = (texto) => texto.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
-const formatarHora = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" });
+// Refeições do plano: as que têm horário no formulário (café, almoço e jantar)
+const PLANO = TIPOS_REFEICAO.filter((tipo) => tipo.campo);
 const formatarDiaSemana = new Intl.DateTimeFormat("pt-BR", { weekday: "short" });
-
-// Dias contados no horário do navegador (a API devolve as datas em UTC)
-function meiaNoite(data) {
-    const d = new Date(data);
-    d.setHours(0, 0, 0, 0);
-    return d;
-}
-
-function diasAtras(n) {
-    const d = meiaNoite(new Date());
-    d.setDate(d.getDate() - n);
-    return d;
-}
-
-const chaveDia = (data) => meiaNoite(data).getTime();
 
 // Dias seguidos com pelo menos uma refeição. Hoje ainda sem registro não quebra a sequência.
 function diasSeguidos(dias) {
@@ -47,8 +25,6 @@ function diasSeguidos(dias) {
     return total;
 }
 
-const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
-
 // Itens do plano: as refeições do formulário (feitas ou não) + as outras registradas hoje
 function montarPlano(perfil, doDia) {
     const restantes = [...doDia];
@@ -60,7 +36,7 @@ function montarPlano(perfil, doDia) {
         itens.push({ ...p, horario: perfil[p.campo], refeicao: i >= 0 ? restantes.splice(i, 1)[0] : null });
     }
     for (const r of restantes) {
-        itens.push({ nome: r.nome, icone: "🍽️", refeicao: r });
+        itens.push({ nome: r.nome, icone: tipoDaRefeicao(r.nome)?.icone || "🍽️", refeicao: r });
     }
 
     // Refeição do plano fica no lugar do horário planejado, mesmo registrada mais tarde
@@ -97,7 +73,7 @@ function criarItemPlano({ nome, icone, refeicao, hora }) {
     } else {
         fim = document.createElement("a");
         fim.className = "meal-arrow";
-        fim.href = "/refeicoes";
+        fim.href = `/refeicoes?nome=${encodeURIComponent(nome)}`;
         fim.setAttribute("aria-label", `Registrar ${nome}`);
         fim.textContent = "→";
     }

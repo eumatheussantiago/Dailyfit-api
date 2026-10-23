@@ -28,10 +28,13 @@ templates/     index, cadastro, login, formulario (do grupo)
                depois do login: abas Painel/Refeições/Treinos/Progresso, "Olá" e botão Sair)
                painel, refeicoes, treinos, progresso (telas depois do login)
 static/js/     app.js (função api() que envia o token, obterUsuario(), salvarUsuario(), sair(),
-               exigirLogin(), formatarData, criarItemRefeicao())
+               exigirLogin(), TIPOS_REFEICAO/tipoDaRefeicao() (café, almoço, lanche, jantar: nome
+               sem acento contém a chave), datas no fuso local (meiaNoite, diasAtras, chaveDia),
+               plural(), criarItemRefeicao())
                cadastro.js, login.js, formulario.js, script.js (do grupo)
                painel.js (cartão "Hoje" da landing com dados reais: % do dia, plano pelos horários
-               do formulário, dias seguidos, semana e objetivo), refeicoes.js (adicionar/editar/excluir + histórico),
+               do formulário, dias seguidos, semana e objetivo), refeicoes.js (atalhos de nome, adicionar/
+               editar/excluir, histórico por dia; /refeicoes?nome=X já preenche o nome),
                progresso.js (números, % e melhor sequência)
 static/css/    style.css (do grupo) + app.css (só as 4 telas depois do login)
 iniciar.bat    roda o app no Windows com dois cliques
@@ -67,7 +70,8 @@ pytest                           -> esperado: 15 passed
   resumo, deploy no Render + Supabase, correções de segurança e de horário (PR #2), imagens da
   tela de início leves (~9,5 MB → 331 KB, PR #3) e as 4 telas depois do login no visual do site
   (Painel, Refeições, Treinos, Progresso, PR #4).
-- Painel refeito a partir da promessa da landing (cartão "Hoje"): ver painel.js.
+- Telas logadas sendo refeitas a partir da promessa da landing, uma por PR: Painel (cartão
+  "Hoje") e Refeições (atalhos + histórico por dia) prontos; faltam Progresso e Treinos.
   Dias e semana são contados no horário do navegador, a partir da lista de refeições.
 - Treinos é só demonstrativa: a API ainda não tem rotas nem tabela de treinos.
 
