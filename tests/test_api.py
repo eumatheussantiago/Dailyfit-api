@@ -58,6 +58,7 @@ def test_cabecalhos_de_seguranca(client):
     resposta = client.get("/")
     assert resposta.headers["X-Content-Type-Options"] == "nosniff"
     assert resposta.headers["X-Frame-Options"] == "DENY"
+    assert client.get("/static/js/app.js").headers["Cache-Control"] == "no-cache"
 
 
 def test_cadastro_e_login(client):

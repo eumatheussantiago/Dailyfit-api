@@ -31,6 +31,8 @@ async def cabecalhos_de_seguranca(request: Request, call_next):
     resposta.headers.setdefault("X-Content-Type-Options", "nosniff")
     resposta.headers.setdefault("X-Frame-Options", "DENY")
     resposta.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    # Sem isto o navegador reusa JS/CSS antigos por horas depois de um deploy (o ETag deixa a conferência barata)
+    resposta.headers.setdefault("Cache-Control", "no-cache")
     return resposta
 
 
