@@ -3,13 +3,6 @@
 
 const usuario = exigirLogin();
 
-const OBJETIVOS = {
-    emagrecimento: "Emagrecimento",
-    ganho_massa: "Ganho de massa muscular",
-    manutencao: "Manutenção do peso",
-    reeducacao: "Reeducação alimentar",
-};
-
 // Refeições do plano: as que têm horário no formulário (café, almoço e jantar)
 const PLANO = TIPOS_REFEICAO.filter((tipo) => tipo.campo);
 const formatarDiaSemana = new Intl.DateTimeFormat("pt-BR", { weekday: "short" });
@@ -96,11 +89,9 @@ function desenharHoje(perfil, doDia, meta) {
 function desenharSemana(refeicoes, meta) {
     const porDia = refeicoesPorDia(refeicoes);
 
-    // Conta só os dias desde a primeira refeição: quem começou ontem não fica com a semana "vazia"
-    const inicio = refeicoes.length ? meiaNoite(refeicoes.at(-1).data_hora) : meiaNoite(new Date());
     const semana = [6, 5, 4, 3, 2, 1, 0].map((n) => {
         const data = diasAtras(n);
-        return { data, total: porDia.get(data.getTime())?.total || 0, conta: data >= inicio };
+        return { data, total: porDia.get(data.getTime())?.total || 0 };
     });
 
     document.getElementById("semana").replaceChildren(
@@ -116,10 +107,7 @@ function desenharSemana(refeicoes, meta) {
     const totalSemana = semana.reduce((soma, d) => soma + d.total, 0);
     document.getElementById("semana-total").textContent = plural(totalSemana, "refeição", "refeições");
 
-    // Rotina = refeições feitas / planejadas nos dias contados (dia com refeição a mais não compensa outro)
-    const contados = semana.filter((d) => d.conta);
-    const feitas = contados.reduce((soma, d) => soma + Math.min(d.total, meta), 0);
-    const rotina = Math.round((feitas / (meta * Math.max(contados.length, 1))) * 100);
+    const rotina = rotinaDaSemana(refeicoes, porDia, meta);
     document.getElementById("rotina-pct").textContent = `${rotina}%`;
     document.getElementById("rotina-barra").style.width = `${rotina}%`;
 
@@ -134,6 +122,7 @@ function desenharObjetivo(perfil) {
         nome.textContent = "Responda o formulário inicial";
         peso.textContent = "Com ele o DailyFit monta o seu plano do dia.";
         document.getElementById("obj-link").textContent = "Responder agora";
+        document.getElementById("obj-link").href = "/formulario";
         return;
     }
 

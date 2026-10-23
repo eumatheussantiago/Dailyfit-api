@@ -204,6 +204,29 @@ function diasSeguidos(dias) {
     return total;
 }
 
+const OBJETIVOS = {
+    emagrecimento: "Emagrecimento",
+    ganho_massa: "Ganho de massa muscular",
+    manutencao: "Manutenção do peso",
+    reeducacao: "Reeducação alimentar",
+};
+
+// Rotina dos últimos 7 dias: refeições feitas ÷ planejadas (meta por dia). Conta só os dias
+// desde a primeira refeição (quem começou ontem não fica com a semana "vazia") e um dia com
+// refeição a mais não compensa outro.
+function rotinaDaSemana(refeicoes, porDia, meta) {
+    const inicio = meiaNoite(refeicoes.length ? refeicoes.at(-1).data_hora : new Date());
+    let feitas = 0;
+    let dias = 0;
+    for (let n = 0; n < 7; n++) {
+        const data = diasAtras(n);
+        if (data < inicio) continue;
+        dias++;
+        feitas += Math.min(porDia.get(data.getTime())?.total || 0, meta);
+    }
+    return Math.round((feitas / (meta * Math.max(dias, 1))) * 100);
+}
+
 // Item de lista de uma refeição: ícone, nome, hora, descrição e selo dentro/fora da dieta
 function criarItemRefeicao(refeicao) {
     const item = document.createElement("li");
