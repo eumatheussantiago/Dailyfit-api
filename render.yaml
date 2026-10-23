@@ -17,3 +17,7 @@ services:
         sync: false         # o Render pede este valor na hora de criar
       - key: SECRET_KEY
         generateValue: true # chave que assina os tokens de login (gerada pelo Render)
+      - key: ANTHROPIC_API_KEY
+        sync: false         # chave da IA (dicas); sem ela, as dicas ficam desligadas
+      - key: DICAS_LIMITE_DIA
+        value: "200"        # máximo de gerações de dicas por dia no site todo

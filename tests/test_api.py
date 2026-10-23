@@ -1,5 +1,6 @@
 """Testes automáticos da API. Rode com:  pytest"""
 
+import json
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -8,6 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+import ia
 import seguranca
 from database import Base, get_db
 from main import app
@@ -302,3 +304,95 @@ def test_banco_antigo_ganha_coluna_de_senha(tmp_path):
     finally:
         database.engine.dispose()
         database.engine = engine_original
+
+
+DICA = {"titulo": "Café no horário", "texto": "Tome o café às 7h30, como você planejou."}
+
+
+def preparar_dicas(client, monkeypatch, gerar):
+    """Usuário com formulário respondido, chave de teste e a IA trocada por uma função falsa."""
+    usuario_id, token = criar_usuario(client)
+    client.put(f"/usuarios/{usuario_id}/perfil", json=PERFIL, headers=token)
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "chave-de-teste")
+    monkeypatch.setattr(ia, "gerar_dicas", gerar)
+    return f"/usuarios/{usuario_id}/dicas", usuario_id, token
+
+
+def test_dicas_desligadas_sem_chave(client, monkeypatch):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    usuario_id, token = criar_usuario(client)
+    url = f"/usuarios/{usuario_id}/dicas"
+    assert client.get(url, headers=token).json() == {"ligadas": False, "dicas": [], "criado_em": None, "proxima_em": None}
+    assert client.post(url, headers=token).status_code == 503
+
+
+def test_dicas_com_ia(client, monkeypatch):
+    enviados = []
+
+    def ia_falsa(dados):
+        enviados.append(dados)
+        return [DICA]
+
+    url, usuario_id, token = preparar_dicas(client, monkeypatch, ia_falsa)
+    client.post(f"/usuarios/{usuario_id}/refeicoes", json={"nome": "Lanche", "nao_dieta": True}, headers=token)
+
+    gerada = client.post(url, headers=token)
+    assert gerada.status_code == 200
+    assert gerada.json()["ligadas"] is True and gerada.json()["dicas"] == [DICA]
+    assert gerada.json()["criado_em"].endswith("Z")
+
+    # a IA recebe formulário, números e o resumo da semana, nunca nome nem e-mail
+    texto = json.dumps(enviados[0], ensure_ascii=False)
+    assert "ana@email.com" not in texto and "Ana" not in texto
+    assert enviados[0]["formulario"]["restricoes"] == "Lactose"
+    assert enviados[0]["numeros"]["imc"] == 25.9
+    assert enviados[0]["ultimos_7_dias"]["fora_da_dieta"] == 1
+
+    # fica guardada; gerar de novo no mesmo dia é recusado sem chamar a IA
+    assert client.get(url, headers=token).json()["dicas"] == [DICA]
+    assert client.post(url, headers=token).status_code == 429
+    assert len(enviados) == 1
+
+    # só o dono vê
+    _, token_bia = criar_usuario(client, "bia@email.com")
+    assert client.get(url, headers=token_bia).status_code == 403
+
+
+def test_dicas_erro_da_ia_e_limites(client, monkeypatch):
+    def ia_fora_do_ar(dados):
+        raise ia.ErroDicas("O serviço de IA não respondeu agora. Tente de novo mais tarde.")
+
+    url, usuario_id, token = preparar_dicas(client, monkeypatch, ia_fora_do_ar)
+    falhou = client.post(url, headers=token)
+    assert falhou.status_code == 503 and "não respondeu" in falhou.json()["detail"]
+    assert client.get(url, headers=token).json()["dicas"] == []  # nada foi salvo
+
+    monkeypatch.setenv("DICAS_LIMITE_DIA", "0")
+    assert "limite" in client.post(url, headers=token).json()["detail"]
+
+    # sem formulário respondido
+    sem_perfil, token_sem = criar_usuario(client, "caio@email.com")
+    assert client.post(f"/usuarios/{sem_perfil}/dicas", headers=token_sem).status_code == 400
+
+
+def test_ia_usa_haiku_e_trata_recusa(monkeypatch):
+    chamadas = []
+
+    class Recusa:
+        stop_reason = "refusal"
+        parsed_output = None
+
+    class ClienteFalso:
+        def __init__(self, **opcoes):
+            self.messages = self
+
+        def parse(self, **pedido):
+            chamadas.append(pedido)
+            return Recusa()
+
+    monkeypatch.setattr(ia.anthropic, "Anthropic", ClienteFalso)
+    with pytest.raises(ia.ErroDicas):
+        ia.gerar_dicas({"formulario": {"objetivo": "emagrecimento"}})
+    assert chamadas[0]["model"] == "claude-haiku-5-5"
+    assert chamadas[0]["output_format"] is ia.Dicas
+    assert "emagrecimento" in chamadas[0]["messages"][0]["content"]

@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 
 import models  # registra as tabelas antes de criá-las
 from database import criar_tabelas
+from routes.dicas import router as dicas_router
 from routes.pagina import router as pagina_router
 from routes.perfil import router as perfil_router
 from routes.refeicoes import router as refeicoes_router
@@ -43,3 +44,4 @@ app.include_router(usuarios_router)
 app.include_router(perfil_router)
 app.include_router(refeicoes_router)
 app.include_router(resumo_router)
+app.include_router(dicas_router)
