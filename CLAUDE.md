@@ -58,6 +58,9 @@ iniciar.bat    roda o app no Windows com dois cliques
 - Cores apenas pelas variáveis do :root do style.css (--laranja-principal, --verde-escuro,
   --verde-claro, --amarelo, --amarelo-hover, --fundo, --fundo-verde, --branco, --texto,
   --texto-secundario, --borda, --sombra, --radius). Nunca cor fixa (#hex/rgba) em arquivos novos.
+- Telas logadas (app.css): texto laranja usa --laranja-texto (definida no .app-body com color-mix de
+  --laranja-principal e --texto, 4,7:1 no fundo mais escuro); botão laranja leva texto --texto.
+  O --laranja-principal puro fica só para fundo, borda e gráfico (2,4:1 como texto não passa).
 - Nunca colocar senhas, DATABASE_URL ou SECRET_KEY no código/commits (ficam só no Render).
 - Sempre trabalhar em branch separada e abrir pull request. Não fazer merge sem aprovação.
 - Explicar tudo em português simples, como para um leigo.

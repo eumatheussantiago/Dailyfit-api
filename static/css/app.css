@@ -1,4 +1,4 @@
-/* TELAS DO APP (cadastro, login e painel) — usa as variáveis do style.css */
+/* TELAS DEPOIS DO LOGIN (carregadas pelo base_app.html) — usa só as variáveis do style.css */
 
 /* o atributo hidden vence o display das classes (ex.: .hoje-grid, .stat) */
 [hidden] {
@@ -11,7 +11,11 @@
     outline-offset: 2px;
 }
 
+/* Texto laranja das telas logadas: o --laranja-principal puro tem 2,4:1 sobre o fundo claro
+   (mínimo 4,5:1). Misturado com o --texto chega a 4,7:1 no fundo mais escuro, sem cor fixa.
+   Navegador sem color-mix: o texto herda a cor escura. */
 .app-body {
+    --laranja-texto: color-mix(in srgb, var(--laranja-principal) 55%, var(--texto));
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -34,7 +38,13 @@
 }
 
 .app-main h1 span {
-    color: var(--laranja-principal);
+    color: var(--laranja-texto);
+}
+
+/* o rótulo laranja da landing (style.css) com a cor escurecida e tamanho legível */
+.app-main .section-label {
+    color: var(--laranja-texto);
+    font-size: 12px;
 }
 
 .app-main h2 {
@@ -44,7 +54,7 @@
 }
 
 .nav-ola {
-    color: var(--branco);
+    color: var(--texto);
     font-size: 14px;
     font-weight: 600;
 }
@@ -69,6 +79,7 @@
 
 /* BOTÃO PRINCIPAL */
 
+/* fundo laranja da marca com texto escuro: 5,3:1 (o branco tinha 2,5:1) */
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -78,7 +89,7 @@
     border-radius: 10px;
     font-size: 14px;
     font-weight: 700;
-    color: var(--branco);
+    color: var(--texto);
     background: var(--laranja-principal);
     border: 1px solid var(--laranja-principal);
     transition: 0.3s ease;
@@ -105,6 +116,7 @@
 
 .app-form label small {
     color: var(--texto-secundario);
+    font-size: 12px;
     font-weight: 500;
 }
 
@@ -149,42 +161,11 @@
 .form-erro {
     margin-top: 14px;
     padding: 10px 12px;
-    color: var(--laranja-principal);
+    color: var(--laranja-texto);
     background: var(--fundo);
     border: 1px solid var(--laranja-principal);
     border-radius: 8px;
     font-size: 13px;
-}
-
-
-/* CADASTRO / LOGIN */
-
-.auth-card {
-    max-width: 440px;
-    margin: 20px auto;
-    padding: 40px 34px;
-    background: var(--branco);
-    border: 1px solid var(--borda);
-    border-radius: var(--radius);
-    box-shadow: var(--sombra);
-}
-
-.auth-sub {
-    color: var(--texto-secundario);
-    font-size: 14px;
-    margin-bottom: 6px;
-}
-
-.auth-troca {
-    margin-top: 22px;
-    text-align: center;
-    color: var(--texto-secundario);
-    font-size: 13px;
-}
-
-.auth-troca a {
-    color: var(--laranja-principal);
-    font-weight: 700;
 }
 
 
@@ -327,7 +308,7 @@
 }
 
 .opcao-nao input:checked + span {
-    color: var(--laranja-principal);
+    color: var(--laranja-texto);
     background: var(--fundo);
     border-color: var(--texto);
     box-shadow: inset 0 0 0 1px var(--texto);
@@ -407,7 +388,7 @@
 }
 
 .selo-fora {
-    color: var(--laranja-principal);
+    color: var(--laranja-texto);
     background: var(--fundo);
 }
 
@@ -435,12 +416,7 @@
 
 .refeicao-acoes button:hover {
     border-color: var(--laranja-principal);
-    color: var(--laranja-principal);
-}
-
-.refeicao-acoes .apagar:hover {
-    border-color: var(--laranja-principal);
-    color: var(--laranja-principal);
+    color: var(--laranja-texto);
 }
 
 
@@ -758,12 +734,17 @@
     font-size: 13px;
 }
 
+.plano .meal-check {
+    font-size: 14px;
+}
+
 .plano .meal-check.fora {
-    color: var(--laranja-principal);
+    color: var(--laranja-texto);
 }
 
 .plano .meal-arrow {
     padding: 4px 8px;
+    color: var(--laranja-texto);
     text-decoration: none;
 }
 
@@ -833,7 +814,7 @@
 .objetivo a {
     display: inline-block;
     margin-top: 14px;
-    color: var(--laranja-principal);
+    color: var(--laranja-texto);
     font-size: 13px;
     font-weight: 700;
 }
@@ -882,10 +863,6 @@
 @media (max-width: 500px) {
     .app-main {
         padding: 30px 16px 60px;
-    }
-
-    .auth-card {
-        padding: 30px 22px;
     }
 
     .nav-ola {
