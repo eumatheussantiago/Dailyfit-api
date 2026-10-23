@@ -348,7 +348,7 @@
 
 .refeicao-item {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto 1fr auto;
     gap: 8px 14px;
     padding: 16px;
     background: var(--fundo);
@@ -391,8 +391,12 @@
     background: var(--fundo);
 }
 
+.refeicao-item .meal-icon {
+    background: var(--branco);
+}
+
 .refeicao-acoes {
-    grid-column: 1 / -1;
+    grid-column: 2 / -1;
     display: flex;
     gap: 8px;
 }
@@ -493,6 +497,65 @@
 
 .dica p {
     margin-top: 4px;
+}
+
+
+/* REFEIÇÕES — atalhos de nome e histórico por dia */
+
+.atalhos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.atalhos button {
+    padding: 8px 12px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--texto);
+    background: var(--fundo);
+    border: 1px solid var(--borda);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.atalhos button:hover {
+    border-color: var(--verde-claro);
+}
+
+.atalhos button[aria-pressed="true"] {
+    color: var(--verde-escuro);
+    background: var(--fundo-verde);
+    border-color: var(--verde-claro);
+}
+
+.atalhos button:focus-visible {
+    outline: 3px solid var(--amarelo);
+    outline-offset: 2px;
+}
+
+.dia-grupo + .dia-grupo {
+    margin-top: 26px;
+}
+
+.dia-grupo h3 {
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.dia-grupo h3::first-letter {
+    text-transform: uppercase;
+}
+
+.dia-grupo h3 small {
+    margin-left: 4px;
+    color: var(--texto-secundario);
+    font-size: 12px;
+    font-weight: 500;
 }
 
 

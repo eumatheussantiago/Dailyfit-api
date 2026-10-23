@@ -149,18 +149,46 @@ function exigirLogin() {
     return usuario;
 }
 
-const formatarData = new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-});
+// Tipos de refeição: atalhos da tela Refeições, plano do Painel e ícones.
+// Uma refeição é de um tipo quando o nome contém a chave (sem acento e sem maiúscula).
+const TIPOS_REFEICAO = [
+    { nome: "Café da manhã", icone: "☕", chave: "cafe", campo: "horario_cafe" },
+    { nome: "Almoço", icone: "🥗", chave: "almoco", campo: "horario_almoco" },
+    { nome: "Lanche", icone: "🍎", chave: "lanche" },
+    { nome: "Jantar", icone: "🌙", chave: "jant", campo: "horario_jantar" },
+];
 
-// Item de lista de uma refeição: nome, data, descrição e selo dentro/fora da dieta
+const simplificar = (texto) => texto.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+const tipoDaRefeicao = (nome) => TIPOS_REFEICAO.find((tipo) => simplificar(nome).includes(tipo.chave));
+
+const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
+
+const formatarHora = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+// Dias contados no horário do navegador (a API devolve as datas em UTC)
+function meiaNoite(data) {
+    const d = new Date(data);
+    d.setHours(0, 0, 0, 0);
+    return d;
+}
+
+function diasAtras(n) {
+    const d = meiaNoite(new Date());
+    d.setDate(d.getDate() - n);
+    return d;
+}
+
+const chaveDia = (data) => meiaNoite(data).getTime();
+
+// Item de lista de uma refeição: ícone, nome, hora, descrição e selo dentro/fora da dieta
 function criarItemRefeicao(refeicao) {
     const item = document.createElement("li");
     item.className = "refeicao-item";
+
+    const icone = document.createElement("div");
+    icone.className = "meal-icon";
+    icone.setAttribute("aria-hidden", "true");
+    icone.textContent = tipoDaRefeicao(refeicao.nome)?.icone || "🍽️";
 
     const info = document.createElement("div");
     info.className = "refeicao-info";
@@ -168,10 +196,10 @@ function criarItemRefeicao(refeicao) {
     const nome = document.createElement("strong");
     nome.textContent = refeicao.nome;
 
-    const data = document.createElement("small");
-    data.textContent = formatarData.format(new Date(refeicao.data_hora));
+    const hora = document.createElement("small");
+    hora.textContent = formatarHora.format(new Date(refeicao.data_hora));
 
-    info.append(nome, data);
+    info.append(nome, hora);
 
     if (refeicao.descricao) {
         const desc = document.createElement("p");
@@ -183,6 +211,6 @@ function criarItemRefeicao(refeicao) {
     selo.className = refeicao.nao_dieta ? "selo selo-fora" : "selo selo-dentro";
     selo.textContent = refeicao.nao_dieta ? "Fora da dieta" : "Na dieta";
 
-    item.append(info, selo);
+    item.append(icone, info, selo);
     return item;
 }
