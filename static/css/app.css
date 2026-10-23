@@ -559,6 +559,88 @@
 }
 
 
+/* PROGRESSO — gráfico de 14 dias (na dieta embaixo, fora da dieta em cima) */
+
+.legenda {
+    display: flex;
+    gap: 16px;
+    margin: -8px 0 18px;
+    color: var(--texto-secundario);
+    font-size: 12px;
+}
+
+.legenda span::before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 6px;
+    border-radius: 3px;
+    vertical-align: -1px;
+}
+
+.legenda .dentro::before,
+.barra .dentro {
+    background: var(--verde-escuro);
+}
+
+.legenda .fora::before,
+.barra .fora {
+    background: var(--laranja-principal);
+}
+
+.grafico {
+    display: flex;
+    align-items: flex-end;
+}
+
+.coluna {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.coluna small {
+    min-height: 14px;
+    color: var(--texto-secundario);
+    font-size: 11px;
+}
+
+/* 2px de espaço entre as partes; só a ponta de cima é arredondada */
+.barra {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 60%;
+    max-width: 24px;
+}
+
+.barra span {
+    flex-basis: 0;
+}
+
+.barra span:first-child {
+    border-radius: 4px 4px 0 0;
+}
+
+.coluna .rotulo {
+    align-self: stretch;
+    padding-top: 6px;
+    border-top: 1px solid var(--borda);
+    color: var(--texto-secundario);
+    font-size: 11px;
+    text-align: center;
+}
+
+.coluna:last-child .rotulo {
+    color: var(--texto);
+    font-weight: 800;
+}
+
+
 /* PAINEL "HOJE" — o cartão da tela de início (classes do style.css) em tamanho de tela */
 
 .hoje-grid {
