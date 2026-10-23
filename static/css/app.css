@@ -496,6 +496,153 @@
 }
 
 
+/* PAINEL "HOJE" — o cartão da tela de início (classes do style.css) em tamanho de tela */
+
+.hoje-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.hoje .card-label,
+.hoje .status {
+    font-size: 11px;
+}
+
+.hoje .progress-circle {
+    width: 130px;
+    height: 130px;
+    background: conic-gradient(var(--verde-claro) 0 var(--p, 0%), var(--borda) var(--p, 0%) 100%);
+}
+
+.hoje .progress-circle::before {
+    width: 104px;
+    height: 104px;
+}
+
+.hoje .progress-inner strong {
+    font-size: 28px;
+}
+
+.hoje .progress-inner span,
+.hoje .stat span {
+    font-size: 12px;
+}
+
+.hoje .progress-bar {
+    background: var(--borda);
+}
+
+/* sem a animação da tela de início, que termina sempre em 75% */
+.hoje .progress-bar div {
+    width: var(--p, 0%);
+    animation: none;
+    transition: width 0.6s ease;
+}
+
+.hoje .progress-text {
+    font-size: 14px;
+}
+
+.plano {
+    list-style: none;
+    margin-top: 6px;
+}
+
+.plano .meal-icon {
+    background: var(--fundo-verde);
+}
+
+.plano .meal-info strong {
+    font-size: 15px;
+}
+
+.plano .meal-info small {
+    font-size: 13px;
+}
+
+.plano .meal-check.fora {
+    color: var(--laranja-principal);
+}
+
+.plano .meal-arrow {
+    padding: 4px 8px;
+    text-decoration: none;
+}
+
+.hoje-lado {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.lado-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: var(--branco);
+    border: 1px solid var(--borda);
+    border-radius: var(--radius);
+}
+
+.lado-card strong {
+    display: block;
+    font-size: 20px;
+}
+
+.lado-card small {
+    color: var(--texto-secundario);
+    font-size: 13px;
+}
+
+.semana {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.semana div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--texto-secundario);
+    font-size: 10px;
+    text-transform: capitalize;
+}
+
+.semana span {
+    width: 8px;
+    background: var(--laranja-principal);
+    border-radius: 5px;
+}
+
+.objetivo {
+    display: block;
+}
+
+.objetivo h3 {
+    margin: 4px 0;
+    font-size: 18px;
+}
+
+.objetivo p {
+    margin-bottom: 16px;
+    color: var(--texto-secundario);
+    font-size: 13px;
+}
+
+.objetivo a {
+    display: inline-block;
+    margin-top: 14px;
+    color: var(--laranja-principal);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
 /* AVISO RÁPIDO */
 
 .toast {
@@ -526,7 +673,8 @@
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .painel-colunas {
+    .painel-colunas,
+    .hoje-grid {
         grid-template-columns: 1fr;
     }
 

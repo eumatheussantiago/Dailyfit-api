@@ -2,39 +2,77 @@
 
 {% block titulo %}Painel{% endblock %}
 
+{# O cartão "Hoje" da tela de início (classes do style.css), agora com os dados reais do usuário #}
+
 {% block pagina %}
 <div class="painel-topo">
-    <div class="section-label">SUA ROTINA, SEU RITMO</div>
-    <h1>Seu progresso <span>começa hoje</span> 🌱</h1>
-    <p>Acompanhe suas refeições e mantenha o foco nos seus objetivos.</p>
+    <div class="section-label" id="data-hoje">HOJE</div>
+    <h1>Feche o dia <span>dentro da rotina.</span></h1>
 </div>
 
-<div class="resumo-grid tres">
-    <div class="resumo-card">
-        <span>Refeições registradas</span>
-        <strong id="r-total">—</strong>
-    </div>
-    <div class="resumo-card resumo-dentro">
-        <span>Dentro da dieta</span>
-        <strong id="r-dentro">—</strong>
-    </div>
-    <div class="resumo-card resumo-fora">
-        <span>Fora da dieta</span>
-        <strong id="r-fora">—</strong>
-    </div>
+<div class="hoje-grid">
+
+    <section class="hero-card hoje" id="hoje" aria-labelledby="hoje-titulo">
+        <div class="card-header">
+            <div>
+                <span class="card-label">SEU PROGRESSO</span>
+                <h3 id="hoje-titulo">Hoje</h3>
+            </div>
+            <span class="status" id="status"><span></span>Começando</span>
+        </div>
+
+        <div class="progress-area">
+            <div class="progress-circle">
+                <div class="progress-inner">
+                    <strong id="pct">0%</strong>
+                    <span>do dia</span>
+                </div>
+            </div>
+            <div class="progress-details">
+                <div class="stat"><span>Refeições hoje</span> <strong id="hoje-total">—</strong></div>
+                <div class="stat"><span>Dentro da dieta</span> <strong id="hoje-dentro">—</strong></div>
+            </div>
+        </div>
+
+        <div class="progress-bar"><div></div></div>
+        <p class="progress-text" id="frase"></p>
+
+        <ul class="plano" id="plano"></ul>
+
+        <a class="btn-primary btn-full" href="/refeicoes">+ Registrar refeição</a>
+    </section>
+
+    <aside class="hoje-lado">
+        <div class="lado-card">
+            <div class="floating-icon" aria-hidden="true">🔥</div>
+            <div>
+                <strong id="seq">—</strong>
+                <small>seguidos registrando</small>
+            </div>
+        </div>
+
+        <div class="lado-card">
+            <div class="semana" id="semana" aria-hidden="true"></div>
+            <div>
+                <strong id="semana-total">—</strong>
+                <small>nos últimos 7 dias</small>
+            </div>
+        </div>
+
+        <section class="lado-card objetivo">
+            <span class="card-label">SEU OBJETIVO</span>
+            <h3 id="obj-nome">—</h3>
+            <p id="obj-peso"></p>
+            <div class="porcentagem-topo">
+                <span>Rotina da semana</span>
+                <strong id="rotina-pct">0%</strong>
+            </div>
+            <div class="porcentagem-barra"><span id="rotina-barra"></span></div>
+            <a href="/formulario" id="obj-link">Editar respostas</a>
+        </section>
+    </aside>
+
 </div>
-
-<section class="lista-refeicoes bloco">
-    <h2>🍽️ Últimas refeições</h2>
-    <p class="lista-vazia" id="vazia" hidden>Nenhuma refeição registrada ainda.</p>
-    <ul id="lista"></ul>
-    <a class="btn-primary" href="/refeicoes">Registrar ou ver todas</a>
-</section>
-
-<section class="dica">
-    <strong>✨ Consistência vale mais que perfeição.</strong>
-    <p>Registre sua alimentação e acompanhe sua evolução.</p>
-</section>
 {% endblock %}
 
 {% block scripts %}

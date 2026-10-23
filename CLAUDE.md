@@ -30,7 +30,8 @@ templates/     index, cadastro, login, formulario (do grupo)
 static/js/     app.js (função api() que envia o token, obterUsuario(), salvarUsuario(), sair(),
                exigirLogin(), formatarData, criarItemRefeicao())
                cadastro.js, login.js, formulario.js, script.js (do grupo)
-               painel.js (resumo + 5 últimas), refeicoes.js (adicionar/editar/excluir + histórico),
+               painel.js (cartão "Hoje" da landing com dados reais: % do dia, plano pelos horários
+               do formulário, dias seguidos, semana e objetivo), refeicoes.js (adicionar/editar/excluir + histórico),
                progresso.js (números, % e melhor sequência)
 static/css/    style.css (do grupo) + app.css (só as 4 telas depois do login)
 iniciar.bat    roda o app no Windows com dois cliques
@@ -66,12 +67,10 @@ pytest                           -> esperado: 15 passed
   resumo, deploy no Render + Supabase, correções de segurança e de horário (PR #2), imagens da
   tela de início leves (~9,5 MB → 331 KB, PR #3) e as 4 telas depois do login no visual do site
   (Painel, Refeições, Treinos, Progresso, PR #4).
+- Painel refeito a partir da promessa da landing (cartão "Hoje"): ver painel.js.
+  Dias e semana são contados no horário do navegador, a partir da lista de refeições.
 - Treinos é só demonstrativa: a API ainda não tem rotas nem tabela de treinos.
 
 ## Pendências
 1. Salvar os treinos no banco (hoje a tela Treinos é demonstrativa).
 2. Recuperação de senha ("Esqueci minha senha" hoje só mostra um aviso).
-3. Manual (fora do código): monitor no UptimeRobot a cada 10 min para o site não "dormir"
-   (no plano grátis, o primeiro acesso depois de parado leva ~20 s). Use o tipo **Keyword**
-   (palavra "DailyFit"): o tipo HTTP(s) checa com HEAD, que o site responde com 405, e o
-   monitor marcaria "fora do ar" com o site funcionando.
