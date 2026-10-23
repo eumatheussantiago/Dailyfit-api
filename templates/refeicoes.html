@@ -34,7 +34,7 @@
             </label>
         </fieldset>
 
-        <p class="form-erro" id="erro" hidden></p>
+        <p class="form-erro" id="erro" role="alert" hidden></p>
 
         <button type="submit" class="btn-primary btn-full" id="btn-salvar">Adicionar refeição</button>
         <button type="button" class="btn-cancelar" id="btn-cancelar" hidden>Cancelar edição</button>
@@ -42,7 +42,7 @@
 
     <!-- HISTÓRICO -->
     <div class="lista-refeicoes">
-        <h2>Histórico de refeições</h2>
+        <h2 id="historico-titulo" tabindex="-1">Histórico de refeições</h2>
         <p class="lista-vazia" id="vazia" hidden>Nenhuma refeição registrada ainda. Comece pela de agora.</p>
         <div id="lista"></div>
     </div>

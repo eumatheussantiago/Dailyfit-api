@@ -49,7 +49,7 @@ seguranca.py     → criptografia das senhas, tokens de acesso e limite de tenta
 models/          → tabelas do banco (usuários, perfis e refeições)
 schemas/         → formato e validação dos dados da API
 routes/          → rotas da API e das páginas
-templates/       → páginas HTML (início, cadastro, login, formulário e, depois do login, painel, refeições, treinos e progresso)
+templates/       → páginas HTML (início, cadastro, login, formulário e, depois do login, painel, refeições, objetivos e progresso)
 static/css/      → estilos (style.css do grupo + app.css das telas depois do login)
 static/js/       → scripts das páginas e da ligação com a API
 tests/           → testes automáticos
@@ -185,10 +185,10 @@ O cadastro e o login devolvem um **`token`**. As demais rotas exigem esse token 
 
 | Tela | Arquivos | O que faz |
 |---|---|---|
-| Painel (`/painel`) | `painel.html` + `painel.js` | Resumo e as 5 refeições mais recentes |
-| Refeições (`/refeicoes`) | `refeicoes.html` + `refeicoes.js` | Adicionar, editar e excluir refeições + histórico |
-| Treinos (`/treinos`) | `treinos.html` | Demonstrativa (ainda não salva no banco) |
-| Progresso (`/progresso`) | `progresso.html` + `progresso.js` | Números da dieta, % e melhor sequência |
+| Painel (`/painel`) | `painel.html` + `painel.js` | Cartão "Hoje" da tela de início com os dados reais: % do dia, plano com os horários do formulário, dias seguidos, últimos 7 dias e objetivo |
+| Refeições (`/refeicoes`) | `refeicoes.html` + `refeicoes.js` | Atalhos (café, almoço, lanche, jantar), adicionar, editar e excluir + histórico por dia |
+| Objetivos (`/objetivos`) | `objetivos.html` + `objetivos.js` | Objetivo e meta de peso, metas da rotina, plano e respostas do formulário (`/treinos` leva para cá) |
+| Progresso (`/progresso`) | `progresso.html` + `progresso.js` | Últimos 7 dias × 7 anteriores, dias seguidos, gráfico de 14 dias e total |
 
 - As 4 telas usam o molde `templates/base_logado.html` (menu com as abas, "Olá" e botão Sair).
 - Os dados vêm da API **pela função `api()` do `static/js/app.js`**, que já envia o token de acesso. O usuário logado vem de `exigirLogin()` (sem login, volta para `/login`). Não use campo de "ID do usuário": a API só mostra os dados do dono do token.
@@ -196,8 +196,5 @@ O cadastro e o login devolvem um **`token`**. As demais rotas exigem esse token 
 
 ## Próximos passos
 
-- Salvar os treinos no banco (hoje a tela é demonstrativa)
 - Recuperação de senha ("Esqueci minha senha" ainda só mostra um aviso)
-- Imagens da tela de início mais leves (hoje somam ~9,5 MB)
-- Gráfico de evolução semanal
 - Hábitos e metas personalizadas

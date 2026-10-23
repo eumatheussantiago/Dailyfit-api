@@ -35,7 +35,9 @@ async function api(caminho, { method = "GET", body } = {}) {
     }
 
     if (!resposta.ok) {
-        throw new Error(mensagemDeErro(dados));
+        const erro = new Error(mensagemDeErro(dados));
+        erro.status = resposta.status;
+        throw erro;
     }
 
     return dados;
@@ -150,16 +152,37 @@ function exigirLogin() {
 }
 
 // Tipos de refeição: atalhos da tela Refeições, plano do Painel e ícones.
-// Uma refeição é de um tipo quando o nome contém a chave (sem acento e sem maiúscula).
+// Uma refeição é de um tipo quando o nome contém uma das chaves (sem acento e sem maiúscula).
 const TIPOS_REFEICAO = [
-    { nome: "Café da manhã", icone: "☕", chave: "cafe", campo: "horario_cafe" },
-    { nome: "Almoço", icone: "🥗", chave: "almoco", campo: "horario_almoco" },
-    { nome: "Lanche", icone: "🍎", chave: "lanche" },
-    { nome: "Jantar", icone: "🌙", chave: "jant", campo: "horario_jantar" },
+    { nome: "Café da manhã", icone: "☕", chaves: ["cafe"], campo: "horario_cafe" },
+    { nome: "Almoço", icone: "🥗", chaves: ["almoco"], campo: "horario_almoco" },
+    { nome: "Lanche", icone: "🍎", chaves: ["lanche", "cafe da tarde"] },
+    { nome: "Jantar", icone: "🌙", chaves: ["jant"], campo: "horario_jantar" },
 ];
 
 const simplificar = (texto) => texto.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
-const tipoDaRefeicao = (nome) => TIPOS_REFEICAO.find((tipo) => simplificar(nome).includes(tipo.chave));
+// Vale a chave que aparece primeiro no nome ("Lanche com café" é lanche); no empate, a mais
+// longa ("Café da tarde" é lanche, não café da manhã)
+function tipoDaRefeicao(nome) {
+    const texto = simplificar(nome);
+    let melhor = null;
+    for (const tipo of TIPOS_REFEICAO) {
+        for (const chave of tipo.chaves) {
+            const posicao = texto.indexOf(chave);
+            if (posicao < 0) continue;
+            if (!melhor || posicao < melhor.posicao || (posicao === melhor.posicao && chave.length > melhor.chave.length)) {
+                melhor = { tipo, posicao, chave };
+            }
+        }
+    }
+    return melhor?.tipo;
+}
+
+// Perfil do formulário inicial; null só quando ainda não foi respondido (404).
+// Outros erros (rede, servidor) seguem como erro, para a tela não pedir o formulário à toa.
+function buscarPerfil(usuarioId) {
+    return api(`/usuarios/${usuarioId}/perfil`).catch((erro) => (erro.status === 404 ? null : Promise.reject(erro)));
+}
 
 const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
 
@@ -172,10 +195,13 @@ function meiaNoite(data) {
     return d;
 }
 
+// Anda os dias a partir do meio-dia: onde o horário de verão começa à meia-noite (ex.: o Brasil
+// até 2019), aquela meia-noite não existe e partir dela erraria a chave dos outros dias
 function diasAtras(n) {
-    const d = meiaNoite(new Date());
+    const d = new Date();
+    d.setHours(12, 0, 0, 0);
     d.setDate(d.getDate() - n);
-    return d;
+    return meiaNoite(d);
 }
 
 const chaveDia = (data) => meiaNoite(data).getTime();

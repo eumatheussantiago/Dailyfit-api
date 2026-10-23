@@ -49,9 +49,11 @@ function desenharRotina(perfil, refeicoes) {
     preencherBarra("hoje-barra", (hoje / meta) * 100);
     document.getElementById("rotina-pct").textContent = `${rotina}%`;
     preencherBarra("rotina-barra", rotina);
-    document.getElementById("frase").textContent = refeicoes.length
-        ? "Continue avançando: cada refeição registrada conta."
-        : "Registre a primeira refeição para começar.";
+    document.getElementById("frase").textContent = !refeicoes.length
+        ? "Registre a primeira refeição para começar."
+        : hoje < meta
+          ? `Faltam ${plural(meta - hoje, "refeição", "refeições")} para cumprir o plano de hoje.`
+          : "Plano de hoje cumprido.";
 }
 
 function desenharPlano(perfil) {
@@ -107,26 +109,26 @@ function desenharContou(perfil) {
     );
 }
 
+// Mostra o perfil assim que ele chega; as metas da rotina entram quando as refeições chegarem
 async function carregarObjetivos() {
-    const base = `/usuarios/${usuario.id}`;
+    const carregando = document.getElementById("carregando");
 
     try {
-        const [perfil, refeicoes] = await Promise.all([
-            api(`${base}/perfil`).catch(() => null), // 404 = formulário ainda não respondido
-            api(`${base}/refeicoes`),
-        ]);
-
+        const perfil = await buscarPerfil(usuario.id);
+        carregando.hidden = true;
         document.getElementById("sem-perfil").hidden = Boolean(perfil);
         document.getElementById("com-perfil").hidden = !perfil;
         if (!perfil) return;
 
         document.getElementById("obj-nome").textContent = OBJETIVOS[perfil.objetivo] || perfil.objetivo;
         desenharPeso(perfil);
-        desenharRotina(perfil, refeicoes);
         desenharPlano(perfil);
         desenharContou(perfil);
+        desenharRotina(perfil, await api(`/usuarios/${usuario.id}/refeicoes`));
     } catch (erro) {
         avisar(erro.message);
+        carregando.textContent = `Não foi possível carregar seus dados: ${erro.message}`;
+        carregando.hidden = false;
     }
 }
 
