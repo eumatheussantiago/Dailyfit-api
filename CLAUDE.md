@@ -30,12 +30,12 @@ templates/     index, cadastro, login, formulario (do grupo)
 static/js/     app.js (função api() que envia o token, obterUsuario(), salvarUsuario(), sair(),
                exigirLogin(), TIPOS_REFEICAO/tipoDaRefeicao() (café, almoço, lanche, jantar: nome
                sem acento contém a chave), datas no fuso local (meiaNoite, diasAtras, chaveDia),
-               plural(), criarItemRefeicao())
+               refeicoesPorDia(), diasSeguidos(), plural(), criarItemRefeicao())
                cadastro.js, login.js, formulario.js, script.js (do grupo)
                painel.js (cartão "Hoje" da landing com dados reais: % do dia, plano pelos horários
                do formulário, dias seguidos, semana e objetivo), refeicoes.js (atalhos de nome, adicionar/
                editar/excluir, histórico por dia; /refeicoes?nome=X já preenche o nome),
-               progresso.js (números, % e melhor sequência)
+               progresso.js (7 dias × 7 anteriores, dias seguidos, gráfico de 14 dias, total)
 static/css/    style.css (do grupo) + app.css (só as 4 telas depois do login)
 iniciar.bat    roda o app no Windows com dois cliques
 
@@ -71,7 +71,8 @@ pytest                           -> esperado: 15 passed
   tela de início leves (~9,5 MB → 331 KB, PR #3) e as 4 telas depois do login no visual do site
   (Painel, Refeições, Treinos, Progresso, PR #4).
 - Telas logadas sendo refeitas a partir da promessa da landing, uma por PR: Painel (cartão
-  "Hoje") e Refeições (atalhos + histórico por dia) prontos; faltam Progresso e Treinos.
+  "Hoje"), Refeições (atalhos + histórico por dia) e Progresso (semana × semana anterior,
+  gráfico de 14 dias) prontos; falta Treinos, que vai virar "Objetivos" (decisão de 22/10/2026).
   Dias e semana são contados no horário do navegador, a partir da lista de refeições.
 - Treinos é só demonstrativa: a API ainda não tem rotas nem tabela de treinos.
 

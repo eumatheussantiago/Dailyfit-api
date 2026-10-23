@@ -180,6 +180,30 @@ function diasAtras(n) {
 
 const chaveDia = (data) => meiaNoite(data).getTime();
 
+// Refeições por dia (chave = meia-noite local): { total, dentro da dieta }
+function refeicoesPorDia(refeicoes) {
+    const dias = new Map();
+    for (const r of refeicoes) {
+        const chave = chaveDia(r.data_hora);
+        const dia = dias.get(chave) || { total: 0, dentro: 0 };
+        dia.total++;
+        if (!r.nao_dieta) dia.dentro++;
+        dias.set(chave, dia);
+    }
+    return dias;
+}
+
+// Dias seguidos com pelo menos uma refeição. Hoje ainda sem registro não quebra a sequência.
+function diasSeguidos(dias) {
+    let n = dias.has(chaveDia(new Date())) ? 0 : 1;
+    let total = 0;
+    while (dias.has(chaveDia(diasAtras(n)))) {
+        total++;
+        n++;
+    }
+    return total;
+}
+
 // Item de lista de uma refeição: ícone, nome, hora, descrição e selo dentro/fora da dieta
 function criarItemRefeicao(refeicao) {
     const item = document.createElement("li");

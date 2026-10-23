@@ -14,17 +14,6 @@ const OBJETIVOS = {
 const PLANO = TIPOS_REFEICAO.filter((tipo) => tipo.campo);
 const formatarDiaSemana = new Intl.DateTimeFormat("pt-BR", { weekday: "short" });
 
-// Dias seguidos com pelo menos uma refeição. Hoje ainda sem registro não quebra a sequência.
-function diasSeguidos(dias) {
-    let n = dias.has(chaveDia(new Date())) ? 0 : 1;
-    let total = 0;
-    while (dias.has(chaveDia(diasAtras(n)))) {
-        total++;
-        n++;
-    }
-    return total;
-}
-
 // Itens do plano: as refeições do formulário (feitas ou não) + as outras registradas hoje
 function montarPlano(perfil, doDia) {
     const restantes = [...doDia];
@@ -105,17 +94,13 @@ function desenharHoje(perfil, doDia, meta) {
 }
 
 function desenharSemana(refeicoes, meta) {
-    const porDia = new Map();
-    for (const r of refeicoes) {
-        const chave = chaveDia(r.data_hora);
-        porDia.set(chave, (porDia.get(chave) || 0) + 1);
-    }
+    const porDia = refeicoesPorDia(refeicoes);
 
     // Conta só os dias desde a primeira refeição: quem começou ontem não fica com a semana "vazia"
     const inicio = refeicoes.length ? meiaNoite(refeicoes.at(-1).data_hora) : meiaNoite(new Date());
     const semana = [6, 5, 4, 3, 2, 1, 0].map((n) => {
         const data = diasAtras(n);
-        return { data, total: porDia.get(data.getTime()) || 0, conta: data >= inicio };
+        return { data, total: porDia.get(data.getTime())?.total || 0, conta: data >= inicio };
     });
 
     document.getElementById("semana").replaceChildren(
@@ -138,7 +123,7 @@ function desenharSemana(refeicoes, meta) {
     document.getElementById("rotina-pct").textContent = `${rotina}%`;
     document.getElementById("rotina-barra").style.width = `${rotina}%`;
 
-    document.getElementById("seq").textContent = plural(diasSeguidos(new Set(porDia.keys())), "dia", "dias");
+    document.getElementById("seq").textContent = plural(diasSeguidos(porDia), "dia", "dias");
 }
 
 function desenharObjetivo(perfil) {

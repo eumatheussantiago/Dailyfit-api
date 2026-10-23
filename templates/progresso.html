@@ -5,38 +5,49 @@
 {% block pagina %}
 <div class="painel-topo">
     <div class="section-label">SUA EVOLUÇÃO</div>
-    <h1>Veja sua <span>consistência</span> 📈</h1>
-    <p>Indicadores calculados a partir das refeições que você registrou.</p>
+    <h1>Pequenos passos. <span>Grandes mudanças.</span></h1>
+    <p>Tudo calculado a partir das refeições que você registrou.</p>
 </div>
 
 <div class="resumo-grid">
     <div class="resumo-card">
-        <span>Total de refeições</span>
-        <strong id="r-total">—</strong>
+        <span>Últimos 7 dias</span>
+        <strong id="semana-total">—</strong>
+        <p id="semana-variacao"></p>
     </div>
     <div class="resumo-card resumo-dentro">
-        <span>Dentro da dieta</span>
-        <strong id="r-dentro">—</strong>
-    </div>
-    <div class="resumo-card resumo-fora">
-        <span>Fora da dieta</span>
-        <strong id="r-fora">—</strong>
+        <span>Dentro da dieta nos 7 dias</span>
+        <strong id="semana-dieta">—</strong>
+        <p id="semana-dieta-antes"></p>
     </div>
     <div class="resumo-card resumo-sequencia">
-        <span>Melhor sequência</span>
-        <strong id="r-sequencia">—</strong>
+        <span>🔥 Dias seguidos registrando</span>
+        <strong id="seq-atual">—</strong>
+        <p id="seq-melhor"></p>
+    </div>
+    <div class="resumo-card resumo-fora">
+        <span>Melhor sequência na dieta</span>
+        <strong id="seq-refeicoes">—</strong>
+        <p>refeições seguidas dentro da dieta</p>
     </div>
 </div>
 
+<section class="lista-refeicoes bloco">
+    <h2>Últimos 14 dias</h2>
+    <div class="legenda">
+        <span class="dentro">Na dieta</span>
+        <span class="fora">Fora da dieta</span>
+    </div>
+    <div class="grafico" id="grafico" role="img"></div>
+</section>
+
 <div class="porcentagem">
     <div class="porcentagem-topo">
-        <span>Refeições dentro da dieta</span>
+        <span id="r-desde">Desde o início</span>
         <strong id="r-porcentagem">0%</strong>
     </div>
     <div class="porcentagem-barra"><span id="r-barra"></span></div>
 </div>
-
-<p class="dica">A <strong>melhor sequência</strong> conta refeições seguidas dentro da dieta (não dias seguidos).</p>
 {% endblock %}
 
 {% block scripts %}
