@@ -121,6 +121,7 @@
 }
 
 .app-form input[type="text"],
+.app-form input[type="datetime-local"],
 .app-form input[type="email"],
 .app-form textarea {
     width: 100%;
