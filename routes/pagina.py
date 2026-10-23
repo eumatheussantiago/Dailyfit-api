@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from fastapi import APIRouter, Request
+from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,5 +22,8 @@ router.add_api_route("/login", _pagina("login.html"), methods=["GET"])
 router.add_api_route("/formulario", _pagina("formulario.html"), methods=["GET"])
 router.add_api_route("/painel", _pagina("painel.html"), methods=["GET"])
 router.add_api_route("/refeicoes", _pagina("refeicoes.html"), methods=["GET"])
-router.add_api_route("/treinos", _pagina("treinos.html"), methods=["GET"])
+router.add_api_route("/objetivos", _pagina("objetivos.html"), methods=["GET"])
+# A tela Treinos virou Objetivos: o endereço antigo leva para ela (redirecionamento temporário,
+# caso treinos volte a existir)
+router.add_api_route("/treinos", lambda: RedirectResponse("/objetivos"), methods=["GET"])
 router.add_api_route("/progresso", _pagina("progresso.html"), methods=["GET"])

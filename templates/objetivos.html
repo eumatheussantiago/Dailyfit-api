@@ -1,0 +1,75 @@
+{% extends "base_logado.html" %}
+
+{% block titulo %}Objetivos{% endblock %}
+
+{# "Seus objetivos" da tela de início: objetivo, meta de peso e metas da rotina, das respostas do formulário #}
+
+{% block pagina %}
+<div class="painel-topo">
+    <div class="section-label">SEUS OBJETIVOS</div>
+    <h1>Defina a meta. <span>Siga a rotina.</span></h1>
+    <p>Tudo aqui vem das respostas do formulário inicial.</p>
+</div>
+
+<section class="lista-refeicoes bloco" id="sem-perfil" hidden>
+    <h2>Responda o formulário inicial</h2>
+    <p>Com ele o DailyFit monta o seu objetivo, a sua meta e o plano do dia.</p>
+    <a class="btn-primary" href="/formulario">Responder agora</a>
+</section>
+
+<div class="hoje-grid" id="com-perfil" hidden>
+
+    <section class="hero-card hoje" aria-labelledby="obj-nome">
+        <div class="card-header">
+            <div>
+                <span class="card-label">SEU OBJETIVO</span>
+                <h3 id="obj-nome">—</h3>
+            </div>
+        </div>
+
+        <div class="progress-details pesos">
+            <div class="stat"><span>Peso informado</span> <strong id="peso-atual">—</strong></div>
+            <div class="stat" id="meta-bloco"><span>Meta</span> <strong id="peso-meta">—</strong></div>
+            <div class="stat" id="dif-bloco"><span>Para chegar à meta</span> <strong id="peso-dif">—</strong></div>
+        </div>
+        <p class="progress-text">O peso não é atualizado sozinho: quando mudar, edite suas respostas.</p>
+
+        <h4 class="metas-titulo">Metas da rotina</h4>
+        <div class="meta-linha">
+            <div class="porcentagem-topo">
+                <span>Refeições hoje</span>
+                <strong id="hoje-total">—</strong>
+            </div>
+            <div class="porcentagem-barra"><span id="hoje-barra"></span></div>
+        </div>
+        <div class="meta-linha">
+            <div class="porcentagem-topo">
+                <span>Rotina dos últimos 7 dias</span>
+                <strong id="rotina-pct">—</strong>
+            </div>
+            <div class="porcentagem-barra"><span id="rotina-barra"></span></div>
+        </div>
+        <p class="progress-text" id="frase"></p>
+
+        <a class="btn-primary btn-full" href="/formulario">Editar respostas</a>
+    </section>
+
+    <aside class="hoje-lado">
+        <section class="lado-card objetivo">
+            <span class="card-label">SEU PLANO</span>
+            <ul class="plano" id="plano"></ul>
+            <p id="plano-resumo"></p>
+        </section>
+
+        <section class="lado-card objetivo" id="contou" hidden>
+            <span class="card-label">O QUE VOCÊ CONTOU</span>
+            <dl class="contou" id="contou-lista"></dl>
+        </section>
+    </aside>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/objetivos.js"></script>
+{% endblock %}

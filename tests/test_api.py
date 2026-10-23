@@ -48,10 +48,13 @@ def criar_usuario(client, email="ana@email.com"):
 
 
 def test_paginas_abrem(client):
-    for pagina in ["/", "/cadastro", "/login", "/formulario", "/painel", "/refeicoes", "/treinos", "/progresso"]:
+    for pagina in ["/", "/cadastro", "/login", "/formulario", "/painel", "/refeicoes", "/objetivos", "/progresso"]:
         assert client.get(pagina).status_code == 200
     assert client.get("/static/css/style.css").status_code == 200
     assert client.get("/static/js/script.js").status_code == 200
+    # endereço antigo da tela Treinos leva para Objetivos
+    antiga = client.get("/treinos", follow_redirects=False)
+    assert antiga.status_code == 307 and antiga.headers["location"] == "/objetivos"
 
 
 def test_cabecalhos_de_seguranca(client):

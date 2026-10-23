@@ -25,8 +25,8 @@ schemas/       validação Pydantic
 routes/        pagina.py (páginas), usuarios.py, perfil.py, refeicoes.py, resumo.py
 templates/     index, cadastro, login, formulario (do grupo)
                base_app (cabeçalho, style.css + app.css e app.js) > base_logado (molde das telas
-               depois do login: abas Painel/Refeições/Treinos/Progresso, "Olá" e botão Sair)
-               painel, refeicoes, treinos, progresso (telas depois do login)
+               depois do login: abas Painel/Refeições/Objetivos/Progresso, "Olá" e botão Sair)
+               painel, refeicoes, objetivos, progresso (telas depois do login)
 static/js/     app.js (função api() que envia o token, obterUsuario(), salvarUsuario(), sair(),
                exigirLogin(), TIPOS_REFEICAO/tipoDaRefeicao() (café, almoço, lanche, jantar: nome
                sem acento contém a chave), datas no fuso local (meiaNoite, diasAtras, chaveDia),
@@ -35,7 +35,8 @@ static/js/     app.js (função api() que envia o token, obterUsuario(), salvarU
                painel.js (cartão "Hoje" da landing com dados reais: % do dia, plano pelos horários
                do formulário, dias seguidos, semana e objetivo), refeicoes.js (atalhos de nome, adicionar/
                editar/excluir, histórico por dia; /refeicoes?nome=X já preenche o nome),
-               progresso.js (7 dias × 7 anteriores, dias seguidos, gráfico de 14 dias, total)
+               progresso.js (7 dias × 7 anteriores, dias seguidos, gráfico de 14 dias, total),
+               objetivos.js (objetivo e meta de peso, metas da rotina, plano e respostas do formulário)
 static/css/    style.css (do grupo) + app.css (só as 4 telas depois do login)
 iniciar.bat    roda o app no Windows com dois cliques
 
@@ -72,10 +73,9 @@ pytest                           -> esperado: 15 passed
   (Painel, Refeições, Treinos, Progresso, PR #4).
 - Telas logadas sendo refeitas a partir da promessa da landing, uma por PR: Painel (cartão
   "Hoje"), Refeições (atalhos + histórico por dia) e Progresso (semana × semana anterior,
-  gráfico de 14 dias) prontos; falta Treinos, que vai virar "Objetivos" (decisão de 22/10/2026).
+  gráfico de 14 dias) e Objetivos (no lugar de Treinos, decisão de 22/10/2026; /treinos
+  redireciona para /objetivos) prontos.
   Dias e semana são contados no horário do navegador, a partir da lista de refeições.
-- Treinos é só demonstrativa: a API ainda não tem rotas nem tabela de treinos.
 
 ## Pendências
-1. Salvar os treinos no banco (hoje a tela Treinos é demonstrativa).
-2. Recuperação de senha ("Esqueci minha senha" hoje só mostra um aviso).
+1. Recuperação de senha ("Esqueci minha senha" hoje só mostra um aviso).

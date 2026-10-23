@@ -9,7 +9,7 @@
 
 {% block conteudo %}
 <nav class="abas" aria-label="Menu do app">
-    {% for endereco, nome in [("/painel", "Painel"), ("/refeicoes", "Refeições"), ("/treinos", "Treinos"), ("/progresso", "Progresso")] %}
+    {% for endereco, nome in [("/painel", "Painel"), ("/refeicoes", "Refeições"), ("/objetivos", "Objetivos"), ("/progresso", "Progresso")] %}
     <a href="{{ endereco }}"{% if request.url.path == endereco %} class="ativa" aria-current="page"{% endif %}>{{ nome }}</a>
     {% endfor %}
 </nav>
