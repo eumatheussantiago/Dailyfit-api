@@ -12,7 +12,8 @@ responde um formulário inicial (3 etapas), registra refeições (dentro/fora da
 - Banco: SQLite local (dailyfit.db, criado sozinho) | PostgreSQL no Supabase em produção (driver psycopg 3)
 - Front-end: HTML + CSS + JavaScript puro (sem framework)
 - Deploy: Render, plano grátis, configurado em render.yaml. Todo push na master publica sozinho (2-3 min)
-- Testes: pytest (tests/test_api.py + tests/test_saude.py) — 20 testes, todos devem passar
+- Testes: pytest (tests/test_api.py + tests/test_saude.py) — 24 testes, todos devem passar
+- IA: Claude Haiku 5.5 (SDK oficial `anthropic`) para as dicas da tela Objetivos (ia.py)
 
 ## Estrutura
 main.py        app FastAPI, middleware de cabeçalhos de segurança, cria tabelas ao iniciar
@@ -20,6 +21,8 @@ database.py    conexão; DATABASE_URL por variável de ambiente; criar_tabelas()
                novos em bancos existentes e liga RLS no Postgres; agora_utc() para datas
 saude.py       IMC e faixa da OMS, peso saudável, gasto calórico (Mifflin-St Jeor), água e prazo
                até a meta; GET/PUT /perfil devolvem esses números em "indicadores"
+ia.py          dicas com IA (Claude Haiku 5.5): regras do prompt, chamada e erros amigáveis
+               (ErroDicas); chave em ANTHROPIC_API_KEY (só no Render), sem ela as dicas ficam desligadas
 seguranca.py   hash de senha (PBKDF2-SHA256), tokens assinados (HMAC, 30 dias), exigir_dono(),
                limite de 10 senhas erradas por e-mail a cada 15 min
 models/        usuarios, perfis (formulário inicial), refeicoes (índice usuario_id + data_hora)
@@ -66,14 +69,18 @@ iniciar.bat    roda o app no Windows com dois cliques
 - Telas logadas (app.css): texto laranja usa --laranja-texto (definida no .app-body com color-mix de
   --laranja-principal e --texto, 4,7:1 no fundo mais escuro); botão laranja leva texto --texto.
   O --laranja-principal puro fica só para fundo, borda e gráfico (2,4:1 como texto não passa).
-- Nunca colocar senhas, DATABASE_URL ou SECRET_KEY no código/commits (ficam só no Render).
+- Nunca colocar senhas, DATABASE_URL, SECRET_KEY ou ANTHROPIC_API_KEY no código/commits (ficam só no Render).
+- Dicas com IA (routes/dicas.py): para a IA vão só formulário, números de saude.py e resumo dos
+  últimos 7 dias, nunca nome/e-mail (dados de saúde são sensíveis pela LGPD); a tela avisa antes;
+  1 geração por pessoa a cada 20 h e DICAS_LIMITE_DIA (padrão 200) no site todo. Nos testes a IA
+  é trocada por uma função falsa (monkeypatch em ia.gerar_dicas): o pytest nunca gasta nada.
 - Sempre trabalhar em branch separada e abrir pull request. Não fazer merge sem aprovação.
 - Explicar tudo em português simples, como para um leigo.
 
 ## Como rodar e testar
 pip install -r requirements.txt
 uvicorn main:app --reload        -> http://127.0.0.1:8000
-pytest                           -> esperado: 20 passed
+pytest                           -> esperado: 24 passed
 
 ## Estado atual (21/10/2026)
 - Concluído e publicado: banco, cadastro/login com senha e token, formulário inicial, refeições,

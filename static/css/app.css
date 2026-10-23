@@ -654,10 +654,51 @@
     font-size: 13px;
 }
 
-.numeros .aviso {
+.numeros .aviso,
+.dicas .aviso {
     margin-top: 16px;
     color: var(--texto-secundario);
     font-size: 12px;
+}
+
+.dicas h2 small {
+    color: var(--texto-secundario);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.dicas ul {
+    margin: 12px 0;
+}
+
+.dicas li {
+    padding: 14px 16px;
+    background: var(--fundo);
+    border-left: 4px solid var(--verde-escuro);
+    border-radius: 12px;
+}
+
+.dicas li strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 15px;
+}
+
+.dicas li p {
+    color: var(--texto-secundario);
+    font-size: 14px;
+}
+
+.dicas .btn-primary {
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.dicas .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: default;
+    transform: none;
 }
 
 .contou dt {

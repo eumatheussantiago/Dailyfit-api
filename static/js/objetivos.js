@@ -115,6 +115,79 @@ function desenharNumeros(perfil) {
     document.getElementById("numeros").hidden = false;
 }
 
+// "hoje às 14:30", "amanhã às 10:00"… no horário do navegador
+const formatarDiaHora = new Intl.DateTimeFormat("pt-BR", { weekday: "long", hour: "2-digit", minute: "2-digit" });
+function formatarQuando(data) {
+    const hora = formatarHora.format(data);
+    const dia = chaveDia(data);
+    if (dia === chaveDia(new Date())) return `hoje às ${hora}`;
+    if (dia === diasAtras(-1).getTime()) return `amanhã às ${hora}`;
+    if (dia === diasAtras(1).getTime()) return `ontem às ${hora}`;
+    return formatarDiaHora.format(data);
+}
+
+// Dicas da IA: a API guarda a última geração e diz quando dá para gerar de novo
+function desenharDicas(resposta) {
+    const estado = document.getElementById("dicas-estado");
+    const botao = document.getElementById("dicas-gerar");
+    document.getElementById("dicas").hidden = false;
+
+    document.getElementById("dicas-lista").replaceChildren(
+        ...resposta.dicas.map(({ titulo, texto }) => {
+            const item = document.createElement("li");
+            const tituloEl = document.createElement("strong");
+            tituloEl.textContent = titulo;
+            const textoEl = document.createElement("p");
+            textoEl.textContent = texto;
+            item.append(tituloEl, textoEl);
+            return item;
+        })
+    );
+
+    if (!resposta.ligadas) {
+        estado.textContent = "As dicas com IA ainda não foram ligadas neste site.";
+        botao.hidden = true;
+        return;
+    }
+
+    const proxima = resposta.proxima_em ? new Date(resposta.proxima_em) : null;
+    const esperar = proxima && proxima > new Date();
+    estado.textContent = resposta.criado_em
+        ? `Geradas ${formatarQuando(new Date(resposta.criado_em))}.`
+        : "Gere dicas feitas para você a partir do seu formulário e das refeições da semana.";
+    botao.hidden = false;
+    botao.disabled = Boolean(esperar);
+    botao.textContent = esperar
+        ? `Novas dicas ${formatarQuando(proxima)}`
+        : resposta.criado_em
+          ? "Gerar novas dicas"
+          : "Gerar dicas";
+}
+
+async function carregarDicas() {
+    try {
+        desenharDicas(await api(`/usuarios/${usuario.id}/dicas`));
+    } catch (erro) {
+        avisar(erro.message);
+    }
+}
+
+document.getElementById("dicas-gerar").addEventListener("click", async () => {
+    const estado = document.getElementById("dicas-estado");
+    const botao = document.getElementById("dicas-gerar");
+    botao.disabled = true;
+    botao.textContent = "Gerando dicas…";
+    estado.textContent = "A IA está escrevendo suas dicas. Leva alguns segundos.";
+    try {
+        desenharDicas(await api(`/usuarios/${usuario.id}/dicas`, { method: "POST" }));
+        document.getElementById("dicas-titulo").focus();
+    } catch (erro) {
+        estado.textContent = erro.message;
+        botao.disabled = false;
+        botao.textContent = "Tentar de novo";
+    }
+});
+
 // Respostas de texto livre: só aparecem as que foram preenchidas
 function desenharContou(perfil) {
     const campos = [
@@ -151,6 +224,7 @@ async function carregarObjetivos() {
         desenharNumeros(perfil);
         desenharPlano(perfil);
         desenharContou(perfil);
+        carregarDicas(); // sem await: as dicas não seguram o resto da tela
         desenharRotina(perfil, await api(`/usuarios/${usuario.id}/refeicoes`));
     } catch (erro) {
         avisar(erro.message);

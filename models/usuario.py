@@ -14,7 +14,7 @@ class UsuarioModel(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     senha_hash: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
-    # Ao apagar um usuário, as refeições e o perfil dele são apagados junto
+    # Ao apagar um usuário, as refeições, o perfil e as dicas dele são apagados junto
     refeicoes: Mapped[list["RefeicaoModel"]] = relationship(
         back_populates="usuario",
         cascade="all, delete-orphan",
@@ -23,6 +23,10 @@ class UsuarioModel(Base):
         back_populates="usuario",
         cascade="all, delete-orphan",
         uselist=False,
+    )
+    dicas: Mapped[list["DicaModel"]] = relationship(
+        back_populates="usuario",
+        cascade="all, delete-orphan",
     )
 
     @property
