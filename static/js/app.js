@@ -238,7 +238,8 @@ const OBJETIVOS = {
 };
 
 // Rotina dos últimos 7 dias: refeições feitas ÷ planejadas (meta por dia). Conta só os dias
-// desde a primeira refeição (quem começou ontem não fica com a semana "vazia") e um dia com
+// desde a primeira refeição (quem começou ontem não fica com a semana "vazia"), hoje só entra
+// depois da primeira refeição do dia (de manhã cedo não puxa a % para baixo) e um dia com
 // refeição a mais não compensa outro.
 function rotinaDaSemana(refeicoes, porDia, meta) {
     const inicio = meiaNoite(refeicoes.length ? refeicoes.at(-1).data_hora : new Date());
@@ -246,9 +247,10 @@ function rotinaDaSemana(refeicoes, porDia, meta) {
     let dias = 0;
     for (let n = 0; n < 7; n++) {
         const data = diasAtras(n);
-        if (data < inicio) continue;
+        const total = porDia.get(data.getTime())?.total || 0;
+        if (data < inicio || (n === 0 && !total)) continue;
         dias++;
-        feitas += Math.min(porDia.get(data.getTime())?.total || 0, meta);
+        feitas += Math.min(total, meta);
     }
     return Math.round((feitas / (meta * Math.max(dias, 1))) * 100);
 }
