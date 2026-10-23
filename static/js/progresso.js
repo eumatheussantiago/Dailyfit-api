@@ -18,16 +18,18 @@ function somarSemana(porDia, n) {
 const porcentagemDieta = ({ total, dentro }) => (total ? Math.round((dentro / total) * 100) : null);
 
 function textoVariacao(atual, anterior) {
-    if (!anterior) return atual ? "Primeira semana com registros" : "Nenhum registro ainda";
+    if (!anterior) return atual ? "Nada registrado nos 7 dias anteriores" : "Nada registrado nos últimos 14 dias";
     const variacao = Math.round(((atual - anterior) / anterior) * 100);
     if (variacao === 0) return "Igual aos 7 dias anteriores";
     return `${variacao > 0 ? "+" : "−"}${Math.abs(variacao)}% em relação aos 7 dias anteriores`;
 }
 
+// Do meio-dia, pelo mesmo motivo de diasAtras() no app.js
 function diaSeguinte(chave) {
     const d = new Date(chave);
+    d.setHours(12, 0, 0, 0);
     d.setDate(d.getDate() + 1);
-    return d.getTime();
+    return meiaNoite(d).getTime();
 }
 
 // Maior número de dias seguidos com registro, em toda a história

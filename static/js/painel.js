@@ -14,7 +14,7 @@ function montarPlano(perfil, doDia) {
 
     for (const p of PLANO) {
         if (!perfil?.[p.campo]) continue;
-        const i = restantes.findIndex((r) => simplificar(r.nome).includes(p.chave));
+        const i = restantes.findIndex((r) => tipoDaRefeicao(r.nome)?.chave === p.chave);
         itens.push({ ...p, horario: perfil[p.campo], refeicao: i >= 0 ? restantes.splice(i, 1)[0] : null });
     }
     for (const r of restantes) {

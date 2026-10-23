@@ -159,7 +159,20 @@ const TIPOS_REFEICAO = [
 ];
 
 const simplificar = (texto) => texto.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
-const tipoDaRefeicao = (nome) => TIPOS_REFEICAO.find((tipo) => simplificar(nome).includes(tipo.chave));
+// Vale a chave que aparece primeiro no nome: "Lanche com café" é lanche, não café da manhã
+function tipoDaRefeicao(nome) {
+    const texto = simplificar(nome);
+    let escolhido;
+    let posicao = Infinity;
+    for (const tipo of TIPOS_REFEICAO) {
+        const i = texto.indexOf(tipo.chave);
+        if (i >= 0 && i < posicao) {
+            escolhido = tipo;
+            posicao = i;
+        }
+    }
+    return escolhido;
+}
 
 const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
 
@@ -172,10 +185,13 @@ function meiaNoite(data) {
     return d;
 }
 
+// Anda os dias a partir do meio-dia: onde o horário de verão começa à meia-noite (ex.: o Brasil
+// até 2019), aquela meia-noite não existe e partir dela erraria a chave dos outros dias
 function diasAtras(n) {
-    const d = meiaNoite(new Date());
+    const d = new Date();
+    d.setHours(12, 0, 0, 0);
     d.setDate(d.getDate() - n);
-    return d;
+    return meiaNoite(d);
 }
 
 const chaveDia = (data) => meiaNoite(data).getTime();
