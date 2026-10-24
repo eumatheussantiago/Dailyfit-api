@@ -36,6 +36,9 @@ Tempo sugerido: **8 a 10 minutos**. Site: https://dailyfit-037t.onrender.com
 
 ## Recado para o grupo (repositório ME-Bastos/DailyFit)
 
+**Política de privacidade:** agora existe em `/privacidade`. No cadastro (`templates/cadastro.html`), o texto "Aceito os termos de uso e a política de privacidade." pode virar link para `/privacidade`. Vale também um link no rodapé da tela de início. Os dois arquivos são do grupo, por isso não mexemos neles. Ainda não existem "termos de uso": dá para tirar essa parte do texto ou escrever os termos.
+
+
 Nas telas depois do login, o texto laranja foi escurecido para passar no contraste mínimo de leitura (4,5:1). Para isso foi criada a variável `--laranja-texto` no `app.css`, misturando o `--laranja-principal` com o `--texto`. **Na tela de início, no cadastro e no login, que são do grupo, o laranja continua como está**, e alguns textos ficam abaixo do mínimo:
 
 - texto laranja sobre fundo claro (`.section-label`, títulos com `<span>` laranja, links "Entrar"): **cerca de 2,3:1 a 2,4:1**;

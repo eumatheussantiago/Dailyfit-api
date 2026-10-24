@@ -1,0 +1,71 @@
+{% extends "base_app.html" %}
+
+{% block titulo %}Política de privacidade{% endblock %}
+
+{% block nav %}
+<a href="/" class="btn-sair">Início</a>
+{% endblock %}
+
+{% block conteudo %}
+<article class="lista-refeicoes politica">
+    <div class="section-label">LGPD (LEI 13.709/2018)</div>
+    <h1>Política de <span>privacidade.</span></h1>
+    <p class="atualizada">Última atualização: 24 de outubro de 2026.</p>
+
+    <p>O DailyFit é um <strong>projeto acadêmico</strong>, feito por um grupo de alunos de Análise e Desenvolvimento de Sistemas. Não é um serviço comercial: não vendemos dados, não mostramos anúncios e não usamos ferramentas de rastreamento ou de análise de visitas. Esta página explica, em linguagem simples, quais dados o DailyFit guarda, para quê, com quem eles passam e o que você pode fazer com eles.</p>
+
+    <h2>1. Quais dados guardamos</h2>
+    <ul>
+        <li><strong>Conta:</strong> nome, e-mail e senha. A senha nunca é guardada como texto: o banco recebe só uma versão embaralhada (hash) que não pode ser revertida. O código de recuperação de senha também é guardado só em hash.</li>
+        <li><strong>Formulário inicial:</strong> objetivo, sexo, idade, altura, peso atual e meta, nível de atividade, tipo de alimentação, restrições, preferências, refeições por dia, horários e dificuldades da rotina.</li>
+        <li><strong>Refeições:</strong> nome, descrição (opcional), dia e hora, e se foi dentro ou fora da dieta.</li>
+        <li><strong>Dicas com IA:</strong> as dicas geradas e a data em que você concordou pela primeira vez em usar a IA.</li>
+    </ul>
+    <p><strong>Peso, altura, restrições alimentares e hábitos de alimentação são dados de saúde</strong>, que a LGPD trata como dados pessoais sensíveis (art. 11). Por isso eles só são usados para mostrar a você seus próprios números e, se você pedir, para gerar suas dicas.</p>
+
+    <h2>2. Para que usamos</h2>
+    <ul>
+        <li>Criar e proteger sua conta, e permitir que você entre e recupere a senha.</li>
+        <li>Mostrar seu plano do dia, sua sequência, seu progresso e seus números de saúde (IMC, peso saudável, gasto calórico estimado, água).</li>
+        <li>Gerar dicas personalizadas com IA, <strong>só quando você marca que concorda e clica em "Gerar dicas"</strong>.</li>
+    </ul>
+    <p>As bases legais são a execução do serviço que você pediu ao criar a conta (art. 7º, V) e, para os dados de saúde e para o uso da IA, o seu consentimento específico (art. 11, I), dado ao aceitar esta política no cadastro e ao marcar a caixa de consentimento das dicas.</p>
+
+    <h2>3. Com quem os dados passam</h2>
+    <p>Usamos serviços de terceiros para o site funcionar. Eles processam dados em nosso nome e ficam nos Estados Unidos:</p>
+    <ul>
+        <li><strong>Render</strong> (hospedagem do site, Ohio, EUA): recebe os pedidos do navegador e guarda registros técnicos de acesso, como o endereço IP e a página pedida.</li>
+        <li><strong>Supabase</strong> (banco de dados, região us-east-2, EUA): guarda os dados da seção 1.</li>
+        <li><strong>Anthropic</strong> (IA Claude, EUA): <strong>só quando você gera dicas</strong>. Vão as respostas do formulário, os números calculados e um resumo das refeições dos últimos 7 dias. <strong>Nome e e-mail nunca são enviados.</strong> Os textos que você escreveu no formulário vão como estão, então não escreva neles o que não quiser compartilhar. A Anthropic trata esses dados conforme a política de privacidade dela.</li>
+        <li><strong>Google Fonts, jsDelivr e Unsplash</strong>: entregam as fontes, um arquivo de estilo e as fotos da tela de início. O seu navegador baixa esses arquivos direto deles, então eles recebem o seu endereço IP, como acontece em quase todo site.</li>
+    </ul>
+    <p>Esses envios aos Estados Unidos são transferências internacionais de dados (art. 33 da LGPD), necessárias para o site funcionar. Não compartilhamos seus dados com mais ninguém.</p>
+
+    <h2>4. No seu navegador</h2>
+    <p>O DailyFit <strong>não usa cookies</strong>. Para manter você logado, o navegador guarda um código de acesso no armazenamento local (localStorage, se você marcar "lembrar", ou sessionStorage, que some ao fechar o navegador). O botão "Sair" apaga esse código.</p>
+
+    <h2>5. Por quanto tempo guardamos</h2>
+    <p>Enquanto a sua conta existir. Quando você apaga a conta, ela e todos os dados ligados a ela (formulário, refeições e dicas) são apagados na hora do nosso banco. Registros técnicos e cópias de segurança mantidos pelos provedores podem durar mais um tempo, conforme as regras de cada um.</p>
+
+    <h2>6. Seus direitos (art. 18 da LGPD)</h2>
+    <ul>
+        <li><strong>Ver seus dados:</strong> estão nas telas Painel, Refeições, Objetivos e Progresso.</li>
+        <li><strong>Corrigir:</strong> edite suas respostas em Objetivos → "Editar respostas", e suas refeições em Refeições.</li>
+        <li><strong>Apagar:</strong> em <strong>Objetivos → Segurança da conta → "Apagar minha conta"</strong>.</li>
+        <li><strong>Retirar o consentimento da IA:</strong> basta não gerar mais dicas. As dicas já geradas saem junto com a conta.</li>
+        <li><strong>Tirar dúvidas ou pedir outra coisa:</strong> fale com o grupo responsável pelo projeto.</li>
+    </ul>
+
+    <h2>7. Segurança</h2>
+    <p>Senhas e códigos de recuperação guardados só em hash; acesso aos dados só com login e só aos seus próprios dados; trava contra tentativas repetidas de senha; conexão sempre por HTTPS; e o banco bloqueia o acesso direto de fora do site. Nenhum sistema é 100% seguro: se algo grave acontecer com os dados, avisaremos quem for afetado.</p>
+
+    <h2>8. Idade</h2>
+    <p>As dicas com IA são só para maiores de 18 anos. Se você tem menos de 18 anos, use o DailyFit com a ajuda de um responsável.</p>
+
+    <h2>9. Saúde</h2>
+    <p>Os números e as dicas do DailyFit são estimativas gerais e <strong>não substituem a orientação de um nutricionista ou médico</strong>.</p>
+
+    <h2>10. Mudanças nesta política</h2>
+    <p>Se esta política mudar, a data no topo da página será atualizada.</p>
+</article>
+{% endblock %}
