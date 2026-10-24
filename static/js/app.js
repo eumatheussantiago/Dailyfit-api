@@ -107,7 +107,7 @@ const CHAVE_CODIGO = "dailyfit_codigo_novo";
 
 function mostrarCodigoNovo(usuario, depois) {
     const { codigo_recuperacao: codigo, ...conta } = usuario;
-    if (conta.token) salvarUsuario(conta);
+    if (conta.token) salvarUsuario(conta, false); // sem "lembrar": num PC público, sai ao fechar o navegador
     try {
         sessionStorage.setItem(CHAVE_CODIGO, JSON.stringify({ codigo, depois }));
         window.location.href = "/codigo-recuperacao";

@@ -1,14 +1,15 @@
-fastapi
-uvicorn[standard]
-sqlalchemy>=2.0
-jinja2
+# Versões fixas (as que passam nos testes): atualize de propósito, rodando o pytest
+fastapi==0.159.1
+uvicorn[standard]==0.54.0
+sqlalchemy==2.1.6
+jinja2==3.1.5
 
 # SDK oficial da Anthropic: dicas com IA (Claude Haiku 5.5); a chave fica no Render
-anthropic>=2.2
+anthropic==2.2.0
 
 # Driver do PostgreSQL (usado em produção, no Render + Supabase)
-psycopg[binary]>=3.1
+psycopg[binary]==3.3.6
 
 # Para rodar os testes automáticos (pytest)
-pytest
-httpx
+pytest==9.1.1
+httpx==0.28.1

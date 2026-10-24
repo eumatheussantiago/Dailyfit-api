@@ -9,7 +9,7 @@ Projeto em grupo do curso de **Análise e Desenvolvimento de Sistemas (ADS)**.
 **https://dailyfit-037t.onrender.com**
 
 - Documentação da API: https://dailyfit-037t.onrender.com/docs
-- O site usa o plano grátis do Render: depois de **15 minutos sem acesso ele "dorme"** e leva cerca de **1 minuto para abrir** de novo. Antes de apresentar, abra o link alguns minutos antes.
+- O site usa o plano grátis do Render: depois de **15 minutos sem acesso ele "dorme"** e leva de **20 segundos a 1 minuto para abrir** de novo. Antes de apresentar, abra o link alguns minutos antes.
 
 ## Funcionalidades
 
@@ -99,7 +99,7 @@ No computador, o banco é um arquivo `dailyfit.db` criado automaticamente na pri
 pytest
 ```
 
-Resultado esperado: `32 passed`.
+Resultado esperado: `33 passed`.
 
 ## Deploy (site publicado)
 
@@ -155,7 +155,7 @@ O cadastro e o login devolvem um **`token`**. As demais rotas exigem esse token 
 
 | Método | Rota | O que faz |
 |---|---|---|
-| POST | `/usuarios` | Cria um usuário (devolve o token) |
+| POST | `/usuarios` | Cria um usuário (devolve o token e o código de recuperação, só desta vez) |
 | POST | `/usuarios/login` | Entra com e-mail e senha (devolve o token) |
 | GET | `/usuarios/{id}` 🔒 | Mostra o próprio usuário |
 | PUT | `/usuarios/{id}/perfil` 🔒 | Salva as respostas do formulário inicial |
@@ -166,6 +166,10 @@ O cadastro e o login devolvem um **`token`**. As demais rotas exigem esse token 
 | PUT | `/usuarios/{id}/refeicoes/{refeicao_id}` 🔒 | Edita uma refeição |
 | DELETE | `/usuarios/{id}/refeicoes/{refeicao_id}` 🔒 | Exclui uma refeição |
 | GET | `/usuarios/{id}/resumo` 🔒 | Métricas da dieta |
+| POST | `/usuarios/recuperar-senha` | Troca a senha com e-mail + código de recuperação (mesma trava de tentativas do login; devolve um código novo) |
+| POST | `/usuarios/{id}/codigo-recuperacao` 🔒 | Gera um código de recuperação novo (o anterior deixa de valer) |
+| GET | `/usuarios/{id}/dicas` 🔒 | Últimas dicas da IA e quando dá para gerar de novo |
+| POST | `/usuarios/{id}/dicas` 🔒 | Gera dicas com IA (pede `{"consentimento": true}`, 18+ anos, 1 vez a cada 20 h) |
 
 ## Regras do grupo
 
