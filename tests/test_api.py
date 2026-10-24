@@ -50,7 +50,7 @@ def criar_usuario(client, email="ana@email.com"):
 
 
 def test_paginas_abrem(client):
-    for pagina in ["/", "/cadastro", "/login", "/formulario", "/painel", "/refeicoes", "/objetivos", "/progresso"]:
+    for pagina in ["/", "/cadastro", "/login", "/formulario", "/painel", "/refeicoes", "/objetivos", "/progresso", "/recuperar-senha", "/codigo-recuperacao"]:
         assert client.get(pagina).status_code == 200
     assert client.get("/static/css/style.css").status_code == 200
     assert client.get("/static/js/script.js").status_code == 200
@@ -493,3 +493,50 @@ def test_ia_resposta_cortada_ou_vazia_vira_erro_amigavel(monkeypatch):
     for _ in range(2):
         with pytest.raises(ia.ErroDicas):
             ia.gerar_dicas({"formulario": {}})
+
+
+def test_recuperar_senha_com_codigo(client):
+    cadastro = client.post("/usuarios", json={"nome": "Ana", "email": "ana@email.com", "senha": "segredo123"}).json()
+    codigo = cadastro["codigo_recuperacao"]
+    assert len(codigo) == 14 and codigo.count("-") == 2  # "XXXX-XXXX-XXXX"
+
+    # o login normal não devolve o código
+    assert client.post("/usuarios/login", json={"email": "ana@email.com", "senha": "segredo123"}).json()["codigo_recuperacao"] is None
+
+    # código errado: mesma mensagem que e-mail inexistente
+    errado = client.post("/usuarios/recuperar-senha", json={"email": "ana@email.com", "codigo": "AAAA-AAAA-AAAA", "nova_senha": "nova12345"})
+    sem_conta = client.post("/usuarios/recuperar-senha", json={"email": "ninguem@email.com", "codigo": codigo, "nova_senha": "nova12345"})
+    assert errado.status_code == sem_conta.status_code == 400
+    assert errado.json()["detail"] == sem_conta.json()["detail"]
+
+    # aceita minúsculas e sem traços; troca a senha e devolve um código novo
+    certo = client.post("/usuarios/recuperar-senha", json={"email": "ANA@email.com", "codigo": codigo.lower().replace("-", ""), "nova_senha": "nova12345"})
+    assert certo.status_code == 200 and certo.json()["token"]
+    assert certo.json()["codigo_recuperacao"] not in (None, codigo)
+    assert client.post("/usuarios/login", json={"email": "ana@email.com", "senha": "segredo123"}).status_code == 401
+    assert client.post("/usuarios/login", json={"email": "ana@email.com", "senha": "nova12345"}).status_code == 200
+
+    # cada código vale uma vez só
+    de_novo = client.post("/usuarios/recuperar-senha", json={"email": "ana@email.com", "codigo": codigo, "nova_senha": "outra1234"})
+    assert de_novo.status_code == 400
+
+
+def test_gerar_novo_codigo_logado(client):
+    usuario_id, token = criar_usuario(client)
+    novo = client.post(f"/usuarios/{usuario_id}/codigo-recuperacao", headers=token)
+    assert novo.status_code == 200
+    codigo = novo.json()["codigo_recuperacao"]
+    assert client.post("/usuarios/recuperar-senha", json={"email": "ana@email.com", "codigo": codigo, "nova_senha": "nova12345"}).status_code == 200
+
+    # só o dono, e só com login
+    _, token_bia = criar_usuario(client, "bia@email.com")
+    assert client.post(f"/usuarios/{usuario_id}/codigo-recuperacao", headers=token_bia).status_code == 403
+    assert client.post(f"/usuarios/{usuario_id}/codigo-recuperacao").status_code == 401
+
+
+def test_recuperar_senha_tem_limite_de_tentativas(client):
+    criar_usuario(client)
+    for _ in range(10):
+        client.post("/usuarios/recuperar-senha", json={"email": "ana@email.com", "codigo": "AAAA-AAAA-AAAA", "nova_senha": "nova12345"})
+    bloqueado = client.post("/usuarios/recuperar-senha", json={"email": "ana@email.com", "codigo": "AAAA-AAAA-AAAA", "nova_senha": "nova12345"})
+    assert bloqueado.status_code == 429

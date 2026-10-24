@@ -253,4 +253,16 @@ async function carregarObjetivos() {
     }
 }
 
+document.getElementById("novo-codigo").addEventListener("click", async (evento) => {
+    if (!confirm("Gerar um código novo? O código anterior deixa de valer.")) return;
+    evento.currentTarget.disabled = true;
+    try {
+        const resposta = await api(`/usuarios/${usuario.id}/codigo-recuperacao`, { method: "POST" });
+        mostrarCodigoNovo(resposta, "/objetivos");
+    } catch (erro) {
+        avisar(erro.message);
+        evento.currentTarget.disabled = false;
+    }
+});
+
 if (usuario) carregarObjetivos();

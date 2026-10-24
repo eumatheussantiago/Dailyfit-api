@@ -101,6 +101,35 @@ function sair() {
     window.location.href = "/login";
 }
 
+// Código de recuperação de senha: a API devolve no cadastro, na recuperação e quando a pessoa pede
+// um novo. Guarda o login SEM o código e leva para a tela que mostra o código uma única vez.
+const CHAVE_CODIGO = "dailyfit_codigo_novo";
+
+function mostrarCodigoNovo(usuario, depois) {
+    const { codigo_recuperacao: codigo, ...conta } = usuario;
+    if (conta.token) salvarUsuario(conta);
+    try {
+        sessionStorage.setItem(CHAVE_CODIGO, JSON.stringify({ codigo, depois }));
+        window.location.href = "/codigo-recuperacao";
+    } catch {
+        // navegador sem armazenamento: mostra aqui mesmo para o código não se perder
+        window.alert(`Guarde seu código de recuperação de senha: ${codigo}`);
+        window.location.href = depois;
+    }
+}
+
+// Lê e apaga (só aparece uma vez). Só aceita destino dentro do próprio site.
+function lerCodigoNovo() {
+    try {
+        const dados = JSON.parse(sessionStorage.getItem(CHAVE_CODIGO));
+        sessionStorage.removeItem(CHAVE_CODIGO);
+        if (dados?.codigo && /^\/[^/]/.test(dados.depois || "")) return dados;
+    } catch {
+        /* ignora */
+    }
+    return null;
+}
+
 // Depois de entrar: quem ainda não respondeu o formulário inicial vai para ele
 function destinoAposEntrar(usuario) {
     return usuario && usuario.perfil_preenchido ? "/painel" : "/formulario";

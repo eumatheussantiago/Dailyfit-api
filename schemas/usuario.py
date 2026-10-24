@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
@@ -47,3 +49,20 @@ class UsuarioLogado(UsuarioResponse):
     """Resposta do cadastro e do login: os dados do usuário + o token de acesso."""
 
     token: str
+    # Só no cadastro e na recuperação de senha: a tela mostra uma vez e não guarda
+    codigo_recuperacao: Optional[str] = None
+
+
+class RecuperarSenha(BaseModel):
+    email: str
+    codigo: str = Field(min_length=1, max_length=40)
+    nova_senha: str = Field(min_length=6, max_length=128)
+
+    @field_validator("email")
+    @classmethod
+    def normalizar(cls, valor: str) -> str:
+        return valor.strip().lower()
+
+
+class CodigoRecuperacao(BaseModel):
+    codigo_recuperacao: str

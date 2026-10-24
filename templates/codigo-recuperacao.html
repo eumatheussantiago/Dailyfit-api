@@ -1,0 +1,20 @@
+{% extends "base_app.html" %}
+
+{% block titulo %}Código de recuperação{% endblock %}
+
+{% block conteudo %}
+<section class="lista-refeicoes cartao-estreito">
+    <div class="section-label">GUARDE ESTE CÓDIGO</div>
+    <h1>Seu código de <span>recuperação.</span></h1>
+    <p class="lista-vazia" id="explicacao">Se esquecer a senha, é com ele que você cria uma nova. Ele aparece só agora: anote ou tire um print e guarde num lugar seguro.</p>
+
+    <p class="codigo-recuperacao" id="codigo">—</p>
+    <button type="button" class="btn-sair btn-copiar" id="copiar" hidden>Copiar código</button>
+
+    <a class="btn-primary btn-full" id="continuar" href="/painel">Já guardei, continuar</a>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/codigo-recuperacao.js"></script>
+{% endblock %}

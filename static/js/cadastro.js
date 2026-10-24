@@ -44,9 +44,8 @@ formCadastro.addEventListener("submit", async (evento) => {
             },
         });
 
-        salvarUsuario(usuario);
         mostrarMensagem(mensagemCadastro, "Conta criada! Vamos conhecer você.", "sucesso");
-        window.location.href = "/formulario";
+        mostrarCodigoNovo(usuario, "/formulario"); // antes do formulário, mostra o código de recuperação
     } catch (erro) {
         mostrarMensagem(mensagemCadastro, erro.message);
         botao.disabled = false;

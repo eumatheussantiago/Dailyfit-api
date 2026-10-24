@@ -50,6 +50,32 @@ def verificar_senha(senha: str, hash_salvo: str | None) -> bool:
 # para que o tempo de resposta não revele quais e-mails estão cadastrados.
 HASH_FALSO = gerar_hash_senha(secrets.token_hex(16))
 
+# Código de recuperação de senha (o site não manda e-mail): 12 caracteres sem os que se confundem
+# (0/O, 1/I/L), mostrado uma única vez e guardado só como hash. Por ser aleatório (~59 bits) e
+# ter a trava de tentativas do login, basta SHA-256: o PBKDF2 lento é para senha escolhida por
+# gente, e no Render grátis deixaria o cadastro vários segundos mais lento.
+ALFABETO_CODIGO = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+
+
+def gerar_codigo_recuperacao() -> str:
+    letras = "".join(secrets.choice(ALFABETO_CODIGO) for _ in range(12))
+    return "-".join(letras[i:i + 4] for i in range(0, 12, 4))  # ex.: "K7PQ-ZM3T-RW9H"
+
+
+def normalizar_codigo(codigo: str) -> str:
+    """Aceita com ou sem traços e em minúsculas."""
+    return "".join(letra for letra in codigo.upper() if letra.isalnum())
+
+
+def hash_do_codigo(codigo: str) -> str:
+    return hashlib.sha256(normalizar_codigo(codigo).encode()).hexdigest()
+
+
+def codigo_confere(codigo: str, hash_salvo: str | None) -> bool:
+    normalizado = normalizar_codigo(codigo)
+    # compare_digest: o tempo da comparação não revela quantos caracteres batem
+    return bool(normalizado and hash_salvo) and hmac.compare_digest(hash_do_codigo(normalizado), hash_salvo)
+
 
 # ---------------------------------------------------------------- tokens
 

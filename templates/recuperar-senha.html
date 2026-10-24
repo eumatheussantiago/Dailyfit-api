@@ -1,0 +1,38 @@
+{% extends "base_app.html" %}
+
+{% block titulo %}Recuperar senha{% endblock %}
+
+{% block nav %}
+<a href="/login" class="btn-sair">Entrar</a>
+{% endblock %}
+
+{% block conteudo %}
+<section class="lista-refeicoes cartao-estreito">
+    <div class="section-label">ESQUECEU A SENHA?</div>
+    <h1>Crie uma <span>senha nova.</span></h1>
+    <p class="lista-vazia">Use o código de recuperação que apareceu quando você criou a conta (ex.: K7PQ-ZM3T-RW9H).</p>
+
+    <form id="form-recuperar" class="app-form" novalidate>
+        <label for="email">E-mail</label>
+        <input id="email" name="email" type="email" autocomplete="username" required maxlength="255">
+
+        <label for="codigo">Código de recuperação</label>
+        <input id="codigo" name="codigo" type="text" autocomplete="off" required maxlength="40" placeholder="XXXX-XXXX-XXXX">
+
+        <label for="nova-senha">Nova senha <small>(mínimo 6 caracteres)</small></label>
+        <input id="nova-senha" name="nova_senha" type="password" autocomplete="new-password" required minlength="6" maxlength="128">
+
+        <label for="confirmar">Repita a nova senha</label>
+        <input id="confirmar" name="confirmar" type="password" autocomplete="new-password" required minlength="6" maxlength="128">
+
+        <p class="form-erro" id="erro" role="alert" hidden></p>
+        <button type="submit" class="btn-primary btn-full" id="btn-salvar">Salvar nova senha</button>
+    </form>
+
+    <p class="aviso">Perdeu o código também? Peça a alguém do grupo para criar uma conta nova para você: o código é a única forma de recuperar a senha.</p>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/recuperar-senha.js"></script>
+{% endblock %}

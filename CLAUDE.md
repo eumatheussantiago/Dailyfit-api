@@ -12,7 +12,7 @@ responde um formulário inicial (3 etapas), registra refeições (dentro/fora da
 - Banco: SQLite local (dailyfit.db, criado sozinho) | PostgreSQL no Supabase em produção (driver psycopg 3)
 - Front-end: HTML + CSS + JavaScript puro (sem framework)
 - Deploy: Render, plano grátis, configurado em render.yaml. Todo push na master publica sozinho (2-3 min)
-- Testes: pytest (tests/test_api.py + tests/test_saude.py) — 29 testes, todos devem passar
+- Testes: pytest (tests/test_api.py + tests/test_saude.py) — 32 testes, todos devem passar
 - IA: Claude Haiku 5.5 (SDK oficial `anthropic`) para as dicas da tela Objetivos (ia.py)
 
 ## Estrutura
@@ -47,6 +47,11 @@ static/css/    style.css (do grupo) + app.css (só as 4 telas depois do login)
 iniciar.bat    roda o app no Windows com dois cliques
 
 ## Autenticação
+- Recuperação de senha SEM e-mail: o cadastro devolve "codigo_recuperacao" (XXXX-XXXX-XXXX), que a
+  tela /codigo-recuperacao mostra UMA vez (passa pelo sessionStorage e é apagado; nunca fica salvo
+  junto com o login). /recuperar-senha troca a senha com e-mail + código (mesma trava de tentativas
+  do login) e devolve um código novo (cada um vale uma vez). Logado, POST /usuarios/{id}/codigo-recuperacao
+  gera outro (botão em Objetivos). O banco guarda só o SHA-256 do código (aleatório, ~59 bits).
 - POST /usuarios (cadastro) e POST /usuarios/login devolvem { id, nome, email, perfil_preenchido, token }
 - Todas as rotas /usuarios/{id}/... exigem "Authorization: Bearer <token>" do PRÓPRIO usuário
   (401 sem login/token inválido, 403 para outro usuário). Não existe rota que liste usuários.
@@ -83,7 +88,7 @@ iniciar.bat    roda o app no Windows com dois cliques
 ## Como rodar e testar
 pip install -r requirements.txt
 uvicorn main:app --reload        -> http://127.0.0.1:8000
-pytest                           -> esperado: 29 passed
+pytest                           -> esperado: 32 passed
 
 ## Estado atual (21/10/2026)
 - Concluído e publicado: banco, cadastro/login com senha e token, formulário inicial, refeições,
@@ -99,4 +104,4 @@ pytest                           -> esperado: 29 passed
   numa meia-noite, que não existe onde o horário de verão começa à meia-noite).
 
 ## Pendências
-1. Recuperação de senha ("Esqueci minha senha" hoje só mostra um aviso).
+- (nenhuma no código) Recuperação de senha feita com código de recuperação (sem e-mail).
