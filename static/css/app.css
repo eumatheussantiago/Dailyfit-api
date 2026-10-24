@@ -196,6 +196,15 @@
     border: 1px solid var(--borda);
 }
 
+.apagar-texto {
+    margin-top: 22px;
+}
+
+.btn-perigo {
+    color: var(--laranja-texto);
+    border-color: var(--laranja-principal);
+}
+
 .btn-borda:disabled {
     opacity: 0.6;
     cursor: wait;
