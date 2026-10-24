@@ -27,8 +27,8 @@ class UsuarioCreate(BaseModel):
 
 
 class UsuarioLogin(BaseModel):
-    email: str
-    senha: str
+    email: str = Field(max_length=255)
+    senha: str = Field(max_length=128)
 
     @field_validator("email")
     @classmethod
@@ -54,7 +54,7 @@ class UsuarioLogado(UsuarioResponse):
 
 
 class RecuperarSenha(BaseModel):
-    email: str
+    email: str = Field(max_length=255)
     codigo: str = Field(min_length=1, max_length=40)
     nova_senha: str = Field(min_length=6, max_length=128)
 

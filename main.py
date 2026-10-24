@@ -25,6 +25,15 @@ app = FastAPI(
 
 
 
+# Só deixa o navegador carregar o que as páginas usam de verdade (bloqueia script injetado)
+CSP = (
+    "default-src 'self'; script-src 'self'; "
+    "style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; "
+    "font-src https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com; "
+    "connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+)
+
+
 @app.middleware("http")
 async def cabecalhos_de_seguranca(request: Request, call_next):
     """Proteções básicas do navegador em todas as respostas."""
@@ -32,6 +41,11 @@ async def cabecalhos_de_seguranca(request: Request, call_next):
     resposta.headers.setdefault("X-Content-Type-Options", "nosniff")
     resposta.headers.setdefault("X-Frame-Options", "DENY")
     resposta.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    resposta.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    resposta.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+    # /docs e /redoc carregam scripts de CDN: ficam sem CSP
+    if request.url.path not in ("/docs", "/redoc"):
+        resposta.headers.setdefault("Content-Security-Policy", CSP)
     # Sem isto o navegador reusa JS/CSS antigos por horas depois de um deploy (o ETag deixa a conferência barata)
     resposta.headers.setdefault("Cache-Control", "no-cache")
     return resposta
