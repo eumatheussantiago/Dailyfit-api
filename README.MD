@@ -158,6 +158,7 @@ O cadastro e o login devolvem um **`token`**. As demais rotas exigem esse token 
 | POST | `/usuarios` | Cria um usuário (devolve o token e o código de recuperação, só desta vez) |
 | POST | `/usuarios/login` | Entra com e-mail e senha (devolve o token) |
 | GET | `/usuarios/{id}` 🔒 | Mostra o próprio usuário |
+| DELETE | `/usuarios/{id}` 🔒 | Apaga a conta e todos os dados (perfil, refeições, dicas) — botão em Objetivos |
 | PUT | `/usuarios/{id}/perfil` 🔒 | Salva as respostas do formulário inicial |
 | GET | `/usuarios/{id}/perfil` 🔒 | Mostra as respostas do formulário inicial |
 | POST | `/usuarios/{id}/refeicoes` 🔒 | Cadastra uma refeição |

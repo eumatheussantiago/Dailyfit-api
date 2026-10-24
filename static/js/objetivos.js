@@ -266,4 +266,20 @@ document.getElementById("novo-codigo").addEventListener("click", async (evento) 
     }
 });
 
+// LGPD (art. 18): a pessoa pode apagar a conta e todos os dados dela
+document.getElementById("apagar-conta").addEventListener("click", async (evento) => {
+    const botao = evento.currentTarget;
+    const certeza = prompt('Isso apaga para sempre sua conta, formulário, refeições e dicas. Para confirmar, digite APAGAR:');
+    if (certeza?.trim().toUpperCase() !== "APAGAR") return;
+    botao.disabled = true;
+    try {
+        await api(`/usuarios/${usuario.id}`, { method: "DELETE" });
+        alert("Sua conta foi apagada.");
+        sair();
+    } catch (erro) {
+        avisar(erro.message);
+        botao.disabled = false;
+    }
+});
+
 if (usuario) carregarObjetivos();
