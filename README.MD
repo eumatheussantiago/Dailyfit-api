@@ -168,6 +168,7 @@ O cadastro e o login devolvem um **`token`**. As demais rotas exigem esse token 
 | DELETE | `/usuarios/{id}/refeicoes/{refeicao_id}` 🔒 | Exclui uma refeição |
 | GET | `/usuarios/{id}/resumo` 🔒 | Métricas da dieta |
 | GET | `/privacidade` | Política de privacidade (LGPD) |
+| GET | `/termos` | Termos de uso |
 | POST | `/usuarios/recuperar-senha` | Troca a senha com e-mail + código de recuperação (mesma trava de tentativas do login; devolve um código novo) |
 | POST | `/usuarios/{id}/codigo-recuperacao` 🔒 | Gera um código de recuperação novo (o anterior deixa de valer) |
 | GET | `/usuarios/{id}/dicas` 🔒 | Últimas dicas da IA e quando dá para gerar de novo |

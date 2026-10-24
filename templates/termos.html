@@ -1,0 +1,62 @@
+{% extends "base_app.html" %}
+
+{% block titulo %}Termos de uso{% endblock %}
+
+{% block nav %}
+<a href="/" class="btn-sair">Início</a>
+{% endblock %}
+
+{% block conteudo %}
+<article class="lista-refeicoes politica">
+    <div class="section-label">REGRAS DE USO</div>
+    <h1>Termos de <span>uso.</span></h1>
+    <p class="atualizada">Última atualização: 24 de outubro de 2026.</p>
+
+    <p>Ao criar uma conta no DailyFit, você concorda com estes termos e com a <a href="/privacidade">política de privacidade</a>. Se não concordar, não use o site.</p>
+
+    <h2>1. O que é o DailyFit</h2>
+    <p>O DailyFit é um <strong>projeto acadêmico</strong>, feito por um grupo de alunos de Análise e Desenvolvimento de Sistemas, para organizar a rotina alimentar: registrar refeições, acompanhar o progresso e ver números e dicas a partir do formulário inicial. É <strong>gratuito</strong>, não tem anúncios e não é um serviço comercial.</p>
+
+    <h2>2. Saúde: leia com atenção</h2>
+    <ul>
+        <li>O DailyFit <strong>não é um serviço de saúde</strong> e não substitui nutricionista, médico ou outro profissional.</li>
+        <li>O IMC, o peso saudável, o gasto calórico e a água são <strong>estimativas gerais</strong>, calculadas por fórmulas conhecidas. Elas não levam em conta condições de saúde, gravidez, remédios ou outras particularidades.</li>
+        <li>As dicas geradas por IA podem conter erros. Antes de mudar a alimentação, principalmente se você tem alguma doença, alergia, restrição ou distúrbio alimentar, converse com um profissional.</li>
+        <li>Em caso de emergência, procure um serviço de saúde.</li>
+    </ul>
+
+    <h2>3. Sua conta</h2>
+    <ul>
+        <li>Use informações verdadeiras no cadastro e no formulário. Os números dependem delas.</li>
+        <li>Você é responsável pela sua senha e pelo seu código de recuperação. Guarde o código num lugar seguro: sem ele, não dá para recuperar a conta se você esquecer a senha.</li>
+        <li>Uma conta é de uma pessoa só. Não use a conta de outra pessoa nem cadastre alguém sem autorização.</li>
+        <li>Se você tem menos de 18 anos, use o DailyFit com a ajuda de um responsável. As dicas com IA são só para maiores de 18 anos.</li>
+    </ul>
+
+    <h2>4. Dicas com inteligência artificial</h2>
+    <p>As dicas são opcionais e só são geradas quando você marca que concorda e clica em "Gerar dicas". Elas são feitas pela IA Claude, da Anthropic, a partir dos seus dados, como explica a <a href="/privacidade">política de privacidade</a>. Para manter o custo do projeto baixo, cada pessoa gera no máximo uma vez a cada 20 horas, e o site tem um limite de gerações por dia.</p>
+
+    <h2>5. O que não é permitido</h2>
+    <ul>
+        <li>Tentar acessar dados de outras pessoas, quebrar a segurança ou sobrecarregar o site (por exemplo, com robôs, cadastros em massa ou testes de senha).</li>
+        <li>Usar o site para algo ilegal ou para prejudicar outras pessoas.</li>
+        <li>Escrever nos campos de texto conteúdo ofensivo ou tentar fazer a IA gerar conteúdo perigoso.</li>
+    </ul>
+    <p>Contas que desrespeitarem estas regras podem ser removidas.</p>
+
+    <h2>6. Disponibilidade</h2>
+    <p>O site roda em planos gratuitos. Ele pode demorar para abrir depois de um tempo parado, ficar fora do ar ou mudar sem aviso. Como é um projeto de faculdade, <strong>pode ser encerrado</strong> ao fim do curso ou do semestre. Se isso acontecer, as contas e os dados serão apagados. Não use o DailyFit como o único lugar onde você guarda informações importantes.</p>
+
+    <h2>7. Seus dados e o nosso código</h2>
+    <p>Os dados que você registra são seus: você pode ver, corrigir e apagar, inclusive a conta inteira, em Objetivos → Segurança da conta. O código e o visual do site são do grupo do projeto.</p>
+
+    <h2>8. Responsabilidade</h2>
+    <p>O DailyFit é oferecido como está, sem garantia de que vai funcionar sempre ou de que os números e as dicas estão certos para o seu caso. O grupo não se responsabiliza por decisões de saúde tomadas só com base no site.</p>
+
+    <h2>9. Mudanças nestes termos</h2>
+    <p>Se estes termos mudarem, a data no topo da página será atualizada. Continuar usando o site depois disso significa concordar com a nova versão.</p>
+
+    <h2>10. Lei aplicável</h2>
+    <p>Estes termos seguem as leis do Brasil, incluindo a Lei Geral de Proteção de Dados (LGPD) e o Marco Civil da Internet.</p>
+</article>
+{% endblock %}
