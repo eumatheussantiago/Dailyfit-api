@@ -115,7 +115,10 @@ def test_rotas_exigem_login(client):
 def test_token_expirado_e_recusado(client, monkeypatch):
     usuario_id, _ = criar_usuario(client)
     monkeypatch.setattr(seguranca, "VALIDADE_TOKEN", -1)
-    vencido = {"Authorization": f"Bearer {seguranca.gerar_token(usuario_id)}"}
+    from models.usuario import UsuarioModel
+    with SessaoTeste() as db:
+        senha_hash = db.get(UsuarioModel, usuario_id).senha_hash
+    vencido = {"Authorization": f"Bearer {seguranca.gerar_token(usuario_id, senha_hash)}"}
     assert client.get(f"/usuarios/{usuario_id}/resumo", headers=vencido).status_code == 401
 
 
