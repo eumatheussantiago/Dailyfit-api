@@ -54,7 +54,7 @@ def dicas_ligadas() -> bool:
 
 def gerar_dicas(dados: dict) -> list[dict]:
     """Pede as dicas à IA. Devolve [{"titulo", "texto"}, ...] ou lança ErroDicas."""
-    cliente = anthropic.Anthropic(timeout=30.0, max_retries=1)
+    cliente = anthropic.Anthropic(timeout=15.0, max_retries=0)  # falha rápido: a chamada prende uma thread do servidor
     try:
         resposta = cliente.messages.parse(
             model=MODELO,

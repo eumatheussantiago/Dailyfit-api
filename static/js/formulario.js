@@ -131,8 +131,15 @@ function lerFormulario() {
 
 // Se o usuário já respondeu antes, mostra as respostas para ele editar
 async function carregarRespostas() {
+    let perfil;
     try {
-        const perfil = await api(`/usuarios/${usuarioLogado.id}/perfil`);
+        perfil = await buscarPerfil(usuarioLogado.id); // null só quando ainda não respondeu (404)
+    } catch (erro) {
+        mostrarMensagem(mensagemFormulario, `Não foi possível carregar suas respostas (${erro.message}). Recarregue a página antes de salvar.`);
+        return;
+    }
+    if (!perfil) return; // ainda não respondeu: formulário começa vazio
+    try {
         formularioDieta.objetivo.value = perfil.objetivo;
         formularioDieta.atividade.value = perfil.atividade;
         for (const [campo, chave] of Object.entries(camposSimples)) {
@@ -141,7 +148,7 @@ async function carregarRespostas() {
             }
         }
     } catch {
-        /* ainda não respondeu: formulário começa vazio */
+        /* algum campo do formulário mudou de nome: preenche o que der */
     }
 }
 

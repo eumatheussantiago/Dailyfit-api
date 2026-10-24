@@ -1,8 +1,10 @@
+import logging
 import os
 from datetime import datetime, timezone
 from pathlib import Path
 
 from sqlalchemy import create_engine, inspect, text
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 # Padrão: arquivo SQLite criado automaticamente na pasta do projeto.
@@ -58,7 +60,16 @@ def criar_tabelas():
 
     Assim, quem já tinha um dailyfit.db de uma versão anterior não precisa
     apagar o arquivo quando o projeto ganha um campo novo (ex.: senha).
+    Se o banco estiver fora do ar, avisa no log e deixa o site subir (as páginas
+    abrem; a API responde erro até o banco voltar).
     """
+    try:
+        _criar_tabelas()
+    except OperationalError as erro:
+        logging.getLogger(__name__).error("Banco indisponível ao iniciar; tabelas não conferidas: %s", erro.__class__.__name__)
+
+
+def _criar_tabelas():
     Base.metadata.create_all(bind=engine)
 
     inspetor = inspect(engine)

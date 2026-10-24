@@ -116,7 +116,7 @@ function desenharNumeros(perfil) {
 }
 
 // "hoje às 14:30", "amanhã às 10:00"… no horário do navegador
-const formatarDiaHora = new Intl.DateTimeFormat("pt-BR", { weekday: "long", hour: "2-digit", minute: "2-digit" });
+const formatarDiaHora = new Intl.DateTimeFormat("pt-BR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
 function formatarQuando(data) {
     const hora = formatarHora.format(data);
     const dia = chaveDia(data);
@@ -254,14 +254,15 @@ async function carregarObjetivos() {
 }
 
 document.getElementById("novo-codigo").addEventListener("click", async (evento) => {
+    const botao = evento.currentTarget; // depois do await, currentTarget já é null
     if (!confirm("Gerar um código novo? O código anterior deixa de valer.")) return;
-    evento.currentTarget.disabled = true;
+    botao.disabled = true;
     try {
         const resposta = await api(`/usuarios/${usuario.id}/codigo-recuperacao`, { method: "POST" });
         mostrarCodigoNovo(resposta, "/objetivos");
     } catch (erro) {
         avisar(erro.message);
-        evento.currentTarget.disabled = false;
+        botao.disabled = false;
     }
 });
 

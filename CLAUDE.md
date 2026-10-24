@@ -12,7 +12,7 @@ responde um formulário inicial (3 etapas), registra refeições (dentro/fora da
 - Banco: SQLite local (dailyfit.db, criado sozinho) | PostgreSQL no Supabase em produção (driver psycopg 3)
 - Front-end: HTML + CSS + JavaScript puro (sem framework)
 - Deploy: Render, plano grátis, configurado em render.yaml. Todo push na master publica sozinho (2-3 min)
-- Testes: pytest (tests/test_api.py + tests/test_saude.py) — 32 testes, todos devem passar
+- Testes: pytest (tests/test_api.py + tests/test_saude.py) — 33 testes (test_api, test_saude, test_robustez), todos devem passar
 - IA: Claude Haiku 5.5 (SDK oficial `anthropic`) para as dicas da tela Objetivos (ia.py)
 
 ## Estrutura
@@ -25,13 +25,18 @@ ia.py          dicas com IA (Claude Haiku 5.5): regras do prompt, chamada e erro
                (ErroDicas); chave em ANTHROPIC_API_KEY (só no Render), sem ela as dicas ficam desligadas
 seguranca.py   hash de senha (PBKDF2-SHA256), tokens assinados (HMAC, 30 dias), exigir_dono(),
                limite de 10 senhas erradas por e-mail a cada 15 min
-models/        usuarios, perfis (formulário inicial), refeicoes (índice usuario_id + data_hora)
+models/        usuarios (consentimento_ia_em, codigo_recuperacao_hash), perfis (formulário inicial),
+               refeicoes (índice usuario_id + data_hora), dicas (gerações da IA, reserva "" / "erro")
 schemas/       validação Pydantic
-routes/        pagina.py (páginas), usuarios.py, perfil.py, refeicoes.py, resumo.py
+routes/        pagina.py (páginas), usuarios.py (cadastro, login, recuperar-senha, codigo-recuperacao),
+               perfil.py, refeicoes.py, resumo.py, dicas.py (GET/POST das dicas com IA)
+scripts/       criar_conta_demo.py (conta com uma semana de dados para a apresentação)
+docs/          roteiro-apresentacao.md
 templates/     index, cadastro, login, formulario (do grupo)
                base_app (cabeçalho, style.css + app.css e app.js) > base_logado (molde das telas
                depois do login: abas Painel/Refeições/Objetivos/Progresso, "Olá" e botão Sair)
                painel, refeicoes, objetivos, progresso (telas depois do login)
+               recuperar-senha, codigo-recuperacao (recuperação de senha, sem login)
 static/js/     app.js (função api() que envia o token, obterUsuario(), salvarUsuario(), sair(),
                exigirLogin(), buscarPerfil() (null só no 404), TIPOS_REFEICAO/tipoDaRefeicao()
                (café, almoço, lanche, jantar: nome sem acento contém a chave; vale a que aparece
@@ -42,7 +47,8 @@ static/js/     app.js (função api() que envia o token, obterUsuario(), salvarU
                do formulário, dias seguidos, semana e objetivo), refeicoes.js (atalhos de nome, adicionar/
                editar/excluir, histórico por dia; /refeicoes?nome=X já preenche o nome),
                progresso.js (7 dias × 7 anteriores, dias seguidos, gráfico de 14 dias, total),
-               objetivos.js (objetivo e meta de peso, metas da rotina, plano e respostas do formulário)
+               objetivos.js (objetivo e meta de peso, números de saúde, dicas com IA, segurança da conta),
+               recuperar-senha.js, codigo-recuperacao.js
 static/css/    style.css (do grupo) + app.css (só as 4 telas depois do login)
 iniciar.bat    roda o app no Windows com dois cliques
 
@@ -88,20 +94,17 @@ iniciar.bat    roda o app no Windows com dois cliques
 ## Como rodar e testar
 pip install -r requirements.txt
 uvicorn main:app --reload        -> http://127.0.0.1:8000
-pytest                           -> esperado: 32 passed
+pytest                           -> esperado: 33 passed
 
-## Estado atual (21/10/2026)
-- Concluído e publicado: banco, cadastro/login com senha e token, formulário inicial, refeições,
-  resumo, deploy no Render + Supabase, correções de segurança e de horário (PR #2), imagens da
-  tela de início leves (~9,5 MB → 331 KB, PR #3) e as 4 telas depois do login no visual do site
-  (Painel, Refeições, Treinos, Progresso, PR #4).
-- Telas logadas sendo refeitas a partir da promessa da landing, uma por PR: Painel (cartão
-  "Hoje"), Refeições (atalhos + histórico por dia) e Progresso (semana × semana anterior,
-  gráfico de 14 dias) e Objetivos (no lugar de Treinos, decisão de 22/10/2026; /treinos
-  redireciona para /objetivos) prontos.
-  Dias e semana são contados no horário do navegador, a partir da lista de refeições.
+## Estado atual (24/10/2026)
+- Publicado: cadastro/login com token, formulário inicial, as 4 telas depois do login refeitas a partir
+  da promessa da landing (Painel "Hoje", Refeições com horário opcional, Objetivos com números de
+  saúde e dicas com IA, Progresso), recuperação de senha por código, contraste conferido nas telas
+  logadas e roteiro da apresentação (docs/).
+- Dias e semana são contados no horário do navegador, a partir da lista de refeições.
   Para andar entre dias use diasAtras()/chaveDia() (partem do meio-dia; nunca setDate() direto
   numa meia-noite, que não existe onde o horário de verão começa à meia-noite).
+- Dicas com IA só funcionam com ANTHROPIC_API_KEY no Render.
 
 ## Pendências
 - (nenhuma no código) Recuperação de senha feita com código de recuperação (sem e-mail).
