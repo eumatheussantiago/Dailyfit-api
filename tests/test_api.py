@@ -50,7 +50,7 @@ def criar_usuario(client, email="ana@email.com"):
 
 
 def test_paginas_abrem(client):
-    for pagina in ["/", "/cadastro", "/login", "/formulario", "/painel", "/refeicoes", "/objetivos", "/progresso", "/recuperar-senha", "/codigo-recuperacao"]:
+    for pagina in ["/", "/cadastro", "/login", "/formulario", "/painel", "/refeicoes", "/objetivos", "/progresso", "/recuperar-senha", "/codigo-recuperacao", "/privacidade"]:
         assert client.get(pagina).status_code == 200
     assert client.get("/static/css/style.css").status_code == 200
     assert client.get("/static/js/script.js").status_code == 200

@@ -170,6 +170,44 @@
 }
 
 
+/* POLÍTICA DE PRIVACIDADE */
+
+.politica {
+    max-width: 780px;
+    margin: 10px auto;
+    line-height: 1.6;
+}
+
+.politica h2 {
+    margin: 28px 0 10px;
+}
+
+.politica p,
+.politica li {
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+/* .lista-refeicoes ul tira as bolinhas e vira coluna flex: aqui é lista de texto normal */
+.lista-refeicoes.politica ul {
+    display: block;
+    padding-left: 22px;
+    list-style: disc;
+}
+
+.politica .atualizada {
+    color: var(--texto-secundario);
+    font-size: 13px;
+}
+
+.aviso a,
+.aceite a,
+.politica a {
+    color: var(--laranja-texto);
+    font-weight: 700;
+}
+
+
 /* RECUPERAÇÃO DE SENHA */
 
 .cartao-estreito {

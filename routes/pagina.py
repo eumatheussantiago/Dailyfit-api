@@ -19,6 +19,7 @@ def _pagina(nome: str):
 router.add_api_route("/", _pagina("index.html"), methods=["GET"])
 router.add_api_route("/cadastro", _pagina("cadastro.html"), methods=["GET"])
 router.add_api_route("/login", _pagina("login.html"), methods=["GET"])
+router.add_api_route("/privacidade", _pagina("privacidade.html"), methods=["GET"])
 router.add_api_route("/recuperar-senha", _pagina("recuperar-senha.html"), methods=["GET"])
 router.add_api_route("/codigo-recuperacao", _pagina("codigo-recuperacao.html"), methods=["GET"])
 router.add_api_route("/formulario", _pagina("formulario.html"), methods=["GET"])
