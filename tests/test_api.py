@@ -428,6 +428,20 @@ def test_dicas_tentativas_contam_no_limite(client, monkeypatch):
     assert bia.status_code == 503 and "limite" in bia.json()["detail"]
 
 
+def test_apagar_conta_nao_zera_o_limite_do_site(client, monkeypatch):
+    url, usuario_id, token = preparar_dicas(client, monkeypatch, lambda dados: [DICA])
+    assert client.post(url, json=ACEITE, headers=token).status_code == 200
+    apagar = client.request("DELETE", f"/usuarios/{usuario_id}", json={"senha": "segredo123"}, headers=token)
+    assert apagar.status_code == 204
+
+    # a geração da conta apagada continua contando: "criar, gerar, apagar" não gasta a chave sem fim
+    monkeypatch.setenv("DICAS_LIMITE_DIA", "1")
+    bia_id, token_bia = criar_usuario(client, "bia@email.com")
+    client.put(f"/usuarios/{bia_id}/perfil", json=PERFIL, headers=token_bia)
+    bia = client.post(f"/usuarios/{bia_id}/dicas", json=ACEITE, headers=token_bia)
+    assert bia.status_code == 503 and "limite" in bia.json()["detail"]
+
+
 def test_dicas_em_andamento_bloqueiam_clique_duplo(client, monkeypatch):
     from datetime import datetime as dt
 
@@ -526,15 +540,36 @@ def test_recuperar_senha_com_codigo(client):
 
 def test_gerar_novo_codigo_logado(client):
     usuario_id, token = criar_usuario(client)
-    novo = client.post(f"/usuarios/{usuario_id}/codigo-recuperacao", headers=token)
+    url = f"/usuarios/{usuario_id}/codigo-recuperacao"
+    # pede a senha: só o token (login esquecido num PC compartilhado) não toma a conta
+    errada = client.post(url, json={"senha": "errada123"}, headers=token)
+    assert errada.status_code == 400 and errada.json()["detail"] == "Senha incorreta"
+    novo = client.post(url, json={"senha": "segredo123"}, headers=token)
     assert novo.status_code == 200
     codigo = novo.json()["codigo_recuperacao"]
     assert client.post("/usuarios/recuperar-senha", json={"email": "ana@email.com", "codigo": codigo, "nova_senha": "nova12345"}).status_code == 200
 
     # só o dono, e só com login
     _, token_bia = criar_usuario(client, "bia@email.com")
-    assert client.post(f"/usuarios/{usuario_id}/codigo-recuperacao", headers=token_bia).status_code == 403
-    assert client.post(f"/usuarios/{usuario_id}/codigo-recuperacao").status_code == 401
+    assert client.post(url, json={"senha": "segredo123"}, headers=token_bia).status_code == 403
+    assert client.post(url, json={"senha": "segredo123"}).status_code == 401
+
+
+def test_cadastro_repetido_e_pedido_gigante(client):
+    criar_usuario(client)
+    repetido = client.post("/usuarios", json={"nome": "Ana", "email": "ana@email.com", "senha": "segredo123"})
+    assert repetido.status_code == 400 and repetido.json()["detail"] == "E-mail já cadastrado. Faça login."
+
+    gigante = client.post("/usuarios", content=b"x" * (65 * 1024), headers={"Content-Type": "application/json"})
+    assert gigante.status_code == 413
+
+
+def test_login_tem_limite_por_ip(client, monkeypatch):
+    monkeypatch.setattr(seguranca, "MAX_POR_IP", 3)
+    # a mesma senha testada em e-mails diferentes a partir do mesmo IP
+    for i in range(3):
+        assert client.post("/usuarios/login", json={"email": f"x{i}@email.com", "senha": "123456"}).status_code == 401
+    assert client.post("/usuarios/login", json={"email": "outro@email.com", "senha": "123456"}).status_code == 429
 
 
 def test_recuperar_senha_tem_limite_de_tentativas(client):

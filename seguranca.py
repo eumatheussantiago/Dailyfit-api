@@ -173,6 +173,7 @@ def exigir_dono(
 # shortcut: trava em memória, zera no reinício; migrar para tabela se o app crescer
 MAX_TENTATIVAS = 10        # por e-mail + IP: quem erra é bloqueado, a dona da conta (outro IP) não
 MAX_POR_EMAIL = 50         # por e-mail sozinho: segura força bruta espalhada em muitos IPs
+MAX_POR_IP = 100           # por IP sozinho: segura uma senha testada em milhares de e-mails
 MAX_CADASTROS_POR_IP = 30  # alto de propósito: a turma toda pode estar no mesmo Wi-Fi
 JANELA_SEGUNDOS = 15 * 60
 
@@ -191,7 +192,11 @@ def ip_do_cliente(request: Request) -> str:
 
 def travas(prefixo: str, email: str, ip: str) -> list[tuple[str, int]]:
     """Contadores (chave, máximo) de uma ação: "login" e "rec" (recuperação) contam separado."""
-    return [(f"{prefixo}:{email}:{ip}", MAX_TENTATIVAS), (f"{prefixo}:{email}", MAX_POR_EMAIL)]
+    return [
+        (f"{prefixo}:{email}:{ip}", MAX_TENTATIVAS),
+        (f"{prefixo}:{email}", MAX_POR_EMAIL),
+        (f"{prefixo}:ip:{ip}", MAX_POR_IP),
+    ]
 
 
 def checar_limite_login(chave: str, maximo: int = MAX_TENTATIVAS) -> None:

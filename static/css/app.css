@@ -123,6 +123,7 @@
 .app-form input[type="text"],
 .app-form input[type="datetime-local"],
 .app-form input[type="email"],
+.app-form input[type="password"],
 .app-form textarea {
     width: 100%;
     padding: 12px 14px;

@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 import ia
 from database import agora_utc, get_db
-from models.dica import DicaModel
+from models.dica import DicaModel, GeracaoIAModel
 from models.perfil import PerfilModel
 from models.refeicao import RefeicaoModel
 from models.usuario import UsuarioModel
@@ -28,7 +28,8 @@ router = APIRouter(
 INTERVALO_ENTRE_GERACOES = timedelta(hours=20)
 
 # Cada tentativa vira uma linha ANTES de chamar a IA (assim os limites contam tentativas, não só
-# sucessos, e dois cliques ao mesmo tempo não passam juntos). Estes valores marcam a situação:
+# sucessos; a linha do usuário fica travada até a reserva ser gravada, então dois cliques ao mesmo
+# tempo não passam juntos). Estes valores marcam a situação:
 EM_ANDAMENTO = ""
 FALHOU = "erro"
 TEMPO_MAXIMO_DA_IA = timedelta(minutes=5)   # reserva mais velha que isso é considerada falha
@@ -132,7 +133,10 @@ def obter_dicas(usuario_id: int, db: Session = Depends(get_db)):
 # GERAR DICAS NOVAS (chama a IA)
 @router.post("", response_model=DicasResponse)
 def gerar_dicas(usuario_id: int, pedido: PedidoDicas, db: Session = Depends(get_db)):
-    usuario = buscar_usuario(usuario_id, db)
+    # FOR UPDATE: um segundo pedido do mesmo usuário espera aqui até a reserva deste ser gravada
+    usuario = db.query(UsuarioModel).filter(UsuarioModel.id == usuario_id).with_for_update().first()
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
     if not ia.dicas_ligadas():
         raise HTTPException(status_code=503, detail="As dicas com IA ainda não foram ligadas neste site.")
@@ -158,8 +162,8 @@ def gerar_dicas(usuario_id: int, pedido: PedidoDicas, db: Session = Depends(get_
         raise HTTPException(status_code=429, detail="Muitas tentativas sem sucesso hoje. Tente de novo amanhã.")
 
     tentativas_no_site = (
-        db.query(func.count(DicaModel.id))
-        .filter(DicaModel.criado_em >= agora - timedelta(days=1))
+        db.query(func.count(GeracaoIAModel.id))
+        .filter(GeracaoIAModel.criado_em >= agora - timedelta(days=1))
         .scalar()
     )
     if tentativas_no_site >= limite_do_site():
@@ -176,7 +180,7 @@ def gerar_dicas(usuario_id: int, pedido: PedidoDicas, db: Session = Depends(get_
     if usuario.consentimento_ia_em is None:
         usuario.consentimento_ia_em = agora
     reserva = DicaModel(usuario_id=usuario_id, conteudo=EM_ANDAMENTO, criado_em=agora)
-    db.add(reserva)
+    db.add_all([reserva, GeracaoIAModel(criado_em=agora)])
     db.commit()  # grava a reserva e libera a conexão: a chamada à IA leva segundos
     reserva_id = reserva.id
 
