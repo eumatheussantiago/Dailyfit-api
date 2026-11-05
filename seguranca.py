@@ -173,7 +173,7 @@ def exigir_dono(
 # shortcut: trava em memória, zera no reinício; migrar para tabela se o app crescer
 MAX_TENTATIVAS = 10        # por e-mail + IP: quem erra é bloqueado, a dona da conta (outro IP) não
 MAX_POR_EMAIL = 50         # por e-mail sozinho: segura força bruta espalhada em muitos IPs
-MAX_POR_IP = 100           # por IP sozinho: segura uma senha testada em milhares de e-mails
+MAX_POR_IP = 300           # por IP sozinho (alto: a turma pode dividir o Wi-Fi): segura uma senha em milhares de e-mails
 MAX_CADASTROS_POR_IP = 30  # alto de propósito: a turma toda pode estar no mesmo Wi-Fi
 JANELA_SEGUNDOS = 15 * 60
 

@@ -275,6 +275,7 @@ document.getElementById("novo-codigo").addEventListener("click", async (evento) 
         mostrarCodigoNovo(resposta, "/objetivos");
     } catch (erro) {
         mostrarErro("erro-conta", erro.message);
+        document.getElementById("senha-conta").focus();
         botao.disabled = false;
     }
 });
@@ -293,6 +294,7 @@ document.getElementById("apagar-conta").addEventListener("click", async (evento)
         sair();
     } catch (erro) {
         mostrarErro("erro-conta", erro.message);
+        document.getElementById("senha-conta").focus();
         botao.disabled = false;
     }
 });

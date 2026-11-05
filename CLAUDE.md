@@ -26,7 +26,7 @@ ia.py          dicas com IA (Claude Haiku 5.5): regras do prompt, chamada e erro
 seguranca.py   hash de senha (PBKDF2-SHA256), tokens assinados (HMAC, 30 dias) com carimbo da senha
                (trocar a senha derruba as sessões antigas), exigir_dono() (confere o usuário no banco),
                travas em memória: login e recuperação por e-mail+IP (10 em 15 min), por e-mail (50) e
-               por IP (100), cadastro 30 por IP em 15 min; pedidos acima de 64 KB recusados (main.py); ip_do_cliente() usa o ÚLTIMO X-Forwarded-For (proxy do
+               por IP (300), cadastro 30 por IP em 15 min; pedidos acima de 64 KB recusados (main.py); ip_do_cliente() usa o ÚLTIMO X-Forwarded-For (proxy do
                Render); SECRET_KEY obrigatória fora do SQLite
 models/        usuarios (consentimento_ia_em, codigo_recuperacao_hash), perfis (formulário inicial),
                refeicoes (índice usuario_id + data_hora), dicas (gerações da IA, reserva "" / "erro"),
