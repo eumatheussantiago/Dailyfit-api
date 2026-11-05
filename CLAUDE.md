@@ -12,7 +12,7 @@ responde um formulário inicial (3 etapas), registra refeições (dentro/fora da
 - Banco: SQLite local (dailyfit.db, criado sozinho) | PostgreSQL no Supabase em produção (driver psycopg 3)
 - Front-end: HTML + CSS + JavaScript puro (sem framework)
 - Deploy: Render, plano grátis, configurado em render.yaml. Todo push na master publica sozinho (2-3 min)
-- Testes: pytest (tests/test_api.py + tests/test_saude.py) — 33 testes (test_api, test_saude, test_robustez), todos devem passar
+- Testes: pytest (tests/: test_api, test_saude, test_seguranca, test_robustez) — 43 testes, todos devem passar
 - IA: Claude Haiku 5.5 (SDK oficial `anthropic`) para as dicas da tela Objetivos (ia.py)
 
 ## Estrutura
@@ -23,8 +23,11 @@ saude.py       IMC e faixa da OMS, peso saudável, gasto calórico (Mifflin-St J
                até a meta; GET/PUT /perfil devolvem esses números em "indicadores"
 ia.py          dicas com IA (Claude Haiku 5.5): regras do prompt, chamada e erros amigáveis
                (ErroDicas); chave em ANTHROPIC_API_KEY (só no Render), sem ela as dicas ficam desligadas
-seguranca.py   hash de senha (PBKDF2-SHA256), tokens assinados (HMAC, 30 dias), exigir_dono(),
-               limite de 10 senhas erradas por e-mail a cada 15 min
+seguranca.py   hash de senha (PBKDF2-SHA256), tokens assinados (HMAC, 30 dias) com carimbo da senha
+               (trocar a senha derruba as sessões antigas), exigir_dono() (confere o usuário no banco),
+               travas em memória: login e recuperação por e-mail+IP (10 em 15 min) e por e-mail (50),
+               cadastro 30 por IP em 15 min; ip_do_cliente() usa o ÚLTIMO X-Forwarded-For (proxy do
+               Render); SECRET_KEY obrigatória fora do SQLite
 models/        usuarios (consentimento_ia_em, codigo_recuperacao_hash), perfis (formulário inicial),
                refeicoes (índice usuario_id + data_hora), dicas (gerações da IA, reserva "" / "erro")
 schemas/       validação Pydantic
@@ -37,6 +40,7 @@ templates/     index, cadastro, login, formulario (do grupo)
                depois do login: abas Painel/Refeições/Objetivos/Progresso, "Olá" e botão Sair)
                painel, refeicoes, objetivos, progresso (telas depois do login)
                recuperar-senha, codigo-recuperacao (recuperação de senha, sem login)
+               privacidade, termos (política de privacidade e termos de uso, LGPD)
 static/js/     app.js (função api() que envia o token, obterUsuario(), salvarUsuario(), sair(),
                exigirLogin(), buscarPerfil() (null só no 404), TIPOS_REFEICAO/tipoDaRefeicao()
                (café, almoço, lanche, jantar: nome sem acento contém a chave; vale a que aparece
@@ -94,17 +98,21 @@ iniciar.bat    roda o app no Windows com dois cliques
 ## Como rodar e testar
 pip install -r requirements.txt
 uvicorn main:app --reload        -> http://127.0.0.1:8000
-pytest                           -> esperado: 33 passed
+pytest                           -> esperado: 43 passed
 
-## Estado atual (24/10/2026)
+## Estado atual (04/11/2026)
 - Publicado: cadastro/login com token, formulário inicial, as 4 telas depois do login refeitas a partir
   da promessa da landing (Painel "Hoje", Refeições com horário opcional, Objetivos com números de
   saúde e dicas com IA, Progresso), recuperação de senha por código, contraste conferido nas telas
-  logadas e roteiro da apresentação (docs/).
+  logadas, auditoria de segurança aplicada (sessões, travas, CSP/HSTS, apagar conta), política de
+  privacidade (/privacidade), termos de uso (/termos) e roteiro da apresentação (docs/).
 - Dias e semana são contados no horário do navegador, a partir da lista de refeições.
   Para andar entre dias use diasAtras()/chaveDia() (partem do meio-dia; nunca setDate() direto
   numa meia-noite, que não existe onde o horário de verão começa à meia-noite).
 - Dicas com IA só funcionam com ANTHROPIC_API_KEY no Render.
 
 ## Pendências
-- (nenhuma no código) Recuperação de senha feita com código de recuperação (sem e-mail).
+- Fora do código: ANTHROPIC_API_KEY no Render (liga as dicas); o grupo linkar /termos e /privacidade
+  no checkbox do cadastro e no rodapé da tela de início e corrigir o contraste do laranja no style.css
+  (recado no fim de docs/roteiro-apresentacao.md).
+- Opcional: paginar GET /refeicoes (hoje devolve tudo; Painel/Progresso precisam do histórico para os recordes).
