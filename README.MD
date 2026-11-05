@@ -99,7 +99,7 @@ No computador, o banco é um arquivo `dailyfit.db` criado automaticamente na pri
 pytest
 ```
 
-Resultado esperado: `33 passed`.
+Resultado esperado: `43 passed`.
 
 ## Deploy (site publicado)
 
