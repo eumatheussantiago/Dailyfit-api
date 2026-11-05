@@ -266,6 +266,10 @@ def test_formulario_inicial(client):
     salvo = client.put(url, json=PERFIL, headers=token)
     assert salvo.status_code == 200
     assert salvo.json()["preferencias"] is None  # texto vazio vira vazio no banco
+    # "não tenho" também vira vazio (senão a tela mostra "Restrições: não" e a IA lê como restrição)
+    respostas = client.put(url, json={**PERFIL, "restricoes": " Não. ", "dificuldades_rotina": "nenhuma"}, headers=token).json()
+    assert respostas["restricoes"] is None and respostas["dificuldades_rotina"] is None
+    assert client.put(url, json={**PERFIL, "restricoes": "Não como glúten"}, headers=token).json()["restricoes"] == "Não como glúten"
 
     # Responder de novo atualiza em vez de duplicar
     atualizado = client.put(url, json={**PERFIL, "peso_atual": 69}, headers=token)
