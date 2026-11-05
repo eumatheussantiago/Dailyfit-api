@@ -1,4 +1,4 @@
-"""Cria (ou completa) uma conta de demonstração com uma semana de refeições.
+"""Cria uma conta de demonstração, ou completa uma conta que já existe, com uma semana de refeições.
 
 Uso, para a apresentação (rode alguns minutos antes, o site grátis "dorme"):
 
@@ -7,6 +7,8 @@ Uso, para a apresentação (rode alguns minutos antes, o site grátis "dorme"):
 A senha é perguntada na hora (não fica no código nem no histórico do terminal).
 Usa só a API pública do site: cadastro (ou login, se a conta já existir), formulário
 inicial e refeições com horário dos últimos 7 dias (campo "data_hora").
+Numa conta que já tem dados, NÃO apaga nem troca nada: mantém o formulário respondido e só
+cria refeições nos dias (dos últimos 7) que ainda estão vazios.
 """
 
 import getpass
@@ -78,17 +80,23 @@ def main():
         print("A conta já existia: entrei com ela.")
     uid, token = conta["id"], conta["token"]
 
-    status, _ = chamar(base, "PUT", f"/usuarios/{uid}/perfil", PERFIL, token)
-    print("Formulário inicial salvo." if status == 200 else f"Falha no formulário: {status}")
-
-    _, existentes = chamar(base, "GET", f"/usuarios/{uid}/refeicoes", token=token)
-    if existentes:
-        print(f"A conta já tem {len(existentes)} refeições: não adicionei outras.")
-        return
+    status, _ = chamar(base, "GET", f"/usuarios/{uid}/perfil", token=token)
+    if status == 200:
+        print("Formulário já respondido: mantive as suas respostas.")
+    else:
+        status, _ = chamar(base, "PUT", f"/usuarios/{uid}/perfil", PERFIL, token)
+        print("Formulário inicial salvo." if status == 200 else f"Falha no formulário: {status}")
 
     agora = datetime.now().astimezone()  # horário local deste computador, com fuso
+    _, existentes = chamar(base, "GET", f"/usuarios/{uid}/refeicoes", token=token)
+    dias_com_registro = {
+        datetime.fromisoformat(r["data_hora"].replace("Z", "+00:00")).astimezone(agora.tzinfo).date()
+        for r in existentes or []
+    }
     criadas = 0
     for dias, refeicoes in SEMANA.items():
+        if (agora - timedelta(days=dias)).date() in dias_com_registro:
+            continue  # dia que já tem refeição: não mexe
         for nome, hora, fora in refeicoes:
             h, m = map(int, hora.split(":"))
             quando = (agora - timedelta(days=dias)).replace(hour=h, minute=m, second=0, microsecond=0)
@@ -97,7 +105,7 @@ def main():
             corpo = {"nome": nome, "nao_dieta": fora, "data_hora": quando.isoformat()}
             status, _ = chamar(base, "POST", f"/usuarios/{uid}/refeicoes", corpo, token)
             criadas += status == 201
-    print(f"{criadas} refeições criadas nos últimos 7 dias. Pronto: entre com {email} no site.")
+    print(f"{criadas} refeições criadas nos dias vazios dos últimos 7. Pronto: entre com {email} no site.")
 
 
 if __name__ == "__main__":
