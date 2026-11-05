@@ -282,6 +282,20 @@ def test_formulario_inicial(client):
     assert client.put(url, json={**PERFIL, "objetivo": "voar"}, headers=token).status_code == 422
     assert client.put(url, json={**PERFIL, "horario_cafe": "25:00"}, headers=token).status_code == 422
 
+    # regras de saúde: idade mínima, altura em centímetros, peso em quilos, meta que combina com o objetivo
+    def erro(**campos):
+        resposta = client.put(url, json={**PERFIL, **campos}, headers=token)
+        assert resposta.status_code == 422
+        return resposta.json()["detail"][0]["msg"]
+
+    assert "18 anos" in erro(idade=16)
+    assert "centímetros" in erro(altura=1.75)
+    assert "quilos" in erro(peso_meta=5)
+    assert "menor que o peso atual" in erro(objetivo="emagrecimento", peso_atual=80, peso_meta=95)
+    assert "maior que o peso atual" in erro(objetivo="ganho_massa", peso_atual=80, peso_meta=70)
+    manter = client.put(url, json={**PERFIL, "objetivo": "manutencao", "peso_meta": 80}, headers=token)
+    assert manter.status_code == 200
+
 
 def test_banco_antigo_ganha_coluna_de_senha(tmp_path):
     """Quem já tinha um dailyfit.db sem a coluna de senha não precisa apagá-lo."""
@@ -407,7 +421,11 @@ def test_dicas_exigem_consentimento_e_maioridade(client, monkeypatch):
     sem_aceite = client.post(url, json={}, headers=token)
     assert sem_aceite.status_code == 400 and "concorda" in sem_aceite.json()["detail"]
 
-    client.put(f"/usuarios/{usuario_id}/perfil", json={**PERFIL, "idade": 16}, headers=token)
+    # perfil antigo, de antes da idade mínima no formulário
+    db = next(get_db_teste())
+    from models.perfil import PerfilModel
+    db.query(PerfilModel).filter(PerfilModel.usuario_id == usuario_id).update({"idade": 16})
+    db.commit()
     menor = client.post(url, json=ACEITE, headers=token)
     assert menor.status_code == 400 and "18 anos" in menor.json()["detail"]
 
