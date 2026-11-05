@@ -36,6 +36,7 @@ else:
         pool_recycle=300,
         pool_size=3,          # o plano grátis do Supabase limita as conexões
         max_overflow=2,
+        connect_args={"connect_timeout": 10},  # Supabase fora do ar: erro em 10 s, não espera sem fim
     )
 
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)

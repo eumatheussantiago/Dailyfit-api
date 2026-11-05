@@ -13,7 +13,6 @@ import json
 import logging
 import os
 
-import anthropic
 from pydantic import BaseModel, ValidationError
 
 log = logging.getLogger(__name__)
@@ -54,6 +53,8 @@ def dicas_ligadas() -> bool:
 
 def gerar_dicas(dados: dict) -> list[dict]:
     """Pede as dicas à IA. Devolve [{"titulo", "texto"}, ...] ou lança ErroDicas."""
+    import anthropic  # aqui e não no topo: o SDK é pesado e deixava o site lento para acordar no Render
+
     cliente = anthropic.Anthropic(timeout=15.0, max_retries=0)  # falha rápido: a chamada prende uma thread do servidor
     try:
         resposta = cliente.messages.parse(

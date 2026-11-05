@@ -232,6 +232,9 @@ function desenharContou(perfil) {
 async function carregarObjetivos() {
     const carregando = document.getElementById("carregando");
 
+    const refeicoes = api(`/usuarios/${usuario.id}/refeicoes`);
+    refeicoes.catch(() => {}); // sem formulário a tela nem usa a lista: o erro dela não fica solto
+
     try {
         const perfil = await buscarPerfil(usuario.id);
         carregando.hidden = true;
@@ -245,7 +248,7 @@ async function carregarObjetivos() {
         desenharPlano(perfil);
         desenharContou(perfil);
         carregarDicas(perfil); // sem await: as dicas não seguram o resto da tela
-        desenharRotina(perfil, await api(`/usuarios/${usuario.id}/refeicoes`));
+        desenharRotina(perfil, await refeicoes);
     } catch (erro) {
         avisar(erro.message);
         carregando.textContent = `Não foi possível carregar seus dados: ${erro.message}`;

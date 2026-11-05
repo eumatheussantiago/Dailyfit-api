@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
 
 import models  # registra as tabelas antes de criá-las
@@ -50,6 +51,8 @@ async def cabecalhos_de_seguranca(request: Request, call_next):
     resposta.headers.setdefault("Cache-Control", "no-cache")
     return resposta
 
+
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
