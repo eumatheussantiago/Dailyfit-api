@@ -9,7 +9,8 @@ Tempo sugerido: **8 a 10 minutos**. Site: https://dailyfit-037t.onrender.com
    ```
    python scripts/criar_conta_demo.py https://dailyfit-037t.onrender.com demo@dailyfit.app
    ```
-   Ele cria a conta "Maria Demonstração" com o formulário respondido e uma semana de refeições com horário. Se a conta já existir, só confere.
+   Ele cria a conta "Maria Demonstração" com o formulário respondido e uma semana de refeições com horário.
+   **Também serve para completar uma conta de verdade** (troque o e-mail pelo seu): mantém o formulário que já está respondido e só cria refeições nos dias dos últimos 7 que estiverem vazios. Não apaga nem troca nada.
 3. Deixe **duas abas** abertas: a tela de início e o login já feito com a conta de demonstração.
 4. Para mostrar as dicas com IA, a chave `ANTHROPIC_API_KEY` precisa estar cadastrada no Render. Sem ela, a seção mostra "ainda não foram ligadas", e o resto funciona normal.
 
