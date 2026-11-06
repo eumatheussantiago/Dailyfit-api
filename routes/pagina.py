@@ -16,7 +16,8 @@ def _pagina(nome: str):
     return view
 
 
-router.add_api_route("/", _pagina("index.html"), methods=["GET"])
+# HEAD: monitores de uptime (UptimeRobot) checam só o cabeçalho; sem ele davam 405 e o site dormia
+router.add_api_route("/", _pagina("index.html"), methods=["GET", "HEAD"])
 router.add_api_route("/cadastro", _pagina("cadastro.html"), methods=["GET"])
 router.add_api_route("/login", _pagina("login.html"), methods=["GET"])
 router.add_api_route("/termos", _pagina("termos.html"), methods=["GET"])
