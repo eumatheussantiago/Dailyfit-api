@@ -60,7 +60,7 @@
 }
 
 .btn-sair {
-    min-height: 40px;
+    min-height: 44px;
     padding: 9px 17px;
     border-radius: 10px;
     font: inherit;
@@ -484,6 +484,7 @@
 }
 
 .refeicao-acoes button {
+    min-height: 44px;
     padding: 6px 12px;
     font: inherit;
     font-size: 12px;
@@ -567,6 +568,7 @@
 }
 
 .atalhos button {
+    min-height: 44px;
     padding: 8px 12px;
     font: inherit;
     font-size: 13px;

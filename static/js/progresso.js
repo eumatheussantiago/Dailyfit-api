@@ -92,6 +92,8 @@ async function carregarProgresso() {
 
     try {
         const [refeicoes, resumo] = await Promise.all([api(`${base}/refeicoes`), api(`${base}/resumo`)]);
+        document.getElementById("carregando").hidden = true;
+        document.getElementById("progresso-vazio").hidden = refeicoes.length > 0;
         const porDia = refeicoesPorDia(refeicoes);
 
         const semana = somarSemana(porDia, 0);
@@ -118,7 +120,7 @@ async function carregarProgresso() {
         document.getElementById("r-porcentagem").textContent = `${geral}%`;
         document.getElementById("r-barra").style.width = `${geral}%`;
     } catch (erro) {
-        avisar(erro.message);
+        document.getElementById("carregando").textContent = `Não foi possível carregar seus números. ${erro.message} Recarregue a página.`;
     }
 }
 

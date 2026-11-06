@@ -55,10 +55,13 @@ form.nome.addEventListener("input", marcarAtalho);
 
 // Se o login tiver vencido, a função api() já leva o usuário de volta para a tela de login.
 async function carregarRefeicoes() {
+    const carregando = document.getElementById("carregando");
     try {
         desenharLista(await api(`${base}/refeicoes`));
+        carregando.hidden = true;
     } catch (erro) {
-        avisar(erro.message);
+        carregando.textContent = `Não foi possível carregar suas refeições. ${erro.message} Recarregue a página.`;
+        carregando.hidden = false;
     }
 }
 
@@ -117,7 +120,7 @@ function criarItemComAcoes(refeicao) {
     apagar.className = "apagar";
     apagar.textContent = "Excluir";
     apagar.setAttribute("aria-label", `Excluir ${qual}`);
-    apagar.addEventListener("click", () => excluir(refeicao));
+    apagar.addEventListener("click", () => excluir(refeicao, apagar));
 
     acoes.append(editar, apagar);
     item.append(acoes);
@@ -133,6 +136,7 @@ function comecarEdicao(refeicao) {
     form.dieta.value = refeicao.nao_dieta ? "nao" : "sim";
     marcarAtalho();
     formTitulo.textContent = "Editar refeição";
+    document.getElementById("quando-ajuda").textContent = "(vazio = mantém o horário)";
     btnSalvar.textContent = "Salvar alterações";
     btnCancelar.hidden = false;
     form.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -145,6 +149,7 @@ function limparFormulario() {
     form.quando.dataset.original = "";
     marcarAtalho();
     formTitulo.textContent = "Nova refeição";
+    document.getElementById("quando-ajuda").textContent = "(opcional; vazio = agora)";
     btnSalvar.textContent = "Adicionar refeição";
     btnCancelar.hidden = true;
     esconderErro("erro");
@@ -159,6 +164,11 @@ btnCancelar.addEventListener("click", () => {
 form.addEventListener("submit", async (evento) => {
     evento.preventDefault();
     esconderErro("erro");
+    if (!form.nome.value.trim()) {
+        mostrarErro("erro", "Escolha um atalho ou escreva o nome da refeição.");
+        form.nome.focus();
+        return;
+    }
     btnSalvar.disabled = true;
 
     const dados = {
@@ -191,9 +201,10 @@ form.addEventListener("submit", async (evento) => {
     }
 });
 
-async function excluir(refeicao) {
-    if (!confirm(`Excluir "${refeicao.nome}"?`)) return;
+async function excluir(refeicao, botao) {
+    if (botao.disabled || !confirm(`Excluir "${refeicao.nome}"?`)) return;
 
+    botao.disabled = true; // toque duplo não manda dois pedidos
     try {
         await api(`${base}/refeicoes/${refeicao.id}`, { method: "DELETE" });
         if (editandoId === refeicao.id) limparFormulario();
@@ -202,6 +213,7 @@ async function excluir(refeicao) {
         document.getElementById("historico-titulo").focus(); // o item com foco foi apagado
     } catch (erro) {
         avisar(erro.message);
+        botao.disabled = false;
     }
 }
 

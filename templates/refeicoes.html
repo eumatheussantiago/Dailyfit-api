@@ -19,7 +19,7 @@
         <div class="atalhos" id="atalhos" role="group" aria-label="Atalhos de refeição"></div>
         <input id="nome" name="nome" type="text" placeholder="Ou escreva outro nome, ex.: Pré-treino" required maxlength="100">
 
-        <label for="quando">Quando? <small>(opcional; vazio = agora)</small></label>
+        <label for="quando">Quando? <small id="quando-ajuda">(opcional; vazio = agora)</small></label>
         <input id="quando" name="quando" type="datetime-local">
 
         <label for="descricao">Descrição <small>(opcional)</small></label>
@@ -46,6 +46,7 @@
     <!-- HISTÓRICO -->
     <div class="lista-refeicoes">
         <h2 id="historico-titulo" tabindex="-1">Histórico de refeições</h2>
+        <p class="lista-vazia" id="carregando" role="status">Carregando suas refeições…</p>
         <p class="lista-vazia" id="vazia" hidden>Nenhuma refeição registrada ainda. Comece pela de agora.</p>
         <div id="lista"></div>
     </div>

@@ -34,6 +34,7 @@ formCadastro.addEventListener("submit", async (evento) => {
     botao.disabled = true;
     mostrarMensagem(mensagemCadastro, "Criando sua conta...", "info");
 
+    const demora = setTimeout(() => mostrarMensagem(mensagemCadastro, AVISO_DEMORA, "info"), 8000);
     try {
         const usuario = await api("/usuarios", {
             method: "POST",
@@ -43,10 +44,12 @@ formCadastro.addEventListener("submit", async (evento) => {
                 senha: campoSenha.value,
             },
         });
+        clearTimeout(demora);
 
         mostrarMensagem(mensagemCadastro, "Conta criada! Vamos conhecer você.", "sucesso");
         mostrarCodigoNovo(usuario, "/formulario"); // antes do formulário, mostra o código de recuperação
     } catch (erro) {
+        clearTimeout(demora);
         mostrarMensagem(mensagemCadastro, erro.message);
         botao.disabled = false;
     }
