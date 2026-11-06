@@ -30,6 +30,7 @@ formLogin.addEventListener("submit", async (evento) => {
     botao.disabled = true;
     mostrarMensagem(mensagemLogin, "Entrando...", "info");
 
+    const demora = setTimeout(() => mostrarMensagem(mensagemLogin, AVISO_DEMORA, "info"), 8000);
     try {
         const usuario = await api("/usuarios/login", {
             method: "POST",
@@ -38,10 +39,12 @@ formLogin.addEventListener("submit", async (evento) => {
                 senha: campoSenhaLogin.value,
             },
         });
+        clearTimeout(demora);
 
         salvarUsuario(usuario, formLogin.lembrar.checked);
         window.location.href = destinoAposEntrar(usuario);
     } catch (erro) {
+        clearTimeout(demora);
         mostrarMensagem(mensagemLogin, erro.message);
         botao.disabled = false;
     }

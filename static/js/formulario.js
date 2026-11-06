@@ -72,6 +72,12 @@ document.querySelectorAll(".next-step").forEach((botao) => {
     });
 });
 
+document.getElementById("formulario-dieta").addEventListener("keydown", (evento) => {
+    if (evento.key !== "Enter" || evento.target.tagName !== "INPUT" || etapaAtual >= 3) return;
+    evento.preventDefault();
+    document.querySelector(`.form-step[data-step="${etapaAtual}"] .next-step`)?.click();
+});
+
 document.querySelectorAll(".prev-step").forEach((botao) => {
     botao.addEventListener("click", () => {
         if (etapaAtual > 1) {
@@ -162,16 +168,19 @@ formularioDieta.addEventListener("submit", async (evento) => {
     botao.disabled = true;
     mostrarMensagem(mensagemFormulario, "Salvando suas respostas...", "info");
 
+    const demora = setTimeout(() => mostrarMensagem(mensagemFormulario, AVISO_DEMORA, "info"), 8000);
     try {
         await api(`/usuarios/${usuarioLogado.id}/perfil`, {
             method: "PUT",
             body: lerFormulario(),
         });
+        clearTimeout(demora);
 
         salvarUsuario({ ...usuarioLogado, perfil_preenchido: true });
         mostrarMensagem(mensagemFormulario, "Formulário preenchido com sucesso!", "sucesso");
         window.location.href = "/painel";
     } catch (erro) {
+        clearTimeout(demora);
         mostrarMensagem(mensagemFormulario, erro.message);
         botao.disabled = false;
     }

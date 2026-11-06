@@ -4,6 +4,8 @@ const CHAVE_USUARIO = "dailyfit_usuario";
 
 // Chama a API e devolve o JSON. Em caso de erro, lança uma mensagem amigável.
 // Se o usuário estiver logado, envia o token de acesso junto.
+const AVISO_DEMORA = "O servidor está acordando (o site gratuito dorme quando ninguém usa). Pode levar até 1 minuto…";
+
 async function api(caminho, { method = "GET", body } = {}) {
     const opcoes = { method, headers: {} };
     const token = obterUsuario()?.token;
@@ -17,11 +19,15 @@ async function api(caminho, { method = "GET", body } = {}) {
         opcoes.body = JSON.stringify(body);
     }
 
+    // O Render grátis leva até ~1 min para acordar: depois de 8 s explica a demora
+    const demora = setTimeout(() => avisar(AVISO_DEMORA), 8000);
     let resposta;
     try {
         resposta = await fetch(caminho, opcoes);
     } catch {
-        throw new Error("Não foi possível conectar ao servidor.");
+        throw new Error("Não foi possível conectar ao servidor. Confira a internet e tente de novo.");
+    } finally {
+        clearTimeout(demora);
     }
 
     if (resposta.status === 204) return null;
@@ -164,7 +170,8 @@ function avisar(mensagem) {
     toast.textContent = mensagem;
     toast.classList.add("visivel");
     clearTimeout(temporizadorToast);
-    temporizadorToast = setTimeout(() => toast.classList.remove("visivel"), 2500);
+    // mensagem longa (erro, aviso de demora) fica mais tempo para dar tempo de ler
+    temporizadorToast = setTimeout(() => toast.classList.remove("visivel"), mensagem.length > 40 ? 6000 : 2500);
 }
 
 // Telas depois do login (base_logado.html): sem login volta para /login;

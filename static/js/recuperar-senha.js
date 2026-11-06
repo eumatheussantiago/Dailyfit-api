@@ -12,6 +12,7 @@ form.addEventListener("submit", async (evento) => {
 
     const botao = document.getElementById("btn-salvar");
     botao.disabled = true;
+    botao.textContent = "Salvando…";
     try {
         const usuario = await api("/usuarios/recuperar-senha", {
             method: "POST",
@@ -21,6 +22,7 @@ form.addEventListener("submit", async (evento) => {
     } catch (erro) {
         mostrarErro("erro", erro.message);
         botao.disabled = false;
+        botao.textContent = "Salvar nova senha";
     }
 });
 

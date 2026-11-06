@@ -155,8 +155,8 @@ async function carregarPainel() {
         desenharSemana(refeicoes, meta);
         desenharObjetivo(perfil);
     } catch (erro) {
-        avisar(erro.message);
-        document.getElementById("frase").textContent = `Não foi possível carregar seus dados: ${erro.message}`;
+        document.getElementById("status").lastChild.textContent = "Sem conexão";
+        document.getElementById("frase").textContent = `Não foi possível carregar seus dados. ${erro.message} Recarregue a página.`;
     }
 }
 
