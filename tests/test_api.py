@@ -267,6 +267,10 @@ def test_formulario_inicial(client):
     salvo = client.put(url, json=PERFIL, headers=token)
     assert salvo.status_code == 200
     assert salvo.json()["preferencias"] is None  # texto vazio vira vazio no banco
+    # "não tenho" também vira vazio (senão a tela mostra "Restrições: não" e a IA lê como restrição)
+    respostas = client.put(url, json={**PERFIL, "restricoes": " Não. ", "dificuldades_rotina": "nenhuma"}, headers=token).json()
+    assert respostas["restricoes"] is None and respostas["dificuldades_rotina"] is None
+    assert client.put(url, json={**PERFIL, "restricoes": "Não como glúten"}, headers=token).json()["restricoes"] == "Não como glúten"
 
     # Responder de novo atualiza em vez de duplicar
     atualizado = client.put(url, json={**PERFIL, "peso_atual": 69}, headers=token)
@@ -282,6 +286,20 @@ def test_formulario_inicial(client):
 
     assert client.put(url, json={**PERFIL, "objetivo": "voar"}, headers=token).status_code == 422
     assert client.put(url, json={**PERFIL, "horario_cafe": "25:00"}, headers=token).status_code == 422
+
+    # regras de saúde: idade mínima, altura em centímetros, peso em quilos, meta que combina com o objetivo
+    def erro(**campos):
+        resposta = client.put(url, json={**PERFIL, **campos}, headers=token)
+        assert resposta.status_code == 422
+        return resposta.json()["detail"][0]["msg"]
+
+    assert "18 anos" in erro(idade=16)
+    assert "centímetros" in erro(altura=1.75)
+    assert "quilos" in erro(peso_meta=5)
+    assert "menor que o peso atual" in erro(objetivo="emagrecimento", peso_atual=80, peso_meta=95)
+    assert "maior que o peso atual" in erro(objetivo="ganho_massa", peso_atual=80, peso_meta=70)
+    manter = client.put(url, json={**PERFIL, "objetivo": "manutencao", "peso_meta": 80}, headers=token)
+    assert manter.status_code == 200
 
 
 def test_banco_antigo_ganha_coluna_de_senha(tmp_path):
@@ -408,7 +426,11 @@ def test_dicas_exigem_consentimento_e_maioridade(client, monkeypatch):
     sem_aceite = client.post(url, json={}, headers=token)
     assert sem_aceite.status_code == 400 and "concorda" in sem_aceite.json()["detail"]
 
-    client.put(f"/usuarios/{usuario_id}/perfil", json={**PERFIL, "idade": 16}, headers=token)
+    # perfil antigo, de antes da idade mínima no formulário
+    db = next(get_db_teste())
+    from models.perfil import PerfilModel
+    db.query(PerfilModel).filter(PerfilModel.usuario_id == usuario_id).update({"idade": 16})
+    db.commit()
     menor = client.post(url, json=ACEITE, headers=token)
     assert menor.status_code == 400 and "18 anos" in menor.json()["detail"]
 
@@ -423,6 +445,20 @@ def test_dicas_tentativas_contam_no_limite(client, monkeypatch):
 
     # a falha também conta no limite do site
     monkeypatch.setenv("DICAS_LIMITE_DIA", "3")
+    bia_id, token_bia = criar_usuario(client, "bia@email.com")
+    client.put(f"/usuarios/{bia_id}/perfil", json=PERFIL, headers=token_bia)
+    bia = client.post(f"/usuarios/{bia_id}/dicas", json=ACEITE, headers=token_bia)
+    assert bia.status_code == 503 and "limite" in bia.json()["detail"]
+
+
+def test_apagar_conta_nao_zera_o_limite_do_site(client, monkeypatch):
+    url, usuario_id, token = preparar_dicas(client, monkeypatch, lambda dados: [DICA])
+    assert client.post(url, json=ACEITE, headers=token).status_code == 200
+    apagar = client.request("DELETE", f"/usuarios/{usuario_id}", json={"senha": "segredo123"}, headers=token)
+    assert apagar.status_code == 204
+
+    # a geração da conta apagada continua contando: "criar, gerar, apagar" não gasta a chave sem fim
+    monkeypatch.setenv("DICAS_LIMITE_DIA", "1")
     bia_id, token_bia = criar_usuario(client, "bia@email.com")
     client.put(f"/usuarios/{bia_id}/perfil", json=PERFIL, headers=token_bia)
     bia = client.post(f"/usuarios/{bia_id}/dicas", json=ACEITE, headers=token_bia)
@@ -527,15 +563,36 @@ def test_recuperar_senha_com_codigo(client):
 
 def test_gerar_novo_codigo_logado(client):
     usuario_id, token = criar_usuario(client)
-    novo = client.post(f"/usuarios/{usuario_id}/codigo-recuperacao", headers=token)
+    url = f"/usuarios/{usuario_id}/codigo-recuperacao"
+    # pede a senha: só o token (login esquecido num PC compartilhado) não toma a conta
+    errada = client.post(url, json={"senha": "errada123"}, headers=token)
+    assert errada.status_code == 400 and errada.json()["detail"] == "Senha incorreta"
+    novo = client.post(url, json={"senha": "segredo123"}, headers=token)
     assert novo.status_code == 200
     codigo = novo.json()["codigo_recuperacao"]
     assert client.post("/usuarios/recuperar-senha", json={"email": "ana@email.com", "codigo": codigo, "nova_senha": "nova12345"}).status_code == 200
 
     # só o dono, e só com login
     _, token_bia = criar_usuario(client, "bia@email.com")
-    assert client.post(f"/usuarios/{usuario_id}/codigo-recuperacao", headers=token_bia).status_code == 403
-    assert client.post(f"/usuarios/{usuario_id}/codigo-recuperacao").status_code == 401
+    assert client.post(url, json={"senha": "segredo123"}, headers=token_bia).status_code == 403
+    assert client.post(url, json={"senha": "segredo123"}).status_code == 401
+
+
+def test_cadastro_repetido_e_pedido_gigante(client):
+    criar_usuario(client)
+    repetido = client.post("/usuarios", json={"nome": "Ana", "email": "ana@email.com", "senha": "segredo123"})
+    assert repetido.status_code == 400 and repetido.json()["detail"] == "E-mail já cadastrado. Faça login."
+
+    gigante = client.post("/usuarios", content=b"x" * (65 * 1024), headers={"Content-Type": "application/json"})
+    assert gigante.status_code == 413
+
+
+def test_login_tem_limite_por_ip(client, monkeypatch):
+    monkeypatch.setattr(seguranca, "MAX_POR_IP", 3)
+    # a mesma senha testada em e-mails diferentes a partir do mesmo IP
+    for i in range(3):
+        assert client.post("/usuarios/login", json={"email": f"x{i}@email.com", "senha": "123456"}).status_code == 401
+    assert client.post("/usuarios/login", json={"email": "outro@email.com", "senha": "123456"}).status_code == 429
 
 
 def test_recuperar_senha_tem_limite_de_tentativas(client):

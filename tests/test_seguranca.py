@@ -113,7 +113,10 @@ def test_apagar_a_propria_conta(client):
 
     assert client.delete(f"/usuarios/{usuario_id}").status_code == 401
     assert client.delete(f"/usuarios/{usuario_id}", headers=token_bia).status_code == 403
-    assert client.delete(f"/usuarios/{usuario_id}", headers=token).status_code == 204
+    senha = {"senha": "errada123"}
+    assert client.request("DELETE", f"/usuarios/{usuario_id}", json=senha, headers=token).status_code == 400
+    senha = {"senha": "segredo123"}
+    assert client.request("DELETE", f"/usuarios/{usuario_id}", json=senha, headers=token).status_code == 204
 
     assert client.get(f"/usuarios/{usuario_id}", headers=token).status_code == 401
     assert client.post("/usuarios/login", json=CERTO).status_code == 401

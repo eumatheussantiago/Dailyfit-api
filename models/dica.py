@@ -24,3 +24,13 @@ class DicaModel(Base):
     criado_em: Mapped[datetime] = mapped_column(DateTime, default=agora_utc)
 
     usuario: Mapped["UsuarioModel"] = relationship(back_populates="dicas")
+
+
+class GeracaoIAModel(Base):
+    """Uma linha por tentativa de gerar dicas, SEM ligação com a conta: apagar a conta não zera
+    o limite do site (senão "criar conta, gerar, apagar" gastaria a chave sem limite)."""
+
+    __tablename__ = "geracoes_ia"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    criado_em: Mapped[datetime] = mapped_column(DateTime, default=agora_utc, index=True)

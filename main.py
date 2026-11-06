@@ -2,6 +2,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 import models  # registra as tabelas antes de criá-las
@@ -33,6 +34,19 @@ CSP = (
     "font-src https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com; "
     "connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 )
+
+
+# Os maiores pedidos do site (formulário) têm poucos KB; um pedido gigante esgotaria a memória do Render
+TAMANHO_MAXIMO = 64 * 1024
+
+
+@app.middleware("http")
+async def limitar_tamanho(request: Request, call_next):
+    # shortcut: confia no Content-Length (o proxy do Render manda); envio "chunked" sem ele passa
+    tamanho = request.headers.get("content-length", "0")
+    if not tamanho.isdigit() or int(tamanho) > TAMANHO_MAXIMO:
+        return JSONResponse(status_code=413, content={"detail": "Pedido grande demais."})
+    return await call_next(request)
 
 
 @app.middleware("http")

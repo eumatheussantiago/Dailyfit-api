@@ -56,6 +56,10 @@ function mensagemDeErro(dados) {
     if (texto.startsWith("String should have at least")) {
         return `${nomes[campo] || "Campo"} muito curto.`;
     }
+    const limite = texto.match(/less than or equal to ([\d.]+)/);
+    if (limite) {
+        return `${nomes[campo] || "Campo"}: no máximo ${limite[1]}.`;
+    }
     return nomes[campo] ? `${nomes[campo]}: ${texto}` : texto;
 }
 

@@ -73,7 +73,7 @@ def calcular_indicadores(
     if peso_meta:
         imc_meta = round(peso_meta / metros2, 1)
         indicadores["imc_meta"] = imc_meta
-        indicadores["meta_abaixo_do_saudavel"] = idade >= 20 and imc_meta < 18.5
+        indicadores["meta_abaixo_do_saudavel"] = imc_meta < 18.5
         indicadores["semanas_ate_meta"] = math.ceil(round(abs(peso_meta - peso_atual), 1) / RITMO_KG_POR_SEMANA)
 
     return indicadores
