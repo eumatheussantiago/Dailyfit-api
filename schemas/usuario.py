@@ -64,5 +64,9 @@ class RecuperarSenha(BaseModel):
         return valor.strip().lower()
 
 
+class ConfirmarSenha(BaseModel):
+    senha: str = Field(min_length=1, max_length=128)
+
+
 class CodigoRecuperacao(BaseModel):
     codigo_recuperacao: str

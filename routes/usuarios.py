@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from database import get_db
 from models.usuario import UsuarioModel
 from schemas.usuario import (
     CodigoRecuperacao,
+    ConfirmarSenha,
     RecuperarSenha,
     UsuarioCreate,
     UsuarioLogado,
@@ -47,6 +49,23 @@ def novo_codigo(usuario: UsuarioModel) -> str:
     return codigo
 
 
+def conferir_senha_atual(usuario_id: int, senha: str, db: Session) -> UsuarioModel:
+    """Ações que tomam ou apagam a conta pedem a senha: só o token (ex.: PC compartilhado) não basta."""
+    chave = f"senha:{usuario_id}"
+    checar_limite_login(chave)
+    usuario = db.get(UsuarioModel, usuario_id)
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    hash_salvo = usuario.senha_hash or HASH_FALSO
+    db.rollback()  # devolve a conexão ao pool antes do hash lento
+    if not verificar_senha(senha, hash_salvo):
+        registrar_falha_login(chave)
+        # 400 e não 401: o 401 faz o site sair da conta
+        raise HTTPException(status_code=400, detail="Senha incorreta")
+    limpar_falhas_login(chave)
+    return usuario
+
+
 # CRIAR USUÁRIO
 @router.post(
     "",
@@ -76,7 +95,7 @@ def criar_usuario(
     if usuario_existente:
         raise HTTPException(
             status_code=400,
-            detail="Email já cadastrado"
+            detail="E-mail já cadastrado. Faça login."
         )
 
     novo_usuario = UsuarioModel(
@@ -87,7 +106,11 @@ def criar_usuario(
     codigo = novo_codigo(novo_usuario)
 
     db.add(novo_usuario)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:  # dois cadastros iguais ao mesmo tempo: o índice único barra o segundo
+        db.rollback()
+        raise HTTPException(status_code=400, detail="E-mail já cadastrado. Faça login.")
     db.refresh(novo_usuario)
 
     return com_token(novo_usuario, codigo)
@@ -166,11 +189,16 @@ def recuperar_senha(
     db.rollback()  # devolve a conexão ao pool antes do hash lento da senha nova
     nova_senha_hash = gerar_hash_senha(dados.nova_senha)
 
-    # Recarrega do banco: se o mesmo código foi usado por outro pedido nesse meio-tempo, recusa
-    if usuario.codigo_recuperacao_hash != hash_codigo:
+    # Troca só se o código ainda for o mesmo: se outro pedido usou o código nesse meio-tempo, recusa
+    codigo = gerar_codigo_recuperacao()  # cada código vale uma vez só
+    trocou = (
+        db.query(UsuarioModel)
+        .filter(UsuarioModel.id == usuario.id, UsuarioModel.codigo_recuperacao_hash == hash_codigo)
+        .update({"senha_hash": nova_senha_hash, "codigo_recuperacao_hash": hash_do_codigo(codigo)}, synchronize_session=False)
+    )
+    if not trocou:
+        db.rollback()
         raise erro
-    usuario.senha_hash = nova_senha_hash
-    codigo = novo_codigo(usuario)  # cada código vale uma vez só
     db.commit()
     db.refresh(usuario)
 
@@ -185,15 +213,10 @@ def recuperar_senha(
 )
 def gerar_novo_codigo(
     usuario_id: int,
+    dados: ConfirmarSenha,
     db: Session = Depends(get_db)
 ):
-    usuario = db.get(UsuarioModel, usuario_id)
-
-    if not usuario:
-        raise HTTPException(
-            status_code=404,
-            detail="Usuário não encontrado"
-        )
+    usuario = conferir_senha_atual(usuario_id, dados.senha, db)
 
     codigo = novo_codigo(usuario)
     db.commit()
@@ -230,15 +253,10 @@ def obter_usuario(
 )
 def apagar_usuario(
     usuario_id: int,
+    dados: ConfirmarSenha,
     db: Session = Depends(get_db)
 ):
-    usuario = db.get(UsuarioModel, usuario_id)
-
-    if not usuario:
-        raise HTTPException(
-            status_code=404,
-            detail="Usuário não encontrado"
-        )
+    usuario = conferir_senha_atual(usuario_id, dados.senha, db)
 
     db.delete(usuario)
     db.commit()

@@ -253,15 +253,29 @@ async function carregarObjetivos() {
     }
 }
 
+// Gerar código novo e apagar a conta pedem a senha: só o login aberto (ex.: PC compartilhado) não basta
+function senhaDaConta() {
+    esconderErro("erro-conta");
+    const campo = document.getElementById("senha-conta");
+    if (!campo.value) {
+        mostrarErro("erro-conta", "Digite sua senha para continuar.");
+        campo.focus();
+        return null;
+    }
+    return campo.value;
+}
+
 document.getElementById("novo-codigo").addEventListener("click", async (evento) => {
     const botao = evento.currentTarget; // depois do await, currentTarget já é null
-    if (!confirm("Gerar um código novo? O código anterior deixa de valer.")) return;
+    const senha = senhaDaConta();
+    if (!senha || !confirm("Gerar um código novo? O código anterior deixa de valer.")) return;
     botao.disabled = true;
     try {
-        const resposta = await api(`/usuarios/${usuario.id}/codigo-recuperacao`, { method: "POST" });
+        const resposta = await api(`/usuarios/${usuario.id}/codigo-recuperacao`, { method: "POST", body: { senha } });
         mostrarCodigoNovo(resposta, "/objetivos");
     } catch (erro) {
-        avisar(erro.message);
+        mostrarErro("erro-conta", erro.message);
+        document.getElementById("senha-conta").focus();
         botao.disabled = false;
     }
 });
@@ -269,15 +283,18 @@ document.getElementById("novo-codigo").addEventListener("click", async (evento) 
 // LGPD (art. 18): a pessoa pode apagar a conta e todos os dados dela
 document.getElementById("apagar-conta").addEventListener("click", async (evento) => {
     const botao = evento.currentTarget;
+    const senha = senhaDaConta();
+    if (!senha) return;
     const certeza = prompt('Isso apaga para sempre sua conta, formulário, refeições e dicas. Para confirmar, digite APAGAR:');
     if (certeza?.trim().toUpperCase() !== "APAGAR") return;
     botao.disabled = true;
     try {
-        await api(`/usuarios/${usuario.id}`, { method: "DELETE" });
+        await api(`/usuarios/${usuario.id}`, { method: "DELETE", body: { senha } });
         alert("Sua conta foi apagada.");
         sair();
     } catch (erro) {
-        avisar(erro.message);
+        mostrarErro("erro-conta", erro.message);
+        document.getElementById("senha-conta").focus();
         botao.disabled = false;
     }
 });
