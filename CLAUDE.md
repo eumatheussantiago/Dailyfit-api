@@ -12,7 +12,7 @@ responde um formulário inicial (3 etapas), registra refeições (dentro/fora da
 - Banco: SQLite local (dailyfit.db, criado sozinho) | PostgreSQL no Supabase em produção (driver psycopg 3)
 - Front-end: HTML + CSS + JavaScript puro (sem framework)
 - Deploy: Render, plano grátis, configurado em render.yaml. Todo push na master publica sozinho (2-3 min)
-- Testes: pytest (tests/: test_api, test_saude, test_seguranca, test_robustez) — 43 testes, todos devem passar
+- Testes: pytest (tests/: test_api, test_saude, test_seguranca, test_robustez) — 46 testes, todos devem passar
 - IA: Claude Haiku 5.5 (SDK oficial `anthropic`) para as dicas da tela Objetivos (ia.py)
 
 ## Estrutura
@@ -25,11 +25,12 @@ ia.py          dicas com IA (Claude Haiku 5.5): regras do prompt, chamada e erro
                (ErroDicas); chave em ANTHROPIC_API_KEY (só no Render), sem ela as dicas ficam desligadas
 seguranca.py   hash de senha (PBKDF2-SHA256), tokens assinados (HMAC, 30 dias) com carimbo da senha
                (trocar a senha derruba as sessões antigas), exigir_dono() (confere o usuário no banco),
-               travas em memória: login e recuperação por e-mail+IP (10 em 15 min) e por e-mail (50),
-               cadastro 30 por IP em 15 min; ip_do_cliente() usa o ÚLTIMO X-Forwarded-For (proxy do
+               travas em memória: login e recuperação por e-mail+IP (10 em 15 min), por e-mail (50) e
+               por IP (300), cadastro 30 por IP em 15 min; pedidos acima de 64 KB recusados (main.py); ip_do_cliente() usa o ÚLTIMO X-Forwarded-For (proxy do
                Render); SECRET_KEY obrigatória fora do SQLite
 models/        usuarios (consentimento_ia_em, codigo_recuperacao_hash), perfis (formulário inicial),
-               refeicoes (índice usuario_id + data_hora), dicas (gerações da IA, reserva "" / "erro")
+               refeicoes (índice usuario_id + data_hora), dicas (gerações da IA, reserva "" / "erro"),
+               geracoes_ia (uma linha por tentativa, sem usuário: o limite do site não zera ao apagar conta)
 schemas/       validação Pydantic; perfil: 18+ anos, altura 50–250 cm, peso ≥ 20 kg, meta coerente com o
                objetivo (emagrecer = menor, ganhar massa = maior), mensagens em português
 routes/        pagina.py (páginas), usuarios.py (cadastro, login, recuperar-senha, codigo-recuperacao),
@@ -62,7 +63,8 @@ iniciar.bat    roda o app no Windows com dois cliques
   tela /codigo-recuperacao mostra UMA vez (passa pelo sessionStorage e é apagado; nunca fica salvo
   junto com o login). /recuperar-senha troca a senha com e-mail + código (mesma trava de tentativas
   do login) e devolve um código novo (cada um vale uma vez). Logado, POST /usuarios/{id}/codigo-recuperacao
-  gera outro (botão em Objetivos). O banco guarda só o SHA-256 do código (aleatório, ~59 bits).
+  gera outro (botão em Objetivos). Gerar código novo e DELETE /usuarios/{id} pedem {"senha": ...} (senha
+  errada = 400, nunca 401, que faria o site sair da conta): só o token não toma nem apaga a conta. O banco guarda só o SHA-256 do código (aleatório, ~59 bits).
 - POST /usuarios (cadastro) e POST /usuarios/login devolvem { id, nome, email, perfil_preenchido, token }
 - Todas as rotas /usuarios/{id}/... exigem "Authorization: Bearer <token>" do PRÓPRIO usuário
   (401 sem login/token inválido, 403 para outro usuário). Não existe rota que liste usuários.
@@ -99,7 +101,7 @@ iniciar.bat    roda o app no Windows com dois cliques
 ## Como rodar e testar
 pip install -r requirements.txt
 uvicorn main:app --reload        -> http://127.0.0.1:8000
-pytest                           -> esperado: 43 passed
+pytest                           -> esperado: 46 passed
 
 ## Estado atual (04/11/2026)
 - Publicado: cadastro/login com token, formulário inicial, as 4 telas depois do login refeitas a partir

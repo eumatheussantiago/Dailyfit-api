@@ -17,6 +17,7 @@ Atividade = Literal[
     "extremamente_ativo",
 ]
 TipoAlimentacao = Literal["variada", "vegetariana", "vegana", "outra"]
+SEM_RESPOSTA = {"", "não", "nao", "n", "nenhuma", "nenhum", "nada", "não tenho", "nao tenho", "sem"}
 
 
 class PerfilBase(BaseModel):
@@ -43,7 +44,11 @@ class PerfilBase(BaseModel):
     def texto_vazio_vira_nulo(cls, valor: Optional[str]) -> Optional[str]:
         if valor is None:
             return None
-        return valor.strip() or None
+        valor = valor.strip()
+        # "não", "nenhuma", "-"... são resposta de "não tenho": tratar como campo vazio
+        if valor.lower().strip(".!- ") in SEM_RESPOSTA:
+            return None
+        return valor
 
     # Mensagens em português (as do Pydantic saem em inglês na tela)
     @field_validator("idade")
