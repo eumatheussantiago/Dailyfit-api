@@ -31,7 +31,8 @@ seguranca.py   hash de senha (PBKDF2-SHA256), tokens assinados (HMAC, 30 dias) c
 models/        usuarios (consentimento_ia_em, codigo_recuperacao_hash), perfis (formulário inicial),
                refeicoes (índice usuario_id + data_hora), dicas (gerações da IA, reserva "" / "erro"),
                geracoes_ia (uma linha por tentativa, sem usuário: o limite do site não zera ao apagar conta)
-schemas/       validação Pydantic
+schemas/       validação Pydantic; perfil: 18+ anos, altura 50–250 cm, peso ≥ 20 kg, meta coerente com o
+               objetivo (emagrecer = menor, ganhar massa = maior), mensagens em português
 routes/        pagina.py (páginas), usuarios.py (cadastro, login, recuperar-senha, codigo-recuperacao),
                perfil.py, refeicoes.py, resumo.py, dicas.py (GET/POST das dicas com IA)
 scripts/       criar_conta_demo.py (conta com uma semana de dados para a apresentação)

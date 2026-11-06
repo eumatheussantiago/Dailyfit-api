@@ -2,7 +2,7 @@ import re
 from datetime import datetime, timezone
 from typing import Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator, model_validator
 
 from saude import calcular_indicadores
 
@@ -23,10 +23,10 @@ SEM_RESPOSTA = {"", "não", "nao", "n", "nenhuma", "nenhum", "nada", "não tenho
 class PerfilBase(BaseModel):
     objetivo: Objetivo
     sexo: Sexo
-    idade: int = Field(ge=1, le=120)
-    altura: float = Field(gt=0, le=300)       # cm
-    peso_atual: float = Field(gt=0, le=500)   # kg
-    peso_meta: Optional[float] = Field(default=None, gt=0, le=500)
+    idade: int = Field(le=120)
+    altura: float = Field(le=250)             # cm
+    peso_atual: float = Field(le=500)         # kg
+    peso_meta: Optional[float] = Field(default=None, le=500)
     atividade: Atividade
 
     tipo_alimentacao: TipoAlimentacao
@@ -49,6 +49,37 @@ class PerfilBase(BaseModel):
         if valor.lower().strip(".!- ") in SEM_RESPOSTA:
             return None
         return valor
+
+    # Mensagens em português (as do Pydantic saem em inglês na tela)
+    @field_validator("idade")
+    @classmethod
+    def maior_de_idade(cls, valor: int) -> int:
+        if valor < 18:  # decisão do grupo: dado de saúde de menor exige os responsáveis (LGPD art. 14)
+            raise ValueError("o DailyFit é só para maiores de 18 anos")
+        return valor
+
+    @field_validator("altura")
+    @classmethod
+    def altura_em_centimetros(cls, valor: float) -> float:
+        if valor < 50:  # "1.75" em metros viraria IMC de 228 mil
+            raise ValueError("use centímetros (ex.: 175)")
+        return valor
+
+    @field_validator("peso_atual", "peso_meta")
+    @classmethod
+    def peso_em_quilos(cls, valor: Optional[float]) -> Optional[float]:
+        if valor is not None and valor < 20:
+            raise ValueError("informe em quilos (mínimo 20)")
+        return valor
+
+    @model_validator(mode="after")
+    def meta_combina_com_objetivo(self):
+        if self.peso_meta is not None:
+            if self.objetivo == "emagrecimento" and self.peso_meta >= self.peso_atual:
+                raise ValueError("Para emagrecer, o peso desejado precisa ser menor que o peso atual.")
+            if self.objetivo == "ganho_massa" and self.peso_meta <= self.peso_atual:
+                raise ValueError("Para ganhar massa, o peso desejado precisa ser maior que o peso atual.")
+        return self
 
     @field_validator("horario_cafe", "horario_almoco", "horario_jantar")
     @classmethod

@@ -33,7 +33,8 @@ def test_menores_de_idade_nao_recebem_faixa_nem_gasto():
     assert jovem["imc"] == 22.9
     assert jovem["faixa_imc"] is None  # a OMS usa tabela por idade abaixo de 20 anos
     assert jovem["gasto_calorico"] is None  # Mifflin-St Jeor só a partir de 18
-    assert indicadores(idade=19, peso_meta=50)["meta_abaixo_do_saudavel"] is False
+    # o alerta de meta baixa vale em qualquer idade (igual ao sinal que vai para a IA)
+    assert indicadores(idade=19, peso_meta=50)["meta_abaixo_do_saudavel"] is True
 
 
 def test_limites_das_faixas_e_dados_absurdos():
