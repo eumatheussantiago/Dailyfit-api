@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+import anthropic
 import ia
 import seguranca
 from database import Base, get_db
@@ -412,7 +413,7 @@ def test_ia_usa_haiku_e_trata_recusa(monkeypatch):
             chamadas.append(pedido)
             return Recusa()
 
-    monkeypatch.setattr(ia.anthropic, "Anthropic", ClienteFalso)
+    monkeypatch.setattr(anthropic, "Anthropic", ClienteFalso)
     with pytest.raises(ia.ErroDicas):
         ia.gerar_dicas({"formulario": {"objetivo": "emagrecimento"}})
     assert chamadas[0]["model"] == "claude-haiku-5-5"
@@ -522,7 +523,7 @@ def test_ia_resposta_cortada_ou_vazia_vira_erro_amigavel(monkeypatch):
                 raise resposta
             return resposta
 
-    monkeypatch.setattr(ia.anthropic, "Anthropic", ClienteFalso)
+    monkeypatch.setattr(anthropic, "Anthropic", ClienteFalso)
     try:
         ia.Dicas.model_validate_json('{"dicas": [{"titulo": "Café')  # JSON cortado
     except ValidationError as cortado:
