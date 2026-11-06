@@ -53,6 +53,7 @@ def criar_usuario(client, email="ana@email.com"):
 def test_paginas_abrem(client):
     for pagina in ["/", "/cadastro", "/login", "/formulario", "/painel", "/refeicoes", "/objetivos", "/progresso", "/recuperar-senha", "/codigo-recuperacao", "/privacidade", "/termos"]:
         assert client.get(pagina).status_code == 200
+    assert client.head("/").status_code == 200  # monitor de uptime
     assert client.get("/static/css/style.css").status_code == 200
     assert client.get("/static/js/script.js").status_code == 200
     # endereço antigo da tela Treinos leva para Objetivos

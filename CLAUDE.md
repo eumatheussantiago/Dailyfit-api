@@ -12,6 +12,8 @@ responde um formulário inicial (3 etapas), registra refeições (dentro/fora da
 - Banco: SQLite local (dailyfit.db, criado sozinho) | PostgreSQL no Supabase em produção (driver psycopg 3)
 - Front-end: HTML + CSS + JavaScript puro (sem framework)
 - Deploy: Render, plano grátis, configurado em render.yaml. Todo push na master publica sozinho (2-3 min)
+  O plano grátis dorme após 15 min sem visitas: o UptimeRobot (do dono, 10 min) e a tarefa
+  .github/workflows/manter-acordado.yml (10 min) visitam a página inicial, que aceita GET e HEAD
 - Testes: pytest (tests/: test_api, test_saude, test_seguranca, test_robustez) — 46 testes, todos devem passar
 - IA: Claude Haiku 5.5 (SDK oficial `anthropic`) para as dicas da tela Objetivos (ia.py)
 

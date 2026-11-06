@@ -1,0 +1,19 @@
+# O Render grátis dorme após 15 min sem visitas: esta tarefa visita o site a cada 10 min.
+# É um segundo despertador, junto com o UptimeRobot. O GitHub pode atrasar tarefas agendadas
+# em horários cheios.
+# shortcut: o GitHub desliga tarefas agendadas em repositório público depois de 60 dias sem
+# commits; se o site voltar a dormir, reative em Actions > Manter o site acordado.
+name: Manter o site acordado
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  visitar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Visita a página inicial
+        run: curl -fsS -o /dev/null --retry 3 --retry-delay 20 --max-time 90 -w "%{http_code} em %{time_total}s\n" https://dailyfit-037t.onrender.com/
